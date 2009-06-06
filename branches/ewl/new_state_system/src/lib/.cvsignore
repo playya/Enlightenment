@@ -1,0 +1,8 @@
+.deps
+.libs
+Ewl.h
+Makefile
+Makefile.in
+libewl.la
+*.lo
+*.gcno

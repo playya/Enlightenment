@@ -1,0 +1,7 @@
+Makefile.in
+Makefile
+Ewl.h
+.deps
+.libs
+libewl.la
+*.lo
