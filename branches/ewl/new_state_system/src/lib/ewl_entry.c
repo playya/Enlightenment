@@ -379,7 +379,8 @@ ewl_entry_cb_key_down(Ewl_Widget *w, void *ev, void *data __UNUSED__)
         sel = EWL_TEXT_TRIGGER(EWL_TEXT(w)->selection);
 
         /* reset the cursor blink */
-        ewl_widget_state_remove2(EWL_WIDGET(e->cursor), EWL_STATE_ON);
+        ewl_widget_custom_state_set(EWL_WIDGET(e->cursor), "noblink",
+                                        EWL_TRANSIENT);
 
         if ((!event->keyname) || (!event->keyname[0]))
                 DRETURN(DLEVEL_STABLE);

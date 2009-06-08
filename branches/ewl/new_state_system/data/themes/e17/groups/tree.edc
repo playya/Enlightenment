@@ -272,7 +272,7 @@ group
 			}
 			description
 			{
-				state: "even" 0.0;
+				state: "odd" 0.0;
 				inherit: "default" 0.0;
 				color: 221 221 221 100;
 			}
@@ -333,19 +333,28 @@ group
 	{
 		program
 		{
-			name: "odd";
+			name: "odded";
 			signal: "odd";
-			source: "*";
-			action: STATE_SET "default" 0.0;
+			source: "ewl/*";
+			action: STATE_SET "odd" 0.0;
+			transition: LINEAR 0.0;
+			target: "bg";
+		}
+		program
+		{
+			name: "odd";
+			signal: "odd,on";
+			source: "ewl/*";
+			action: STATE_SET "odd" 0.0;
 			transition: LINEAR 0.0;
 			target: "bg";
 		}
 		program
 		{
 			name: "even";
-			signal: "even";
-			source: "*";
-			action: STATE_SET "even" 0.0;
+			signal: "odd,off";
+			source: "ewl/*";
+			action: STATE_SET "default" 0.0;
 			transition: LINEAR 0.0;
 			target: "bg";
 		}

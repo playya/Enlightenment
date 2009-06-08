@@ -47,7 +47,7 @@ program
 {
 	name: "enable";
 	signal: "enable";
-	source: "ewl/this";
+	source: "ewl/*";
 	action: STATE_SET "default" 0.0;
 	target: "outline";
 }

@@ -161,7 +161,7 @@ group
 		{
 			name: "enable";
 			signal: "enable";
-			source: "ewl/this";
+			source: "ewl/*";
 			action: STATE_SET "default" 0.0;
 			target: "button_image";
 			target: "button_image2";

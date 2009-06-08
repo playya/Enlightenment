@@ -211,7 +211,7 @@ group
 		{
 			name: "no-blink";
 			signal: "noblink";
-			source, "EWL";
+			source, "ewl/this";
 			action: ACTION_STOP;
 			target: "blink-hold-on";
 			target: "blink-hold-off";
