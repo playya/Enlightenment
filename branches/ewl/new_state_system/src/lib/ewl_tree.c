@@ -1022,9 +1022,9 @@ ewl_tree_build_tree_rows(Ewl_Tree *tree, const Ewl_Model *model,
                 if (tree->row_color_alternate)
                 {
                         if (colour)
-                                ewl_widget_state_add2(row, EWL_STATE_ODD);
+                                ewl_widget_state_add(row, EWL_STATE_ODD);
                         else
-                                ewl_widget_state_remove2(row, EWL_STATE_ODD);
+                                ewl_widget_state_remove(row, EWL_STATE_ODD);
                 }
 
                 colour = (colour + 1) % 2;
@@ -1124,7 +1124,7 @@ ewl_tree_cb_row_highlight(Ewl_Widget *w, void *ev __UNUSED__,
         DCHECK_PARAM_PTR(w);
         DCHECK_TYPE(w, EWL_ROW_TYPE);
 
-        ewl_widget_state_add2(w, EWL_STATE_HIGHLIGHTED);
+        ewl_widget_state_add(w, EWL_STATE_HIGHLIGHTED);
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
 }
@@ -1136,7 +1136,7 @@ ewl_tree_cb_row_unhighlight(Ewl_Widget *w, void *ev __UNUSED__, void *data __UNU
         DCHECK_PARAM_PTR(w);
         DCHECK_TYPE(w, EWL_ROW_TYPE);
 
-        ewl_widget_state_remove2(w, EWL_STATE_HIGHLIGHTED);
+        ewl_widget_state_remove(w, EWL_STATE_HIGHLIGHTED);
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
 }

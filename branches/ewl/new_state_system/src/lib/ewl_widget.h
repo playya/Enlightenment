@@ -185,12 +185,12 @@ void             ewl_widget_data_set(Ewl_Widget *w, void *k, void *v);
 void            *ewl_widget_data_del(Ewl_Widget *w, void *k);
 void            *ewl_widget_data_get(Ewl_Widget *w, void *k);
 
-void             ewl_widget_state_add2(Ewl_Widget *w, Ewl_State state);
-void             ewl_widget_state_remove2(Ewl_Widget *w, Ewl_State state);
-unsigned int     ewl_widget_state_has2(Ewl_Widget *w, Ewl_State state);
+void             ewl_widget_state_add(Ewl_Widget *w, Ewl_State state);
+void             ewl_widget_state_remove(Ewl_Widget *w, Ewl_State state);
+unsigned int     ewl_widget_state_has(Ewl_Widget *w, Ewl_State state);
 void             ewl_widget_inherited_state_add(Ewl_Widget *w, Ewl_State state);
 void             ewl_widget_inherited_state_remove(Ewl_Widget *w, Ewl_State state);
-unsigned int     ewl_widget_inherited_state_has2(Ewl_Widget *w, Ewl_State state);
+unsigned int     ewl_widget_inherited_state_has(Ewl_Widget *w, Ewl_State state);
 unsigned int     ewl_widget_applied_state_has(Ewl_Widget *w, Ewl_State state);
 void             ewl_widget_custom_state_set(Ewl_Widget *w, const char *cst,
                                                 Ewl_Durability dur);

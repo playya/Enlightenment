@@ -800,7 +800,7 @@ ewl_widget_appearance_path_get(Ewl_Widget *w)
 }
 
 void
-ewl_widget_state_add2(Ewl_Widget *w, Ewl_State state)
+ewl_widget_state_add(Ewl_Widget *w, Ewl_State state)
 {
         Ewl_Embed *emb;
         Ewl_Event_State_Change ev;
@@ -826,7 +826,7 @@ ewl_widget_state_add2(Ewl_Widget *w, Ewl_State state)
 }
 
 void
-ewl_widget_state_remove2(Ewl_Widget *w, Ewl_State state)
+ewl_widget_state_remove(Ewl_Widget *w, Ewl_State state)
 {
         Ewl_Embed *emb;
         Ewl_Event_State_Change ev;
@@ -852,7 +852,7 @@ ewl_widget_state_remove2(Ewl_Widget *w, Ewl_State state)
 }
 
 unsigned int
-ewl_widget_state_has2(Ewl_Widget *w, Ewl_State state)
+ewl_widget_state_has(Ewl_Widget *w, Ewl_State state)
 {
         DRETURN_INT(!!(w->states & state), DLEVEL_STABLE);
 }
@@ -910,7 +910,7 @@ ewl_widget_inherited_state_remove(Ewl_Widget *w, Ewl_State state)
 }
 
 unsigned int
-ewl_widget_inherited_state_has2(Ewl_Widget *w, Ewl_State state)
+ewl_widget_inherited_state_has(Ewl_Widget *w, Ewl_State state)
 {
         DRETURN_INT(!!(w->inherited_states & state), DLEVEL_STABLE);
 }
@@ -1310,7 +1310,7 @@ ewl_widget_enable(Ewl_Widget *w)
         DCHECK_TYPE(w, EWL_WIDGET_TYPE);
 
         if (DISABLED(w)) {
-                ewl_widget_state_remove2(w, EWL_STATE_DISABLED);
+                ewl_widget_state_remove(w, EWL_STATE_DISABLED);
                 ewl_callback_call(w, EWL_CALLBACK_WIDGET_ENABLE);
         }
 
@@ -1341,10 +1341,10 @@ ewl_widget_disable(Ewl_Widget *w)
                 /* and now remove us self from the info widget list */
                 ewl_embed_info_widgets_cleanup(emb, w);
                 /* finally remove the state flags and set us to disabled*/
-                ewl_widget_state_remove2(w, EWL_STATE_MOUSE_IN);
-                ewl_widget_state_remove2(w, EWL_STATE_MOUSE_DOWN);
-                ewl_widget_state_remove2(w, EWL_STATE_FOCUSED);
-                ewl_widget_state_add2(w, EWL_STATE_DISABLED);
+                ewl_widget_state_remove(w, EWL_STATE_MOUSE_IN);
+                ewl_widget_state_remove(w, EWL_STATE_MOUSE_DOWN);
+                ewl_widget_state_remove(w, EWL_STATE_FOCUSED);
+                ewl_widget_state_add(w, EWL_STATE_DISABLED);
         }
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
@@ -2929,15 +2929,15 @@ ewl_widget_cb_mouse_up(Ewl_Widget *w, void *ev_data,
         if (DISABLED(w))
                 DRETURN(DLEVEL_STABLE);
 
-        if (ewl_widget_state_has2(w, EWL_STATE_DND)) {
-                ewl_widget_state_remove2(w, EWL_STATE_DND);
+        if (ewl_widget_state_has(w, EWL_STATE_DND)) {
+                ewl_widget_state_remove(w, EWL_STATE_DND);
                 ewl_dnd_drag_drop(w);
         }
 
         snprintf(state, sizeof(state), "mouse,up,%i", e->button);
         ewl_widget_custom_state_set(w, state, EWL_TRANSIENT);
 
-        if (ewl_widget_state_has2(w, EWL_STATE_MOUSE_IN)) {
+        if (ewl_widget_state_has(w, EWL_STATE_MOUSE_IN)) {
                 int x, y;
 
                 x = e->base.x - (CURRENT_X(w) - INSET_LEFT(w));
@@ -2981,13 +2981,13 @@ ewl_widget_cb_mouse_move(Ewl_Widget *w, void *ev_data,
         DCHECK_TYPE(w, EWL_WIDGET_TYPE);
 
         /* FIXME this should go into the embed code */
-        if (ewl_widget_state_has2(w, EWL_STATE_MOUSE_DOWN) &&
+        if (ewl_widget_state_has(w, EWL_STATE_MOUSE_DOWN) &&
                         ewl_widget_flags_has(w, EWL_FLAG_PROPERTY_DND_SOURCE,
                                 EWL_FLAGS_PROPERTY_MASK)) {
 
                 embed = ewl_embed_widget_find(w);
-                if (!ewl_widget_state_has2(w, EWL_STATE_DND)) {
-                        ewl_widget_state_add2(w, EWL_STATE_DND);
+                if (!ewl_widget_state_has(w, EWL_STATE_DND)) {
+                        ewl_widget_state_add(w, EWL_STATE_DND);
                         embed->last.drag_widget = w;
                         ewl_dnd_internal_drag_start(w);
                 }

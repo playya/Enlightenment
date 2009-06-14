@@ -415,7 +415,7 @@ ewl_mvc_selected_clear_private(Ewl_MVC *mvc, Ewl_Selection *set)
                         {
                                 if (w != h)
                                 {
-                                        ewl_widget_state_remove2(w,
+                                        ewl_widget_state_remove(w,
                                                         EWL_STATE_SELECTED);
                                 }
                         }
@@ -1174,7 +1174,7 @@ ewl_mvc_selected_range_split(Ewl_MVC *mvc, Ewl_Selection_Range *range,
                         range->start.column + 1) +
                         (column - range->start.column);
         w = ecore_list_index_goto(EWL_SELECTION(range)->highlight, idx);
-        ewl_widget_state_add2(w, EWL_STATE_SELECTED);
+        ewl_widget_state_add(w, EWL_STATE_SELECTED);
 
         /* we have something above, case 1 */
         if (range->start.row < row)
@@ -1295,7 +1295,7 @@ ewl_mvc_highlight_do(Ewl_MVC *mvc __UNUSED__, Ewl_Container *c,
         DCHECK_TYPE(c, EWL_CONTAINER_TYPE);
         DCHECK_TYPE(w, EWL_WIDGET_TYPE);
 
-        ewl_widget_state_add2(w, EWL_STATE_SELECTED);
+        ewl_widget_state_add(w, EWL_STATE_SELECTED);
         ewl_callback_prepend(w, EWL_CALLBACK_DESTROY,
                         ewl_mvc_cb_highlight_destroy, sel);
 
@@ -1533,7 +1533,7 @@ ewl_mvc_selection_free(Ewl_Selection *sel, unsigned int set_state)
                                         ewl_mvc_cb_highlight_destroy);
 
                         if (set_state)
-                                ewl_widget_state_remove2(sel->highlight,
+                                ewl_widget_state_remove(sel->highlight,
                                         EWL_STATE_SELECTED);
                 }
                 else
@@ -1546,7 +1546,7 @@ ewl_mvc_selection_free(Ewl_Selection *sel, unsigned int set_state)
                                                 ewl_mvc_cb_highlight_destroy);
                                 
                                 if (set_state)
-                                        ewl_widget_state_remove2(w, 
+                                        ewl_widget_state_remove(w, 
                                                         EWL_STATE_SELECTED);
                         }
 

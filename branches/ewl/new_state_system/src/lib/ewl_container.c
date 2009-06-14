@@ -1597,7 +1597,7 @@ ewl_container_cb_container_focus_out(Ewl_Widget *w, void *ev_data,
                                 (!DISABLED(w)) && (focus_in != w))
         {
                 /* XXX is this correct? */
-                ewl_widget_state_remove2(w, EWL_STATE_FOCUSED);
+                ewl_widget_state_remove(w, EWL_STATE_FOCUSED);
         }
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);

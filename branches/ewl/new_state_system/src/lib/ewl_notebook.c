@@ -292,7 +292,7 @@ ewl_notebook_visible_page_set(Ewl_Notebook *n, Ewl_Widget *page)
 
                 t = ewl_attach_widget_association_get(n->cur_page);
                 if (t)
-                        ewl_widget_state_remove2(t, EWL_STATE_SELECTED);
+                        ewl_widget_state_remove(t, EWL_STATE_SELECTED);
 
                 /* make sure we set n->cur_page null first or the hide
                  * callback won't let us hide */
@@ -306,7 +306,7 @@ ewl_notebook_visible_page_set(Ewl_Notebook *n, Ewl_Widget *page)
 
         t = ewl_attach_widget_association_get(n->cur_page);
         if (t)
-                ewl_widget_state_add2(t, EWL_STATE_SELECTED);
+                ewl_widget_state_add(t, EWL_STATE_SELECTED);
 
         ewl_callback_call(EWL_WIDGET(n), EWL_CALLBACK_VALUE_CHANGED);
 
@@ -430,7 +430,7 @@ ewl_notebook_page_tab_widget_set(Ewl_Notebook *n, Ewl_Widget *page,
 
         /* if this is the current page set it's tab to selected */
         if (n->cur_page == page)
-                ewl_widget_state_add2(t, EWL_STATE_SELECTED);
+                ewl_widget_state_add(t, EWL_STATE_SELECTED);
 
         ewl_container_child_append(EWL_CONTAINER(t), tab);
 

@@ -1197,7 +1197,7 @@ ewl_paned_grabber_cb_mouse_down(Ewl_Widget *w, void *ev,
         ewl_callback_append(w, EWL_CALLBACK_MOUSE_MOVE,
                                 ewl_paned_grabber_cb_mouse_move,
                                 INT_TO_INTPTR(ds));
-        ewl_widget_state_add2(w, EWL_STATE_SELECTED);
+        ewl_widget_state_add(w, EWL_STATE_SELECTED);
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
 }
@@ -1212,7 +1212,7 @@ ewl_paned_grabber_cb_mouse_up(Ewl_Widget *w, void *ev __UNUSED__,
 
         ewl_callback_del(w, EWL_CALLBACK_MOUSE_MOVE,
                                 ewl_paned_grabber_cb_mouse_move);
-        ewl_widget_state_remove2(w, EWL_STATE_SELECTED);
+        ewl_widget_state_remove(w, EWL_STATE_SELECTED);
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
 }

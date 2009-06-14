@@ -149,9 +149,9 @@ ewl_check_cb_update_check(Ewl_Widget *w, void *ev_data __UNUSED__,
 
         cb = EWL_CHECK(w);
         if (cb->checked)
-                ewl_widget_state_add2(w, EWL_STATE_ON);
+                ewl_widget_state_add(w, EWL_STATE_ON);
         else
-                ewl_widget_state_remove2(w, EWL_STATE_ON);
+                ewl_widget_state_remove(w, EWL_STATE_ON);
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
 }
