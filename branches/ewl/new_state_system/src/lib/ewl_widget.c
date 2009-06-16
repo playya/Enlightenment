@@ -812,8 +812,15 @@ ewl_widget_state_add(Ewl_Widget *w, Ewl_State state)
 
         emb = ewl_embed_widget_find(w);
         if (emb && w->theme_object)
+        {
+                /* we print here only the start, the actual signal name
+                 * must be printed in the engine */
+                if (ewl_config_cache.print_signals)
+                        printf("%p (%s) ", w, w->appearance);
+
                 ewl_engine_theme_element_state_add(emb, w->theme_object, state,
                                                 FALSE);
+        }
 
         ev.custom_state = FALSE;
         ev.normal.state_add = state;
@@ -836,8 +843,15 @@ ewl_widget_state_remove(Ewl_Widget *w, Ewl_State state)
 
         emb = ewl_embed_widget_find(w);
         if (emb && w->theme_object)
+        {
+                /* we print here only the start, the actual signal name
+                 * must be printed in the engine */
+                if (ewl_config_cache.print_signals)
+                        printf("%p (%s) ", w, w->appearance);
+
                 ewl_engine_theme_element_state_remove(emb, w->theme_object,
                                                 state, FALSE);
+        }
 
         ev.custom_state = FALSE;
         ev.normal.state_add = 0;
@@ -866,8 +880,15 @@ ewl_widget_inherited_state_add(Ewl_Widget *w, Ewl_State state)
         emb = ewl_embed_widget_find(w);
 
         if (emb && w->theme_object)
+        {
+                /* we print here only the start, the actual signal name
+                 * must be printed in the engine */
+                if (ewl_config_cache.print_signals)
+                        printf("%p (%s) ", w, w->appearance);
+
                 ewl_engine_theme_element_state_add(emb, w->theme_object, state,
                                                         TRUE);
+        }
 
         ev.custom_state = FALSE;
         ev.normal.state_add = state;
@@ -890,8 +911,15 @@ ewl_widget_inherited_state_remove(Ewl_Widget *w, Ewl_State state)
 
         emb = ewl_embed_widget_find(w);
         if (emb && w->theme_object)
+        {
+                /* we print here only the start, the actual signal name
+                 * must be printed in the engine */
+                if (ewl_config_cache.print_signals)
+                        printf("%p (%s) ", w, w->appearance);
+
                 ewl_engine_theme_element_state_remove(emb, w->theme_object,
                                                 state, FALSE);
+        }
 
         ev.custom_state = FALSE;
         ev.normal.state_add = 0;
@@ -947,8 +975,7 @@ ewl_widget_custom_state_set(Ewl_Widget *w, const char *state, Ewl_Durability fla
 
                 emb = ewl_embed_widget_find(w);
                 if (ewl_config_cache.print_signals)
-                        printf("Emitting: %s to %p (%s)\n", state, w,
-                                                        w->appearance);
+                        printf("%p (%s) ", w, w->appearance);
 
                 ewl_engine_theme_element_custom_state_set(emb, w->theme_object,
                                                                 state);
@@ -2592,6 +2619,9 @@ ewl_widget_cb_reveal(Ewl_Widget *w, void *ev_data __UNUSED__,
          */
         if (w->theme_object)
         {
+                if (ewl_config_cache.print_signals)
+                        printf("%p (%s) apply:\n", w, w->appearance);
+
                 ewl_engine_theme_element_states_apply(emb, w->theme_object,
                                 w->states, FALSE);
                 ewl_engine_theme_element_states_apply(emb, w->theme_object,

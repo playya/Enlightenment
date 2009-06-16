@@ -345,7 +345,9 @@ ee_theme_element_state_add(Evas_Object *obj, Ewl_State state,
         else
                 source = "ewl/this";
 
-        printf("signal: %s source: %s\n", signal, source);
+        if (ewl_config_cache.print_signals)
+                printf("signal: %s source: %s\n", signal, source);
+
         edje_object_signal_emit(obj, signal, source);
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
@@ -397,7 +399,9 @@ ee_theme_element_state_remove(Evas_Object *obj, Ewl_State state,
         else
                 source = "ewl/this";
 
-        printf("signal: %s source: %s\n", signal, source);
+        if (ewl_config_cache.print_signals)
+                printf("signal: %s source: %s\n", signal, source);
+
         edje_object_signal_emit(obj, signal, source);
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
@@ -423,7 +427,9 @@ ee_theme_element_states_apply(Evas_Object *obj, unsigned int states,
         {
                 if (states & (1 << i))
                 {
-                        printf("signal: %s source: %s\n", signal[i], source);
+                        if (ewl_config_cache.print_signals)
+                                printf("\tsignal: %s source: %s\n", signal[i],
+                                                        source);
                         edje_object_signal_emit(obj, signal[i], source);
                 }
         }
@@ -436,8 +442,10 @@ ee_theme_element_custom_state_set(Evas_Object *obj, const char *signal)
 {
         DENTER_FUNCTION(DLEVEL_STABLE);
 
+        if (ewl_config_cache.print_signals)
+                printf("signal: %s source: %s\n", signal, "ewl/this");
+
         edje_object_signal_emit(obj, signal, "ewl/this");
-        printf("signal: %s source: %s\n", signal, "ewl/this");
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
 }
