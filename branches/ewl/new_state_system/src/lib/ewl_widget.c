@@ -808,11 +808,9 @@ ewl_widget_state_add(Ewl_Widget *w, Ewl_State state)
         if (w->states & state)
                 DRETURN(DLEVEL_STABLE);
 
-        if (state < EWL_STATE_MOUSE_MOVE)
-                w->states |= state;
+        w->states |= state;
 
         emb = ewl_embed_widget_find(w);
-
         if (emb && w->theme_object)
                 ewl_engine_theme_element_state_add(emb, w->theme_object, state,
                                                 FALSE);
@@ -834,11 +832,9 @@ ewl_widget_state_remove(Ewl_Widget *w, Ewl_State state)
         if (!(w->states & state))
                 DRETURN(DLEVEL_STABLE);
 
-        if (state < EWL_STATE_MOUSE_MOVE)
-                w->states &= ~state;
+        w->states &= ~state;
 
         emb = ewl_embed_widget_find(w);
-
         if (emb && w->theme_object)
                 ewl_engine_theme_element_state_remove(emb, w->theme_object,
                                                 state, FALSE);
@@ -866,9 +862,7 @@ ewl_widget_inherited_state_add(Ewl_Widget *w, Ewl_State state)
         if (w->inherited_states & state)
                 DRETURN(DLEVEL_STABLE);
 
-        if (state < EWL_STATE_MOUSE_MOVE)
-                w->inherited_states |= state;
-
+        w->inherited_states |= state;
         emb = ewl_embed_widget_find(w);
 
         if (emb && w->theme_object)
@@ -892,11 +886,9 @@ ewl_widget_inherited_state_remove(Ewl_Widget *w, Ewl_State state)
         if (!(w->inherited_states & state))
                 DRETURN(DLEVEL_STABLE);
 
-        if (state < EWL_STATE_MOUSE_MOVE)
-                w->inherited_states &= ~state;
+        w->inherited_states &= ~state;
 
         emb = ewl_embed_widget_find(w);
-
         if (emb && w->theme_object)
                 ewl_engine_theme_element_state_remove(emb, w->theme_object,
                                                 state, FALSE);

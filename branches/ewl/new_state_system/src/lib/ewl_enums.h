@@ -424,9 +424,7 @@ enum Ewl_State
         EWL_STATE_SELECTED = 0x20,
         EWL_STATE_ON = 0x40,
         EWL_STATE_ODD = 0x80,
-        EWL_STATE_DND = 0x100,
-        /* this states do not need to be saved */
-        EWL_STATE_MOUSE_MOVE = 0x1000
+        EWL_STATE_DND = 0x100
 };
 
 /**
