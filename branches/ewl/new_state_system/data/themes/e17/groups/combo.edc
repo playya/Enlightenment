@@ -186,7 +186,7 @@ group
 		{
 			name: "disable";
 			signal: "disable";
-			source: "ewl/*";
+			source: "ewl/both";
 			action: STATE_SET "disabled" 0.0;
 			target: "button_image";
 		}
@@ -195,7 +195,7 @@ group
 		{
 			name: "disabled";
 			signal: "disabled";
-			source: "ewl/*";
+			source: "ewl/both";
 			action: STATE_SET "disabled" 0.0;
 			target: "button_image";
 		}
@@ -204,7 +204,7 @@ group
 		{
 			name: "enable";
 			signal: "enable";
-			source: "ewl/*";
+			source: "ewl/both";
 			action: STATE_SET "default" 0.0;
 			target: "button_image";
 		}
@@ -213,7 +213,7 @@ group
 		{
 			name: "expand";
 			signal: "state,on";
-			source: "ewl/*";
+			source: "ewl/both";
 			action: STATE_SET "expanded" 0.0;
 			target: "arrow";
 		}
@@ -222,7 +222,7 @@ group
 		{
 			name: "collapse";
 			signal: "state,off";
-			source: "ewl/*";
+			source: "ewl/both";
 			action: STATE_SET "default" 0.0;
 			target: "arrow";
 		}
@@ -231,7 +231,7 @@ group
 		{
 			name: "expanded";
 			signal: "on";
-			source: "ewl/*";
+			source: "ewl/both";
 			action: STATE_SET "default" 0.0;
 			target: "arrow";
 		}

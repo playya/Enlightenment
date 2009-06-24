@@ -156,9 +156,9 @@ struct Ewl_Widget
         Ecore_Hash *theme;          /**< Overriding theme settings */
         Ewl_Pair_List theme_text;   /**< Overriding text in theme */
         unsigned int flags;         /**< the widget flags */
-        unsigned int states;        /**< Direct widget states */
-        unsigned int inherited_states;    /**< States that are applied to the
-                                                theme */
+        unsigned short states;        /**< Direct widget states */
+        unsigned short inherited_states;  /**< States that are applied to 
+                                                the theme */
         unsigned char swallowed:1;
 };
 

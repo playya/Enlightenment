@@ -91,7 +91,7 @@ group
 		{
 			name: "disabled";
 			signal: "disabled";
-			source: "*";
+			source: "ewl/both";
 			action: STATE_SET "disabled" 0.0;
 			target: "entry_disabled";
 			target: "entry_focus";
@@ -100,7 +100,7 @@ group
 		{
 			name: "disable";
 			signal: "disable";
-			source: "*";
+			source: "ewl/both";
 			action: STATE_SET "disabled" 0.0;
 			transition: DECELERATE 0.5;
 			target: "entry_disabled";
@@ -110,7 +110,7 @@ group
 		{
 			name: "enable";
 			signal: "enable";
-			source: "*";
+			source: "ewl/both";
 			action: STATE_SET "default" 0.0;
 			transition: ACCELERATE 0.5;
 			target: "entry_disabled";
@@ -119,7 +119,7 @@ group
 		{
 			name: "focused";
 			signal: "focused";
-			source: "*";
+			source: "ewl/this";
 			action: STATE_SET "focus" 0.0;
 			target: "entry_focus";
 		}
@@ -127,7 +127,7 @@ group
 		{
 			name: "focus,in";
 			signal: "focus,in";
-			source: "*";
+			source: "ewl/this";
 			action: STATE_SET "focus" 0.0;
 			transition: DECELERATE 0.2;
 			target: "entry_focus";
@@ -136,7 +136,7 @@ group
 		{
 			name: "focus,out";
 			signal: "focus,out";
-			source: "*";
+			source: "ewl/this";
 			action: STATE_SET "default" 0.0;
 			transition: ACCELERATE 0.5;
 			target: "entry_focus";

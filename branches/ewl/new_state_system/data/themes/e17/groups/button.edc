@@ -393,7 +393,7 @@ group
 		{
 			name: "disabled";
 			signal: "disabled";
-			source: "ewl/*";
+			source: "ewl/both";
 			action: STATE_SET "disabled" 0.0;
 			target: "ewl/label/text";
 		}
@@ -401,7 +401,7 @@ group
 		{
 			name: "disable";
 			signal: "disable";
-			source: "ewl/*";
+			source: "ewl/both";
 			action: STATE_SET "disabled" 0.0;
 			target: "ewl/label/text";
 		}
@@ -409,7 +409,7 @@ group
 		{
 			name: "enable";
 			signal: "enable";
-			source: "ewl/*";
+			source: "ewl/both";
 			action: STATE_SET "default" 0.0;
 			target: "ewl/label/text";
 		}

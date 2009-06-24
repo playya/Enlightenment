@@ -816,10 +816,14 @@ ewl_widget_state_add(Ewl_Widget *w, Ewl_State state)
                 /* we print here only the start, the actual signal name
                  * must be printed in the engine */
                 if (ewl_config_cache.print_signals)
-                        printf("%p (%s) ", w, w->appearance);
+                        printf("%p (%s) add:\n", w, w->appearance);
 
                 ewl_engine_theme_element_state_add(emb, w->theme_object, state,
-                                                FALSE);
+                                                EWL_ENGINE_STATE_SOURCE_THIS);
+                /* if this state isn't inherited, send also both */
+                if (!(state & w->inherited_states))
+                        ewl_engine_theme_element_state_add(emb, w->theme_object,
+                                        state, EWL_ENGINE_STATE_SOURCE_BOTH);
         }
 
         ev.custom_state = FALSE;
@@ -847,10 +851,15 @@ ewl_widget_state_remove(Ewl_Widget *w, Ewl_State state)
                 /* we print here only the start, the actual signal name
                  * must be printed in the engine */
                 if (ewl_config_cache.print_signals)
-                        printf("%p (%s) ", w, w->appearance);
+                        printf("%p (%s) remove:\n", w, w->appearance);
 
                 ewl_engine_theme_element_state_remove(emb, w->theme_object,
-                                                state, FALSE);
+                                        state, EWL_ENGINE_STATE_SOURCE_THIS);
+
+                if (!(state & w->inherited_states))
+                        ewl_engine_theme_element_state_remove(emb,
+                                        w->theme_object, state,
+                                        EWL_ENGINE_STATE_SOURCE_BOTH);
         }
 
         ev.custom_state = FALSE;
@@ -884,10 +893,14 @@ ewl_widget_inherited_state_add(Ewl_Widget *w, Ewl_State state)
                 /* we print here only the start, the actual signal name
                  * must be printed in the engine */
                 if (ewl_config_cache.print_signals)
-                        printf("%p (%s) ", w, w->appearance);
+                        printf("%p (%s) add:", w, w->appearance);
 
                 ewl_engine_theme_element_state_add(emb, w->theme_object, state,
-                                                        TRUE);
+                                                EWL_ENGINE_STATE_SOURCE_PARENT);
+                
+                if (!(state & w->states))
+                        ewl_engine_theme_element_state_add(emb, w->theme_object,
+                                        state, EWL_ENGINE_STATE_SOURCE_BOTH);
         }
 
         ev.custom_state = FALSE;
@@ -915,10 +928,15 @@ ewl_widget_inherited_state_remove(Ewl_Widget *w, Ewl_State state)
                 /* we print here only the start, the actual signal name
                  * must be printed in the engine */
                 if (ewl_config_cache.print_signals)
-                        printf("%p (%s) ", w, w->appearance);
+                        printf("%p (%s) remove:\n", w, w->appearance);
 
                 ewl_engine_theme_element_state_remove(emb, w->theme_object,
-                                                state, FALSE);
+                                                state,
+                                                EWL_ENGINE_STATE_SOURCE_PARENT);
+                if (!(state & w->states))
+                        ewl_engine_theme_element_state_remove(emb,
+                                        w->theme_object, state,
+                                        EWL_ENGINE_STATE_SOURCE_BOTH);
         }
 
         ev.custom_state = FALSE;
@@ -2619,13 +2637,18 @@ ewl_widget_cb_reveal(Ewl_Widget *w, void *ev_data __UNUSED__,
          */
         if (w->theme_object)
         {
-                if (ewl_config_cache.print_signals)
+                if (ewl_config_cache.print_signals && 
+                                (w->states | w->inherited_states))
                         printf("%p (%s) apply:\n", w, w->appearance);
 
                 ewl_engine_theme_element_states_apply(emb, w->theme_object,
-                                w->states, FALSE);
+                                w->states, EWL_ENGINE_STATE_SOURCE_THIS);
                 ewl_engine_theme_element_states_apply(emb, w->theme_object,
-                                w->inherited_states, TRUE);
+                                w->inherited_states,
+                                EWL_ENGINE_STATE_SOURCE_PARENT);
+                ewl_engine_theme_element_states_apply(emb, w->theme_object,
+                                w->states | w->inherited_states,
+                                EWL_ENGINE_STATE_SOURCE_BOTH);
         }
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);

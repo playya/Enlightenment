@@ -169,7 +169,7 @@ group
 		{
 			name: "disbled";
 			signal: "disabled";
-			source: "*";
+			source: "ewl/both";
 			action: STATE_SET "disabled" 0.0;
 			transition: LINEAR 0.0;
 			target: "ewl/label/text";
@@ -178,7 +178,7 @@ group
 		{
 			name: "disble";
 			signal: "disable";
-			source: "*";
+			source: "ewl/both";
 			action: STATE_SET "disabled" 0.0;
 			transition: LINEAR 0.3;
 			target: "ewl/label/text";
@@ -187,7 +187,7 @@ group
 		{
 			name: "enable";
 			signal: "enable";
-			source: "*";
+			source: "ewl/both";
 			action: STATE_SET "default" 0.0;
 			transition: LINEAR 0.3;
 			target: "ewl/label/text";

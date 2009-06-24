@@ -29,7 +29,7 @@ program
 {
 	name: "disabled";
 	signal: "disabled";
-	source: "ewl/*";
+	source: "ewl/both";
 	action: STATE_SET "disabled" 0.0;
 	target: "outline";
 	target: "clip";
@@ -39,7 +39,7 @@ program
 {
 	name: "disable";
 	signal: "disable";
-	source: "ewl/*";
+	source: "ewl/both";
 	action: STATE_SET "disabled" 0.0;
 	target: "outline";
 	target: "clip";
@@ -49,7 +49,7 @@ program
 {
 	name: "enable";
 	signal: "enable";
-	source: "ewl/*";
+	source: "ewl/both";
 	action: STATE_SET "default" 0.0;
 	target: "outline";
 	target: "clip";

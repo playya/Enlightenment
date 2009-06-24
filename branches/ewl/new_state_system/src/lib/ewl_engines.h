@@ -111,10 +111,18 @@ enum Ewl_Engine_Pointer_Hooks
         EWL_ENGINE_POINTER_MAX
 };
 
+enum Ewl_Engine_State_Source
+{
+        EWL_ENGINE_STATE_SOURCE_THIS,
+        EWL_ENGINE_STATE_SOURCE_PARENT,
+        EWL_ENGINE_STATE_SOURCE_BOTH
+};
+
 typedef enum Ewl_Engine_Window_Hooks Ewl_Engine_Window_Hooks;
 typedef enum Ewl_Engine_Theme_Hooks Ewl_Engine_Theme_Hooks;
 typedef enum Ewl_Engine_Canvas_Hooks Ewl_Engine_Canvas_Hooks;
 typedef enum Ewl_Engine_Pointer_Hooks Ewl_Engine_Pointer_Hooks;
+typedef enum Ewl_Engine_State_Source Ewl_Engine_State_Source;
 
 #define EWL_ENGINE(engine) ((Ewl_Engine *)engine)
 
@@ -252,13 +260,13 @@ unsigned int     ewl_engine_theme_element_load_error_get(Ewl_Embed *emb,
                                                 void *obj);
 void             ewl_engine_theme_element_states_apply(Ewl_Embed *emb,
                                                 void *obj, unsigned int states,
-                                                unsigned int inherited);
+                                                Ewl_Engine_State_Source source);
 void             ewl_engine_theme_element_state_add(Ewl_Embed *emb,
                                                 void *obj, Ewl_State state,
-                                                unsigned int inherited);
+                                                Ewl_Engine_State_Source source);
 void             ewl_engine_theme_element_state_remove(Ewl_Embed *emb,
                                                 void *obj, Ewl_State state,
-                                                unsigned int inherited);
+                                                Ewl_Engine_State_Source source);
 void             ewl_engine_theme_element_custom_state_set(Ewl_Embed *emb,
                                                 void *obj, const char *state);
 void             ewl_engine_theme_element_text_set(Ewl_Embed *emb, void *obj,
@@ -377,13 +385,13 @@ typedef unsigned int (*Ewl_Engine_Cb_Theme_Element_File_Set)(void *obj,
 typedef unsigned int (*Ewl_Engine_Cb_Theme_Element_Load_Error_Get)(void *obj);
 typedef void  (*Ewl_Engine_Cb_Theme_Element_State_Add)(void *obj,
                                                 Ewl_State state,
-                                                unsigned int inherited);
+                                                Ewl_Engine_State_Source source);
 typedef void  (*Ewl_Engine_Cb_Theme_Element_State_Remove)(void *obj,
                                                 Ewl_State state,
-                                                unsigned int inherited);
+                                                Ewl_Engine_State_Source source);
 typedef void  (*Ewl_Engine_Cb_Theme_Element_States_Apply)(void *obj,
                                                 unsigned int states,
-                                                unsigned int inherited);
+                                                Ewl_Engine_State_Source source);
 typedef void  (*Ewl_Engine_Cb_Theme_Element_Custom_State_Set)(void *obj,
                                                 const char *state);
 typedef void  (*Ewl_Engine_Cb_Theme_Element_Text_Set)(void *obj,

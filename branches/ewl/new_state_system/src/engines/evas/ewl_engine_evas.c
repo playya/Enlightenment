@@ -301,9 +301,10 @@ ee_theme_element_swallow(Evas_Object *obj1, Evas_Object *obj2)
 
 static void
 ee_theme_element_state_add(Evas_Object *obj, Ewl_State state,
-                unsigned int inherited)
+                Ewl_Engine_State_Source so)
 {
-        const char *source, *signal;
+        const char *signal;
+        const char *source[] = { "ewl/this", "ewl/parent", "ewl/both" };
 
         DENTER_FUNCTION(DLEVEL_STABLE);
 
@@ -340,24 +341,20 @@ ee_theme_element_state_add(Evas_Object *obj, Ewl_State state,
                         break;
         }
 
-        if (inherited)
-                source = "ewl/parent";
-        else
-                source = "ewl/this";
-
         if (ewl_config_cache.print_signals)
-                printf("signal: %s source: %s\n", signal, source);
+                printf("signal: %s source: %s\n", signal, source[so]);
 
-        edje_object_signal_emit(obj, signal, source);
+        edje_object_signal_emit(obj, signal, source[so]);
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
 }
 
 static void
 ee_theme_element_state_remove(Evas_Object *obj, Ewl_State state,
-                unsigned int inherited)
+                Ewl_Engine_State_Source so)
 {
-        const char *source, *signal;
+        const char *signal;
+        const char *source[] = { "ewl/this", "ewl/parent", "ewl/both" };
 
         DENTER_FUNCTION(DLEVEL_STABLE);
 
@@ -394,34 +391,24 @@ ee_theme_element_state_remove(Evas_Object *obj, Ewl_State state,
                         break;
         }
 
-        if (inherited)
-                source = "ewl/parent";
-        else
-                source = "ewl/this";
-
         if (ewl_config_cache.print_signals)
-                printf("signal: %s source: %s\n", signal, source);
+                printf("signal: %s source: %s\n", signal, source[so]);
 
-        edje_object_signal_emit(obj, signal, source);
+        edje_object_signal_emit(obj, signal, source[so]);
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
 }
 
 static void
 ee_theme_element_states_apply(Evas_Object *obj, unsigned int states,
-                unsigned int inherited)
+                Ewl_Engine_State_Source so)
 {
-        const char *source;
+        const char *source[] = { "ewl/this", "ewl/parent", "ewl/both" };
         const char *signal[] = { "moused", "pressed", "focused", "disabled",
                 "highlighted", "selected", "on", "odd", "dnd" };
         unsigned int i;
 
         DENTER_FUNCTION(DLEVEL_STABLE);
-
-        if (inherited)
-                source = "ewl/parent";
-        else
-                source = "ewl/this";
 
         for (i = 0; i < ARRAY_COUNT(signal); i++)
         {
@@ -429,8 +416,8 @@ ee_theme_element_states_apply(Evas_Object *obj, unsigned int states,
                 {
                         if (ewl_config_cache.print_signals)
                                 printf("\tsignal: %s source: %s\n", signal[i],
-                                                        source);
-                        edje_object_signal_emit(obj, signal[i], source);
+                                                        source[so]);
+                        edje_object_signal_emit(obj, signal[i], source[so]);
                 }
         }
 

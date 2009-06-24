@@ -1517,7 +1517,7 @@ ewl_engine_theme_element_load_error_get(Ewl_Embed *embed, void *obj)
  */
 void
 ewl_engine_theme_element_state_add(Ewl_Embed *embed, void *obj, Ewl_State state,
-                unsigned int inherited)
+                Ewl_Engine_State_Source source)
 {
         Ewl_Engine_Cb_Theme_Element_State_Add state_add;
 
@@ -1529,7 +1529,7 @@ ewl_engine_theme_element_state_add(Ewl_Embed *embed, void *obj, Ewl_State state,
                                         EWL_ENGINE_HOOK_TYPE_THEME,
                                         EWL_ENGINE_THEME_ELEMENT_STATE_ADD);
         if (state_add)
-                state_add(obj, state, inherited);
+                state_add(obj, state, source);
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
 }
@@ -1539,7 +1539,8 @@ ewl_engine_theme_element_state_add(Ewl_Embed *embed, void *obj, Ewl_State state,
  */
 void
 ewl_engine_theme_element_state_remove(Ewl_Embed *embed, void *obj,
-                                        Ewl_State state, unsigned int inherited)
+                                        Ewl_State state,
+                                        Ewl_Engine_State_Source source)
 {
         Ewl_Engine_Cb_Theme_Element_State_Remove state_remove;
 
@@ -1551,7 +1552,7 @@ ewl_engine_theme_element_state_remove(Ewl_Embed *embed, void *obj,
                                         EWL_ENGINE_HOOK_TYPE_THEME,
                                         EWL_ENGINE_THEME_ELEMENT_STATE_REMOVE);
         if (state_remove)
-                state_remove(obj, state, inherited);
+                state_remove(obj, state, source);
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
 }
@@ -1562,7 +1563,7 @@ ewl_engine_theme_element_state_remove(Ewl_Embed *embed, void *obj,
 void
 ewl_engine_theme_element_states_apply(Ewl_Embed *embed, void *obj,
                                         unsigned int states,
-                                        unsigned int inherited)
+                                        unsigned int source)
 {
         Ewl_Engine_Cb_Theme_Element_States_Apply states_apply;
 
@@ -1574,7 +1575,7 @@ ewl_engine_theme_element_states_apply(Ewl_Embed *embed, void *obj,
                                         EWL_ENGINE_HOOK_TYPE_THEME,
                                         EWL_ENGINE_THEME_ELEMENT_STATES_APPLY);
         if (states_apply)
-                states_apply(obj, states, inherited);
+                states_apply(obj, states, source);
 
         DLEAVE_FUNCTION(DLEVEL_STABLE);
 }
