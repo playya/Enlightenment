@@ -419,14 +419,6 @@ group
 			description
 			{
 				state: "default" 0.0;
-				rel1 
-				{
-					offset: -4 -4;
-				}
-				rel2
-				{
-					offset: 3 3;
-				}
 				color: 245 205 109 0;
 			}
 			description
@@ -445,7 +437,6 @@ group
 			signal: "selected";
 			source: "ewl/this";
 			action: STATE_SET "selected" 0.0;
-			transition: DECELERATE 0.5;
 			target: "selected";
 		}
 		program
@@ -454,6 +445,7 @@ group
 			signal: "selection,on";
 			source: "ewl/this";
 			action: STATE_SET "selected" 0.0;
+			transition: DECELERATE 0.5;
 			target: "selected";
 		}
 		program

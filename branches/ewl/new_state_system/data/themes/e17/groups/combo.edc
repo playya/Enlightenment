@@ -253,14 +253,6 @@ group
 			{
 				state: "default" 0.0;
 				visible: 0;
-				rel1 
-				{
-					offset: -4 -4;
-				}
-				rel2
-				{
-					offset: 3 3;
-				}
 				color: 245 205 109 102;
 			}
 			description
@@ -312,14 +304,6 @@ group
 			{
 				state: "default" 0.0;
 				visible: 0;
-				rel1 
-				{
-					offset: -4 -4;
-				}
-				rel2
-				{
-					offset: 3 3;
-				}
 				color: 245 205 109 102;
 			}
 			description
