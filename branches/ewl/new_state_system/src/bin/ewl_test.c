@@ -519,6 +519,7 @@ ewl_test_setup_tests(void)
 {
         Eina_List *list = NULL;
         char *name = NULL;
+        char buf[PATH_MAX];
 
         if (tests) return 1;
 
@@ -527,8 +528,10 @@ ewl_test_setup_tests(void)
 
         ecore_list_free_cb_set(tests, ECORE_FREE_CB(ewl_test_free));
 
+        snprintf(buf, sizeof(buf), "%s/tests",
+                        ewl_system_directory_get(EWL_DIRECTORY_LIB));
         tests_path_group = ecore_path_group_new();
-        ecore_path_group_add(tests_path_group, PACKAGE_LIB_DIR "/ewl/tests");
+        ecore_path_group_add(tests_path_group, buf);
         list = ecore_plugin_available_get(tests_path_group);
         /* no tests found ... */
         if (!list) return 0;
@@ -803,8 +806,9 @@ fill_source_text(Ewl_Test *test)
         char *txt;
         char filename[PATH_MAX];
 
-        snprintf(filename, sizeof(filename), 
-                        PACKAGE_DATA_DIR "/ewl/examples/%s", test->filename);
+        snprintf(filename, sizeof(filename), "%s/examples/%s",
+                        ewl_system_directory_get(EWL_DIRECTORY_DATA),
+                        test->filename);
 
         txt = read_file(filename);
         text_parse(txt);
@@ -821,8 +825,8 @@ fill_tutorial_text(Ewl_Test *test)
         p = strrchr(file, '_');
         if ((p != NULL) && (*p != '\0')) *p = '\0';
         
-        snprintf(filename, sizeof(filename),
-                        PACKAGE_DATA_DIR "/ewl/tutorials/%s.dox", file);
+        snprintf(filename, sizeof(filename), "%s/tutorials/%s.dox",
+                        ewl_system_directory_get(EWL_DIRECTORY_DATA), file);
         free(file);
 
         txt = read_file(filename);

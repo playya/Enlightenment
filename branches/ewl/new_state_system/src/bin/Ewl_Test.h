@@ -3,6 +3,9 @@
 #define EWL_TEST_H
 
 #include "ewl_base.h"
+#include <stdio.h>
+#include <limits.h>
+#include <string.h>
 
 /**
  * @enum Ewl_Test_Type
@@ -55,6 +58,30 @@ struct Ewl_Test
         int (*func)(Ewl_Container *con);/**< The test function */
         Ewl_Unit_Test *unit_tests;      /**< The test unit tests */
 };
+
+#if __cplusplus
+extern"C" {
+#endif
+
+static inline const char *
+ewl_test_image_get(const char *name)
+{
+        static char buffer[PATH_MAX];
+
+        snprintf(buffer, sizeof(buffer), "%s/images/%s", 
+                        ewl_system_directory_get(EWL_DIRECTORY_DATA), name);
+        return buffer;
+}
+
+static inline char *
+ewl_test_image_copy_get(const char *name)
+{
+        return strdup(ewl_test_image_get(name));
+}
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

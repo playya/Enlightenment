@@ -65,6 +65,7 @@ AM_CONDITIONAL(EWL_ENABLE_EVAS, test "x$have_evas" = "xyes")
 
 PKG_CHECK_MODULES([ECORE], [ecore ecore-txt ecore-file])
 PKG_CHECK_MODULES([ECORE_EVAS], [ecore-evas])
+PKG_CHECK_MODULES([ECORE_INPUT], [ecore-input])
 PKG_CHECK_MODULES([EDJE], [edje >= 0.5.0])
 
 requirements="evas ecore edje"
@@ -131,14 +132,9 @@ AC_CHECK_FUNCS([dup2 memmove memset nl_langinfo setenv setlocale sqrt strcasecmp
 fnmatch_libs=""
 AC_CHECK_FUNCS(fnmatch, res=yes, res=no)
 if test "x$res" = "xno"; then
-	AC_CHECK_LIB(fnmatch, fnmatch, res=yes fnmatch_libs="-lfnmatch", res=no)
-dnl Test for compilation with MinGW.
-dnl fnmatch function is in the libiberty library
+	AC_SEARCH_LIBS(fnmatch, fnmatch evil iberty, res=yes, res=no)
 	if test "x$res" = "xno"; then
-		AC_CHECK_LIB(iberty, fnmatch, res=yes fnmatch_libs="-liberty", res=no)
-	fi
-	if test "x$res" = "xno"; then
-		AC_MSG_ERROR([Cannot find fnmatch() in neither libc nor libfnmatch, nor libiberty])
+		AC_MSG_ERROR([Cannot find fnmatch() in neither libc nor libfnmatch, nor libevil, nor libiberty])
 	fi
 fi
 
@@ -208,10 +204,11 @@ EWL_CHECK_ENGINE([software_xcb], [software XCB], [0.9.9], [$have_ecore_xcb])
 AM_CONDITIONAL(EWL_ENABLE_XCB, test "x$have_software_xcb" = "xyes" -a "x$have_ecore_xcb" = "xyes")
 
 dnl Win32 engines
+EWL_CHECK_ENGINE([software_gdi], [software GDI], [0.9.9], [$have_ecore_win32])
 EWL_CHECK_ENGINE([software_ddraw], [software DirectDraw], [0.9.9], [$have_ecore_win32])
 EWL_CHECK_ENGINE([opengl_glew], [opengl Glew], [0.9.9], [$have_ecore_win32])
 
-AM_CONDITIONAL(EWL_ENABLE_WIN32, test "x$have_ecore_win32" = "xyes" -a "x$have_opengl_glew" = "xyes" -o "x$have_software_ddraw" = "xyes")
+AM_CONDITIONAL(EWL_ENABLE_WIN32, test "x$have_ecore_win32" = "xyes" -a "x$have_opengl_glew" = "xyes" -o "x$have_software_gdi" = "xyes" -o "x$have_software_ddraw" = "xyes")
 
 # SDL engine
 EWL_CHECK_ENGINE([software_sdl], [software SDL], [0.9.9], [$have_ecore_sdl])
@@ -221,8 +218,8 @@ EWL_CHECK_ENGINE([fb], [framebuffer], [0.9.9], [$have_ecore_framebuffer])
 
 # Set default engine
 case "$host_os" in
-     mingw|mingw32)
-        ewl_evas_engine_default="evas_gl_glew"
+     mingw*)
+        ewl_evas_engine_default="evas_software_gdi"
         ;;
      *)
         ewl_evas_engine_default="evas_software_x11"
@@ -407,6 +404,7 @@ src/engines/evas_gl_x11/Makefile
 src/engines/evas_fb/Makefile
 src/engines/evas_buffer/Makefile
 src/engines/win32/Makefile
+src/engines/evas_software_gdi/Makefile
 src/engines/evas_gl_glew/Makefile
 src/engines/evas_software_ddraw/Makefile
 data/Makefile
@@ -441,6 +439,7 @@ echo "  Software X11.............................: ${have_software_x11}"
 echo "  XRender X11..............................: ${have_xrender_x11}"
 echo "  OpenGL X11...............................: ${have_opengl_x11}"
 echo "  Software XCB.............................: ${have_software_xcb}"
+echo "  Software GDI.............................: ${have_software_gdi}"
 echo "  Software DirectDraw......................: ${have_software_ddraw}"
 echo "  OpenGL Glew..............................: ${have_opengl_glew}"
 echo "  SDL......................................: ${have_software_sdl}"

@@ -27,6 +27,11 @@ extern Ecore_List *ewl_embed_list;
 extern Ecore_List *ewl_window_list;
 
 /*
+ * List of the system directories
+ */
+static const char **ewl_system_dirs = NULL;
+
+/*
  * Configuration and option related flags.
  */
 static Ecore_Idle_Enterer *idle_enterer = NULL;
@@ -85,6 +90,9 @@ static void ewl_configure_queue_run(void);
 static void ewl_realize_queue(void);
 static int ewl_garbage_collect_idler(void *data);
 static void ewl_configure_cancel_request(Ewl_Widget *w);
+
+static int ewl_system_directories_init(void);
+static void ewl_system_directories_shutdown(void);
 
 /**
  * @return Returns no value.
@@ -187,40 +195,35 @@ ewl_init(int *argc, char **argv)
                 setlocale(LC_COLLATE, "");
         }
 
-#ifdef ENABLE_NLS
-        bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
-        bind_textdomain_codeset(PACKAGE, "UTF-8");
-#endif
-
         shutdown_queue = ecore_list_new();
         if (!shutdown_queue) {
                 fprintf(stderr, "Could not create Ewl shutdown queue.\n");
-                goto ERROR;
+                goto FAILED;
         }
 
         if (!ecore_init()) {
                 fprintf(stderr, "Could not initialize Ecore.\n");
-                goto ERROR;
+                goto FAILED;
         }
         ecore_list_prepend(shutdown_queue, ecore_shutdown);
 
 #ifdef BUILD_EFREET_SUPPORT
         if (!efreet_init()) {
                 fprintf(stderr, "Could not initialize Efreet.\n");
-                goto ERROR;
+                goto FAILED;
         }
         ecore_list_prepend(shutdown_queue, efreet_shutdown);
 
         if (!efreet_mime_init()) {
                 fprintf(stderr, "Could not initialize Efreet_Mime.\n");
-                goto ERROR;
+                goto FAILED;
         }
         ecore_list_prepend(shutdown_queue, efreet_mime_shutdown);
 #endif
 
         if (!ecore_string_init()) {
                 fprintf(stderr, "Could not initialize Ecore Strings.\n");
-                goto ERROR;
+                goto FAILED;
         }
         ecore_list_prepend(shutdown_queue, ecore_string_shutdown);
 
@@ -244,7 +247,7 @@ ewl_init(int *argc, char **argv)
                         || (!ewl_window_list) || (!shutdown_hooks)) {
                 fprintf(stderr, "Unable to initialize internal configuration."
                                 " Out of memory?\n");
-                goto ERROR;
+                goto FAILED;
         }
 
         /*
@@ -253,15 +256,30 @@ ewl_init(int *argc, char **argv)
         ecore_list_free_cb_set(configure_active, free);
         ecore_list_free_cb_set(configure_available, free);
 
+        if (!ewl_system_directories_init())
+        {
+                fprintf(stderr, "Could not initialize the system"
+                               " directories.\n");
+                goto FAILED;
+        }
+        ecore_list_prepend(shutdown_queue, ewl_system_directories_shutdown);
+
+        /* now that the directories are init we can also set the text domain */
+#ifdef ENABLE_NLS
+        bindtextdomain(PACKAGE, ewl_system_directory_get(EWL_DIRECTORY_LOCALE));
+        bind_textdomain_codeset(PACKAGE, "UTF-8");
+#endif
+
+
         if (!ewl_config_init()) {
                 fprintf(stderr, "Could not initialize Ewl Config.\n");
-                goto ERROR;
+                goto FAILED;
         }
         ecore_list_prepend(shutdown_queue, ewl_config_shutdown);
 
         if (!ewl_engines_init()) {
                 fprintf(stderr, "Could not intialize Ewl Engines.\n");
-                goto ERROR;
+                goto FAILED;
         }
         ecore_list_prepend(shutdown_queue, ewl_engines_shutdown);
 
@@ -276,12 +294,12 @@ ewl_init(int *argc, char **argv)
         if (!ewl_engine_new(ewl_config_string_get(ewl_config,
                                         EWL_CONFIG_ENGINE_NAME), argc, argv)) {
                 fprintf(stderr, "Could not initialize Ewl Engine.\n");
-                goto ERROR;
+                goto FAILED;
         }
 
         if (!ewl_callbacks_init()) {
                 fprintf(stderr, "Could not initialize Ewl Callback system.\n");
-                goto ERROR;
+                goto FAILED;
         }
         ecore_list_prepend(shutdown_queue, ewl_callbacks_shutdown);
 
@@ -294,42 +312,42 @@ ewl_init(int *argc, char **argv)
 
         if (!ewl_theme_init()) {
                 fprintf(stderr, "Could not setup Ewl Theme system.\n");
-                goto ERROR;
+                goto FAILED;
         }
         ecore_list_prepend(shutdown_queue, ewl_theme_shutdown);
 
         if (!ewl_icon_theme_init()) {
                 fprintf(stderr, "Could not initialize Ewl Icon Theme system.\n");
-                goto ERROR;
+                goto FAILED;
         }
         ecore_list_prepend(shutdown_queue, ewl_icon_theme_shutdown);
 
         if (!ewl_dnd_init()) {
                 fprintf(stderr, "Could not initialize Ewl DND support.\n");
-                goto ERROR;
+                goto FAILED;
         }
         ecore_list_prepend(shutdown_queue, ewl_dnd_shutdown);
 
         if (!ewl_io_manager_init()) {
                 fprintf(stderr, "Could not initialize Ewl IO Manager.\n");
-                goto ERROR;
+                goto FAILED;
         }
         ecore_list_prepend(shutdown_queue, ewl_io_manager_shutdown);
 
         if (!ewl_text_context_init()) {
                 fprintf(stderr, "Could not initialize Ewl Text Context system.\n");
-                goto ERROR;
+                goto FAILED;
         }
         ecore_list_prepend(shutdown_queue, ewl_text_context_shutdown);
 
         if (!(idle_enterer = ecore_idle_enterer_add(ewl_idle_render, NULL))) {
                 fprintf(stderr, "Could not create Idle Enterer.\n");
-                goto ERROR;
+                goto FAILED;
         }
 
         DRETURN_INT(ewl_init_count, DLEVEL_STABLE);
 
-ERROR:
+FAILED:
         ewl_shutdown();
 
         DRETURN_INT(ewl_init_count, DLEVEL_STABLE);
@@ -1274,4 +1292,101 @@ ewl_shutdown_add(Ewl_Shutdown_Hook hook)
         DLEAVE_FUNCTION(DLEVEL_STABLE);
 }
 
+/*
+ * function to init the system dirs array
+ */
+static int
+ewl_system_directories_init(void)
+{
+        const char *var[] = {
+                "EWL_SYSDATA_DIR",
+                "EWL_SYSLIB_DIR",
+                "EWL_SYSCONF_DIR",
+                "EWL_SYSLOCALE_DIR",
+                "EWL_SYSTHEME_DIR"
+        };
+        const char *pkg[] = {
+                PACKAGE_DATA_DIR"/ewl",
+                PACKAGE_LIB_DIR"/ewl",
+                PACKAGE_SYSCONF_DIR"/ewl",
+                PACKAGE_LOCALE_DIR,
+                PACKAGE_DATA_DIR"/ewl/themes"
+        };
+        const char *suffix[] = {
+                "/share/ewl",
+                "/lib/ewl",
+                "/etc/ewl",
+                "/share/locale"
+                "/share/ewl/themes"
+        };
+        int i;
+
+        DSTATIC_ASSERT(EWL_DIRECTORY_MAX == ARRAY_COUNT(var));
+        DSTATIC_ASSERT(EWL_DIRECTORY_MAX == ARRAY_COUNT(pkg));
+
+        DENTER_FUNCTION(DLEVEL_STABLE);
+
+        ewl_system_dirs = NEW(const char *, EWL_DIRECTORY_MAX);
+        if (!ewl_system_dirs)
+                DRETURN_INT(FALSE, DLEVEL_STABLE);
+
+        for (i = 0; i < EWL_DIRECTORY_MAX; i++)
+        {
+                const char *v;
+
+                if ((v = getenv(var[i])) && ecore_file_is_dir(v))
+                       ewl_system_dirs[i] = ecore_string_instance(v);
+                else if ((v = getenv("EWL_PREFIX_DIR")))
+                {
+                        char buffer[PATH_MAX];
+
+                        snprintf(buffer, sizeof(buffer), "%s/%s", v, suffix[i]);
+                        if (ecore_file_is_dir(buffer))
+                                ewl_system_dirs[i] = 
+                                        ecore_string_instance(buffer);
+                }
+
+                /* if no var was set, take the default */
+                if (!ewl_system_dirs[i] && ecore_file_is_dir(pkg[i]))
+                        ewl_system_dirs[i] = ecore_string_instance(pkg[i]);
+        }
+
+        DRETURN_INT(TRUE, DLEVEL_STABLE);
+}
+
+/*
+ * free the system dirs array
+ */
+static void
+ewl_system_directories_shutdown(void)
+{
+        DENTER_FUNCTION(DLEVEL_STABLE);
+
+        if (ewl_system_dirs)
+        {
+                unsigned int i;
+                for (i = 0; i < EWL_DIRECTORY_MAX; i++)
+                        IF_RELEASE(ewl_system_dirs[i]);
+                FREE(ewl_system_dirs);
+        }
+
+        DLEAVE_FUNCTION(DLEVEL_STABLE);
+}
+
+/**
+ * @param t: The type of the directory to get
+ * @return Returns a string to the wanted directory
+ * @brief Find the directory to use
+ *
+ * If no directory is found it will return an empty string.
+ */
+const char *
+ewl_system_directory_get(Ewl_Directory_Type t)
+{
+        DENTER_FUNCTION(DLEVEL_STABLE);
+
+        if (!ewl_system_dirs || !ewl_system_dirs[t])
+                DRETURN_PTR("", DLEVEL_STABLE);
+        DRETURN_PTR(ewl_system_dirs[t], DLEVEL_STABLE);
+}
 

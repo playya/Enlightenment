@@ -8,7 +8,7 @@ else
 EWLTESTPROGRAMS                 =
 endif
 
-AM_CPPFLAGS			=	-I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib -DPACKAGE_DATA_DIR=\"$(datadir)\" -DPACKAGE_LIB_DIR=\"$(libdir)\" @EMOTION_CFLAGS@ @EPSILON_CFLAGS@ @EDJE_CFLAGS@ @ECORE_EVAS_CFLAGS@ @ECORE_CFLAGS@ @EVAS_CFLAGS@
+AM_CPPFLAGS			=	-I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib @EMOTION_CFLAGS@ @EPSILON_CFLAGS@ @EDJE_CFLAGS@ @ECORE_EVAS_CFLAGS@ @ECORE_CFLAGS@ @EVAS_CFLAGS@
 
 bin_PROGRAMS			=	$(EWLTESTPROGRAMS)
 

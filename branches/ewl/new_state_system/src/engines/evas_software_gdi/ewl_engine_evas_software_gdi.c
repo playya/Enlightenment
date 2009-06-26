@@ -1,5 +1,5 @@
 /* vim: set sw=8 ts=8 sts=8 expandtab: */
-#include "Ewl_Engine_Evas_Software_DDraw.h"
+#include "Ewl_Engine_Evas_Software_Gdi.h"
 #include "ewl_private.h"
 #include "ewl_debug.h"
 #include "ewl_macros.h"
@@ -33,11 +33,11 @@ ewl_engine_dependancies(void)
 Ewl_Engine *
 ewl_engine_create(int *argc __UNUSED__, char ** argv __UNUSED__)
 {
-        Ewl_Engine_Evas_Software_DDraw *engine;
+        Ewl_Engine_Evas_Software_Gdi *engine;
 
         DENTER_FUNCTION(DLEVEL_STABLE);
 
-        engine = NEW(Ewl_Engine_Evas_Software_DDraw, 1);
+        engine = NEW(Ewl_Engine_Evas_Software_Gdi, 1);
         if (!engine)
                 DRETURN_PTR(NULL, DLEVEL_STABLE);
 
@@ -84,7 +84,7 @@ ee_canvas_setup(Ewl_Window *win, int debug)
         Evas *evas;
         Ewl_Object *o;
         Evas_Engine_Info *info = NULL;
-        Evas_Engine_Info_Software_DDraw *sinfo;
+        Evas_Engine_Info_Software_Gdi *sinfo;
 
         DENTER_FUNCTION(DLEVEL_STABLE);
         DCHECK_PARAM_PTR(win);
@@ -94,17 +94,17 @@ ee_canvas_setup(Ewl_Window *win, int debug)
 
         evas = evas_new();
         evas_output_method_set(evas,
-                        evas_render_method_lookup("software_ddraw"));
+                        evas_render_method_lookup("software_gdi"));
 
         info = evas_engine_info_get(evas);
         if (!info)
         {
-                fprintf(stderr, "Unable to use software_ddraw engine "
+                fprintf(stderr, "Unable to use software_gdi engine "
                                 "for rendering, ");
                 exit(-1);
         }
 
-        sinfo = (Evas_Engine_Info_Software_DDraw *)info;
+        sinfo = (Evas_Engine_Info_Software_Gdi *)info;
 
         sinfo->info.window = ecore_win32_window_hwnd_get((Ecore_Win32_Window *)win->window);
         sinfo->info.depth = ecore_win32_screen_depth_get();
