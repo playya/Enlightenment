@@ -67,8 +67,8 @@ static void *theme_funcs[] =
                  *  the theme object correctly after it was obscured, in some
                  *  cases. If these problems are solved, please activate them
                  *  again. For more information see bug #3, #116 and #456*/
-                NULL, //edje_freeze,
-                NULL, //edje_thaw,
+                edje_freeze,
+                edje_thaw,
                 ee_theme_layer_stack_add,
                 ee_theme_layer_stack_del,
                 ee_theme_layer_update,
@@ -313,6 +313,9 @@ ee_theme_element_state_add(Evas_Object *obj, Ewl_State state,
                 case EWL_STATE_MOUSE_IN:
                         signal = "mouse,in";
                         break;
+                case EWL_STATE_MOUSE_DOWN:
+                        signal = "mouse,down";
+                        break;
                 case EWL_STATE_FOCUSED:
                         signal = "focus,in";
                         break;
@@ -334,15 +337,13 @@ ee_theme_element_state_add(Evas_Object *obj, Ewl_State state,
                 case EWL_STATE_DND:
                         signal = "dnd,in";
                         break;
-
-                case EWL_STATE_MOUSE_DOWN:
                 default:
                         DRETURN(DLEVEL_STABLE);
                         break;
         }
 
         if (ewl_config_cache.print_signals)
-                printf("signal: %s source: %s\n", signal, source[so]);
+                printf("\tsignal: %s source: %s\n", signal, source[so]);
 
         edje_object_signal_emit(obj, signal, source[so]);
 
@@ -362,6 +363,9 @@ ee_theme_element_state_remove(Evas_Object *obj, Ewl_State state,
         {
                 case EWL_STATE_MOUSE_IN:
                         signal = "mouse,out";
+                        break;
+                case EWL_STATE_MOUSE_DOWN:
+                        signal = "mouse,up";
                         break;
                 case EWL_STATE_FOCUSED:
                         signal = "focus,out";
@@ -384,15 +388,13 @@ ee_theme_element_state_remove(Evas_Object *obj, Ewl_State state,
                 case EWL_STATE_DND:
                         signal = "dnd,out";
                         break;
-
-                case EWL_STATE_MOUSE_DOWN:
                 default:
                         DRETURN(DLEVEL_STABLE);
                         break;
         }
 
         if (ewl_config_cache.print_signals)
-                printf("signal: %s source: %s\n", signal, source[so]);
+                printf("\tsignal: %s source: %s\n", signal, source[so]);
 
         edje_object_signal_emit(obj, signal, source[so]);
 
@@ -404,7 +406,7 @@ ee_theme_element_states_apply(Evas_Object *obj, unsigned int states,
                 Ewl_Engine_State_Source so)
 {
         const char *source[] = { "ewl/this", "ewl/parent", "ewl/both" };
-        const char *signal[] = { "moused", "pressed", "focused", "disabled",
+        const char *signal[] = { "hovered", "pressed", "focused", "disabled",
                 "highlighted", "selected", "on", "odd", "dnd" };
         unsigned int i;
 

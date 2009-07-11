@@ -893,7 +893,7 @@ ewl_widget_inherited_state_add(Ewl_Widget *w, Ewl_State state)
                 /* we print here only the start, the actual signal name
                  * must be printed in the engine */
                 if (ewl_config_cache.print_signals)
-                        printf("%p (%s) add:", w, w->appearance);
+                        printf("%p (%s) add:\n", w, w->appearance);
 
                 ewl_engine_theme_element_state_add(emb, w->theme_object, state,
                                                 EWL_ENGINE_STATE_SOURCE_PARENT);
