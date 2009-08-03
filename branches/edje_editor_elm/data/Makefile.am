@@ -72,7 +72,7 @@ icondir = $(datadir)/icons
 icon_DATA = edje_editor.png
 
 
-edje_editor.edj: edje_editor.edc Makefile
+edje_editor.edj: edje_editor.edc elemele.edc Makefile
 	$(EDJE_CC) $(EDJE_FLAGS) \
 	$(top_srcdir)/data/edje_editor.edc \
 	$(top_builddir)/data/edje_editor.edj

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2006-2008 Davide Andreoli (see AUTHORS)
+/*  Copyright (C) 2006-2009 Davide Andreoli (see AUTHORS)
  *
  *  This file is part of Edje_editor.
  *  Edje_editor is free software: you can redistribute it and/or modify
@@ -15,47 +15,84 @@
  *  along with Edje_editor.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _EDJE_EDITOR_INTERFACE_H_
-#define _EDJE_EDITOR_INTERFACE_H_
+#ifndef _EDJE_EDITOR_WINDOW_H_
+#define _EDJE_EDITOR_WINDOW_H_
+
+//~ /* etk_embed objects */
+//~ Etk_Widget *UI_PartsTreeEmbed;
+//~ Etk_Widget *UI_GroupEmbed;
+//~ Etk_Widget *UI_PartEmbed;
+//~ Etk_Widget *UI_DescriptionEmbed;
+//~ Etk_Widget *UI_RectEmbed;
+//~ Etk_Widget *UI_TextEmbed;
+//~ Etk_Widget *UI_PositionEmbed;
+//~ Etk_Widget *UI_ProgramEmbed;
+//~ Etk_Widget *UI_ScriptEmbed;
+//~ Etk_Widget *UI_ImageEmbed;
+//~ Etk_Widget *UI_GradientEmbed;
+//~ Etk_Widget *UI_FillEmbed;
+//~ Etk_Widget *UI_ToolbarEmbed;
+
+/*** Public */
+void window_main_create(void);
+void window_update_frames_visibility(void);
+//~ Etk_Widget* window_color_button_create (char* label_text, int color_button_enum,int w,int h, Evas *evas);
+//~ void        window_embed_position_set  (void *position_data, int *x, int *y);
 
 
-/* main windows objects */
-Evas        *UI_evas;
-Ecore_Evas  *UI_ecore_MainWin;
-Evas_Object *edje_ui;
+/*** Private */
+void _window_delete_cb(void *data, Evas_Object *obj, void *event_info);
+void _window_logo_key_press(void *data, Evas *e, Evas_Object *obj, void *event_info);
+//~ void     _window_resize_cb           (Ecore_Evas *ecore_evas);
+//~ 
+//~ void     _window_edit_obj_signal_cb  (void *data, Evas_Object *o, const char *sig, const char *src);
+//~ void     _window_edit_obj_click      (void *data, Evas *e, Evas_Object *obj, void *event_info);
+//~ 
+//~ Etk_Bool _window_all_button_click_cb (Etk_Button *button, void *data);
+//~ void     _window_logo_key_press      (void *data, Evas *e, Evas_Object *obj, void *event_info);
+//~ void     _window_color_canvas_click  (void *data, Evas *e, Evas_Object *obj, void *event_info);
+//~ 
+//~ void     _window_confirm_save        (Etk_Dialog *dialog, int response_id, void *data);
 
+//TODO describe this
+#define NEW_ENTRY_TO_TABLE(TITLE, X, Y, ENTRY, EDITABLE) \
+   _o = elm_label_add(parent); \
+   elm_label_label_set(_o, TITLE); \
+   elm_table_pack(tb, _o, X, Y, 1, 1); \
+   evas_object_size_hint_weight_set(_o, 0.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 1.0, 0.0); \
+   evas_object_show(_o); \
+    \
+   _o = elm_entry_add(parent); \
+   elm_entry_single_line_set(_o, 1); \
+   elm_entry_editable_set(_o, EDITABLE); \
+   elm_entry_entry_set(_o, "----"); \
+   elm_table_pack(tb, _o,  X+1, Y, 1, 1); \
+   evas_object_size_hint_weight_set(_o, 1.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 0.0, 0.0); \
+   evas_object_show(_o); \
+   ENTRY = _o; \
+   evas_object_event_callback_add(_o, EVAS_CALLBACK_KEY_DOWN, _entry_key_down, NULL);
 
-/* etk_embed objects */
-Etk_Widget *UI_PartsTreeEmbed;
-Etk_Widget *UI_GroupEmbed;
-Etk_Widget *UI_PartEmbed;
-Etk_Widget *UI_DescriptionEmbed;
-Etk_Widget *UI_RectEmbed;
-Etk_Widget *UI_TextEmbed;
-Etk_Widget *UI_PositionEmbed;
-Etk_Widget *UI_ProgramEmbed;
-Etk_Widget *UI_ScriptEmbed;
-Etk_Widget *UI_ImageEmbed;
-Etk_Widget *UI_GradientEmbed;
-Etk_Widget *UI_FillEmbed;
-Etk_Widget *UI_ToolbarEmbed;
-
-
-void        window_main_create         (void);
-Etk_Widget* window_color_button_create (char* label_text, int color_button_enum,int w,int h, Evas *evas);
-void        window_embed_position_set  (void *position_data, int *x, int *y);
-
-void     _window_delete_cb           (Ecore_Evas *ee);
-void     _window_resize_cb           (Ecore_Evas *ecore_evas);
-
-void     _window_edit_obj_signal_cb  (void *data, Evas_Object *o, const char *sig, const char *src);
-void     _window_edit_obj_click      (void *data, Evas *e, Evas_Object *obj, void *event_info);
-
-Etk_Bool _window_all_button_click_cb (Etk_Button *button, void *data);
-void     _window_logo_key_press      (void *data, Evas *e, Evas_Object *obj, void *event_info);
-void     _window_color_canvas_click  (void *data, Evas *e, Evas_Object *obj, void *event_info);
-
-void     _window_confirm_save        (Etk_Dialog *dialog, int response_id, void *data);
-
+#define NEW_COMBO_TO_TABLE(OBJ, TITLE, X, Y, POPULATE_CB, SEL_CB) \
+   _o = elm_label_add(parent); \
+   elm_label_label_set(_o, TITLE); \
+   elm_table_pack(tb, _o, X, Y, 1, 1); \
+   evas_object_size_hint_weight_set(_o, 0.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 1.0, 0.0); \
+   evas_object_show(_o); \
+    \
+   _o = elm_hoversel_add(parent); \
+   elm_hoversel_hover_parent_set(_o, ui.win); \
+   evas_object_size_hint_weight_set(_o, 1.0, 0.0); \
+   elm_table_pack(tb, _o, X+1, Y, 1, 1); \
+   evas_object_show(_o); \
+   OBJ = _o; \
+   if (POPULATE_CB) { \
+      evas_object_smart_callback_add(_o, "clicked", POPULATE_CB, NULL); \
+      evas_object_smart_callback_add(_o, "dismissed", elm_hoversel_clear, _o); \
+   } \
+   if (SEL_CB) \
+      evas_object_smart_callback_add(_o, "selected", SEL_CB, _o);
 
 #endif

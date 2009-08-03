@@ -1,4 +1,4 @@
-/*  Copyright (C) 2006-2008 Davide Andreoli (see AUTHORS)
+/*  Copyright (C) 2006-2009 Davide Andreoli (see AUTHORS)
  *
  *  This file is part of Edje_editor.
  *  Edje_editor is free software: you can redistribute it and/or modify
@@ -15,176 +15,147 @@
  *  along with Edje_editor.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Etk.h>
-#include <Edje.h>
-#include <Edje_Edit.h>
 #include "main.h"
 
-
-/***   FileChooser Dialog   ***/
-Etk_Widget*
-dialog_filechooser_create(void)
+/***   FileChooser Dialog ***/
+static void
+_dialog_filechooser_done(void *data, Evas_Object *obj, void *event_info)
 {
-   //Dialog
-   UI_FileChooserDialog = etk_dialog_new();
-   etk_object_properties_set(ETK_OBJECT(UI_FileChooserDialog),
-                             "action-area-homogeneous", ETK_FALSE, NULL);
-   etk_signal_connect("delete-event", ETK_OBJECT(UI_FileChooserDialog),
-                      ETK_CALLBACK(etk_window_hide_on_delete), NULL);
-   etk_signal_connect("response", ETK_OBJECT(UI_FileChooserDialog),
-                      ETK_CALLBACK(_dialog_filechooser_response_cb), NULL);
+   /* event_info conatin the full path of the selected file
+    * or NULL if none is selected or cancel is pressed */
+   const char *selected = event_info;
+   
+   int FileChooserType = (long)evas_object_data_get(obj, "FileChooserType");
 
-   //Filechooser
-   UI_FileChooser = etk_filechooser_widget_new();
-   etk_dialog_pack_in_main_area(ETK_DIALOG(UI_FileChooserDialog), UI_FileChooser,
-      ETK_BOX_START, ETK_BOX_EXPAND_FILL,0);
-   etk_signal_connect("selected", ETK_OBJECT(UI_FileChooser),
-                      ETK_CALLBACK(_dialog_filechooser_selected_cb), NULL);
+   if (!selected)
+   {
+      evas_object_del(data); /* delete the test window */
+      return;
+   }
 
-   etk_dialog_button_add_from_stock(ETK_DIALOG(UI_FileChooserDialog),
-      ETK_STOCK_DIALOG_CANCEL, ETK_RESPONSE_CANCEL );
-   UI_FilechooserLoadButton = etk_dialog_button_add_from_stock(ETK_DIALOG(UI_FileChooserDialog),
-      ETK_STOCK_DOCUMENT_OPEN ,ETK_RESPONSE_OK );
-   UI_FilechooserSaveButton = etk_dialog_button_add_from_stock(ETK_DIALOG(UI_FileChooserDialog),
-      ETK_STOCK_DOCUMENT_SAVE ,ETK_RESPONSE_OK );
+   printf("Selected file: %s [type: %d]\n", selected, FileChooserType);
 
-   return UI_FileChooserDialog;
+   switch(FileChooserType)
+   {
+      case FILECHOOSER_OPEN:
+         if (load_edje(selected))
+            evas_object_del(data);
+         break;
+      //~ case FILECHOOSER_SAVE_EDJ:
+            //~ printf("SAVE EDJ\n");
+            //~ snprintf(cmd,4096,"%s/%s",
+               //~ etk_filechooser_widget_current_folder_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)),
+               //~ etk_filechooser_widget_selected_file_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
+            //~ edje_edit_save(edje_o);
+            //~ if(!ecore_file_cp(Cur.edj_temp_name->string, cmd))
+            //~ {
+               //~ dialog_alert_show("<b>ERROR:<\b><br>Can't write file");
+            //~ }
+            //~ else
+            //~ {
+               //~ Cur.edj_file_name = etk_string_set(Cur.edj_file_name, cmd);
+               //~ ecore_evas_title_set(UI_ecore_MainWin, cmd);
+            //~ }
+         //~ break;
+         //~ case FILECHOOSER_SAVE_EDC:
+              //~ dialog_alert_show("Not yet implemented.");
+         //~ break;
+         //~ case FILECHOOSER_IMAGE:
+            //~ snprintf(cmd, 4096, "%s/%s", 
+               //~ etk_filechooser_widget_current_folder_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)),
+               //~ etk_filechooser_widget_selected_file_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
+            //~ if (!edje_edit_image_add(edje_o, cmd))
+            //~ {
+               //~ dialog_alert_show("ERROR: Can't import image file.");
+               //~ break;
+            //~ }
+            //~ image_browser_populate();
+//~ 
+            //~ Etk_Range *range;
+            //~ double upper;
+            //~ range = etk_scrolled_view_vscrollbar_get(
+                    //~ etk_iconbox_scrolled_view_get(ETK_ICONBOX(UI_ImageBrowserIconbox)));
+            //~ etk_range_range_get(range, NULL, &upper);
+            //~ etk_range_value_set(range, upper);
+//~ 
+            //~ Etk_Iconbox_Icon *icon;
+            //~ icon = etk_iconbox_icon_get_by_label(ETK_ICONBOX(UI_ImageBrowserIconbox),
+                                 //~ etk_filechooser_widget_selected_file_get(
+                                 //~ ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
+            //~ etk_iconbox_icon_select(icon);
+//~ 
+            //~ break;
+         //~ case FILECHOOSER_FONT:
+            //~ snprintf(cmd, 4096, "%s/%s", 
+               //~ etk_filechooser_widget_current_folder_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)),
+               //~ etk_filechooser_widget_selected_file_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
+            //~ if (!edje_edit_font_add(edje_o, cmd))
+            //~ {
+               //~ dialog_alert_show("ERROR: Can't import font file.");
+               //~ break;
+            //~ }
+            //~ text_font_combo_populate();
+            //~ etk_combobox_active_item_set(ETK_COMBOBOX(UI_FontComboBox),
+                  //~ etk_combobox_last_item_get(ETK_COMBOBOX(UI_FontComboBox)));
+         //~ break;
+   }
 }
 
 void
 dialog_filechooser_show(int FileChooserType)
 {
-   etk_widget_show_all(UI_FileChooserDialog);
+   Evas_Object *inwin, *fs;
+   
+   // InWin
+   inwin = elm_win_inwin_add(ui.win);
+   //~ elm_object_style_set(inwin, "minimal");
+   elm_object_style_set(inwin, "default"); // TODO Should be minimal, but the genlist will not show in minimal mode :(
+   evas_object_show(inwin);
 
-   FileChooserOperation = FileChooserType;
-   switch(FileChooserType){
-      case FILECHOOSER_OPEN:
-         etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose an EDJ or EDC file to open");
-         etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_FALSE);
-         etk_widget_hide(UI_FilechooserSaveButton);
-      break;
-      case FILECHOOSER_IMAGE:
-         etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose an image to import");
-         etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_FALSE);
-         etk_widget_hide(UI_FilechooserSaveButton);
-      break;
-      case FILECHOOSER_FONT:
-         etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose an font to import");
-         etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_FALSE);
-         etk_widget_hide(UI_FilechooserSaveButton);
-      break;
-      case FILECHOOSER_SAVE_EDJ:
-         etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose the new edje name");
-         etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_TRUE);
-         etk_widget_hide(UI_FilechooserLoadButton);
-      break;
-      case FILECHOOSER_SAVE_EDC:
-         etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose the new edc name");
-         etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_TRUE);
-         etk_widget_hide(UI_FilechooserLoadButton);
-      break;
-      default:
-      break;
-   }
+   // File Selector
+   fs = elm_fileselector_add(ui.win);
+   elm_fileselector_path_set(fs, getenv("HOME"));
+   elm_win_inwin_content_set(inwin, fs);
+   evas_object_show(fs);
+
+   evas_object_smart_callback_add(fs, "done", _dialog_filechooser_done, inwin);
+   evas_object_data_set(fs, "FileChooserType", FileChooserType);
+
+
+   //~ FileChooserOperation = FileChooserType;
+   //~ switch(FileChooserOperation){
+      //~ case FILECHOOSER_OPEN:
+         //~ etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose an EDJ or EDC file to open");
+         //~ etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_FALSE);
+         //~ etk_widget_hide(UI_FilechooserSaveButton);
+      //~ break;
+      //~ case FILECHOOSER_IMAGE:
+         //~ etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose an image to import");
+         //~ etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_FALSE);
+         //~ etk_widget_hide(UI_FilechooserSaveButton);
+      //~ break;
+      //~ case FILECHOOSER_FONT:
+         //~ etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose an font to import");
+         //~ etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_FALSE);
+         //~ etk_widget_hide(UI_FilechooserSaveButton);
+      //~ break;
+      //~ case FILECHOOSER_SAVE_EDJ:
+         //~ etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose the new edje name");
+         //~ etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_TRUE);
+         //~ etk_widget_hide(UI_FilechooserLoadButton);
+      //~ break;
+      //~ case FILECHOOSER_SAVE_EDC:
+         //~ etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose the new edc name");
+         //~ etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_TRUE);
+         //~ etk_widget_hide(UI_FilechooserLoadButton);
+      //~ break;
+      //~ default:
+      //~ break;
+   //~ }
 }
 
 
-
-Etk_Bool
-_dialog_filechooser_response_cb(Etk_Dialog *dialog, int response_id, void *data)
-{
-   char cmd[4096];
-
-   printf("Response Signal on Filechooser EMITTED\n");
-
-   if (response_id == ETK_RESPONSE_OK){
-
-      switch(FileChooserOperation){
-         case FILECHOOSER_OPEN:
-            snprintf(cmd,4096,"%s/%s",
-            etk_filechooser_widget_current_folder_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)),
-            etk_filechooser_widget_selected_file_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
-            load_edje(cmd);
-         break;
-         case FILECHOOSER_SAVE_EDJ:
-            printf("SAVE EDJ\n");
-            snprintf(cmd,4096,"%s/%s",
-               etk_filechooser_widget_current_folder_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)),
-               etk_filechooser_widget_selected_file_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
-            edje_edit_save(edje_o);
-            if(!ecore_file_cp(Cur.edj_temp_name->string, cmd))
-            {
-               dialog_alert_show("<b>ERROR:<\b><br>Can't write file");
-            }
-            else
-            {
-               Cur.edj_file_name = etk_string_set(Cur.edj_file_name, cmd);
-               ecore_evas_title_set(UI_ecore_MainWin, cmd);
-            }
-         break;
-         case FILECHOOSER_SAVE_EDC:
-              dialog_alert_show("Not yet implemented.");
-         break;
-         case FILECHOOSER_IMAGE:
-            snprintf(cmd, 4096, "%s/%s", 
-               etk_filechooser_widget_current_folder_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)),
-               etk_filechooser_widget_selected_file_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
-            if (!edje_edit_image_add(edje_o, cmd))
-            {
-               dialog_alert_show("ERROR: Can't import image file.");
-               break;
-            }
-            image_browser_populate();
-
-            Etk_Range *range;
-            double upper;
-            range = etk_scrolled_view_vscrollbar_get(
-                    etk_iconbox_scrolled_view_get(ETK_ICONBOX(UI_ImageBrowserIconbox)));
-            etk_range_range_get(range, NULL, &upper);
-            etk_range_value_set(range, upper);
-
-            Etk_Iconbox_Icon *icon;
-            icon = etk_iconbox_icon_get_by_label(ETK_ICONBOX(UI_ImageBrowserIconbox),
-                                 etk_filechooser_widget_selected_file_get(
-                                 ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
-            etk_iconbox_icon_select(icon);
-
-            break;
-         case FILECHOOSER_FONT:
-            snprintf(cmd, 4096, "%s/%s", 
-               etk_filechooser_widget_current_folder_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)),
-               etk_filechooser_widget_selected_file_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
-            if (!edje_edit_font_add(edje_o, cmd))
-            {
-               dialog_alert_show("ERROR: Can't import font file.");
-               break;
-            }
-            text_font_combo_populate();
-            etk_combobox_active_item_set(ETK_COMBOBOX(UI_FontComboBox),
-                  etk_combobox_last_item_get(ETK_COMBOBOX(UI_FontComboBox)));
-         break;
-      }
-      etk_widget_hide(ETK_WIDGET(dialog));
-   }
-   else
-   {
-      etk_widget_hide(ETK_WIDGET(dialog));
-   }
-
-   return ETK_TRUE;
-}
-
-Etk_Bool
-_dialog_filechooser_selected_cb(Etk_Filechooser_Widget *filechooser)
-{
-   printf("*** FILECHOOSER SELECTD ON *** \n");
-   _dialog_filechooser_response_cb(ETK_DIALOG(UI_FileChooserDialog),
-                                   ETK_RESPONSE_OK, NULL);
-   return ETK_TRUE;
-}
-
-
-/***   Color Picker Dialog   ***/
+/***   Color Picker Dialog   
 Etk_Widget *
 dialog_colorpicker_create(void)
 {
@@ -262,26 +233,53 @@ _dialog_colorpicker_change_cb(Etk_Object *object, void *data)
 
    canvas_redraw();
    return ETK_TRUE;
-}
+} ***/
 
 /***   Alert Dialog   ***/
-Etk_Widget*
-dialog_alert_create(void)
+static void
+_dialog_alert_ok_click_cb(void *data, Evas_Object *obj, void *event_info)
 {
-   UI_AlertDialog = etk_message_dialog_new (ETK_MESSAGE_DIALOG_INFO,
-                                       ETK_MESSAGE_DIALOG_OK, "Hallo world!");
-   etk_widget_size_request_set(UI_AlertDialog, 240, 100);
-   etk_signal_connect("delete-event", ETK_OBJECT(UI_AlertDialog),
-                      ETK_CALLBACK(etk_window_hide_on_delete), NULL);
-   etk_signal_connect("response", ETK_OBJECT(UI_AlertDialog),
-                      ETK_CALLBACK(etk_window_hide_on_delete), NULL);
-   return UI_AlertDialog;
+   evas_object_del(data);
 }
 
 void
 dialog_alert_show(char* text)
 {
-   etk_message_dialog_text_set(ETK_MESSAGE_DIALOG(UI_AlertDialog), text);
-   etk_widget_show_all(UI_AlertDialog);
+   Evas_Object *inwin, *lb, *table, *icon, *ok;
+   
+   printf("ALERT: %s\n", text);
+   
+   // InWin
+   inwin = elm_win_inwin_add(ui.win);
+   elm_object_style_set(inwin, "minimal");
+   evas_object_show(inwin);
+   
+   // Table
+   table = elm_table_add(ui.win);
+   elm_table_homogenous_set(table, 0);
+   elm_win_inwin_content_set(inwin, table);
+   evas_object_show(table);
+
+   // Icon
+   icon = elm_icon_add(ui.win);
+   elm_icon_file_set(icon, EdjeFile, "WARN.PNG");
+   evas_object_size_hint_min_set(icon, 50, 50);
+   elm_table_pack(table, icon, 0, 0, 1, 1);
+   evas_object_show(icon);
+   
+   // Label
+   lb = elm_label_add(ui.win);
+   elm_label_label_set(lb, text);
+   evas_object_size_hint_padding_set(lb, 50, 50, 50, 50);
+   elm_table_pack(table, lb, 1, 0, 1, 1);
+   evas_object_show(lb);
+   
+   // OK Button
+   ok = elm_button_add(ui.win);
+   elm_button_label_set(ok, "Ok");
+   elm_table_pack(table, ok, 0, 1, 2, 1);
+   evas_object_smart_callback_add(ok, "clicked", _dialog_alert_ok_click_cb, inwin);
+   evas_object_show(ok);
+
 }
 

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2006-2008 Davide Andreoli (see AUTHORS)
+/*  Copyright (C) 2006-2009 Davide Andreoli (see AUTHORS)
  *
  *  This file is part of Edje_editor.
  *  Edje_editor is free software: you can redistribute it and/or modify
@@ -19,20 +19,11 @@
 #define _EDJE_EDITOR_CONSOLLE_H_
 
 
-Evas_Object  *EV_Consolle;     //The lower consolle panel
 Eina_List    *stack;           //Stack for the consolle
-int           consolle_count;  //Counter for the consolle
+int           consolle_count;
 
-
-
-Evas_Object* consolle_create(void);
 void         consolle_log   (char *text);
 void         consolle_clear (void);
-
-
-void PopulateSourceComboEntry(void);
-void PopulateSignalComboEntry(void);
-
 
 
 #endif

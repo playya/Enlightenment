@@ -1,4 +1,4 @@
-/*  Copyright (C) 2006-2008 Davide Andreoli (see AUTHORS)
+/*  Copyright (C) 2006-2009 Davide Andreoli (see AUTHORS)
  *
  *  This file is part of Edje_editor.
  *  Edje_editor is free software: you can redistribute it and/or modify
@@ -15,8 +15,8 @@
  *  along with Edje_editor.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _EDJE_EDITOR_EVAS_H_
-#define _EDJE_EDITOR_EVAS_H_
+#ifndef _EDJE_EDITOR_CANVAS_H_
+#define _EDJE_EDITOR_CANVAS_H_
 
 Evas_Object *EV_fakewin;               //The simple window implementation
 Evas_Object *EV_movebox;               //The object used for moving fakewin
