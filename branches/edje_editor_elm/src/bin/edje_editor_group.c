@@ -31,7 +31,7 @@ _entry_apply(Evas_Object *o)
 
    /* TODO FIX THIS IN ELM */
    /* I get a <br> at the end of the line */
-   /* Need to fix elm for this, probably a single_line entry must take care of this*/
+   /* Need to fix elm for this, maybe a single_line entry must take care of this*/
    const char *to_fix;
    to_fix = elm_entry_entry_get(o);
    txt = strdup(to_fix);

@@ -67,7 +67,7 @@ void _window_logo_key_press(void *data, Evas *e, Evas_Object *obj, void *event_i
    elm_entry_single_line_set(_o, 1); \
    elm_entry_editable_set(_o, EDITABLE); \
    elm_entry_entry_set(_o, "----"); \
-   elm_table_pack(tb, _o,  X+1, Y, 1, 1); \
+   elm_table_pack(tb, _o, X+1, Y, 1, 1); \
    evas_object_size_hint_weight_set(_o, 1.0, 0.0); \
    evas_object_size_hint_align_set(_o, 0.0, 0.0); \
    evas_object_show(_o); \
@@ -85,6 +85,7 @@ void _window_logo_key_press(void *data, Evas *e, Evas_Object *obj, void *event_i
    _o = elm_hoversel_add(parent); \
    elm_hoversel_hover_parent_set(_o, ui.win); \
    evas_object_size_hint_weight_set(_o, 1.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 0.0, 0.0); \
    elm_table_pack(tb, _o, X+1, Y, 1, 1); \
    evas_object_show(_o); \
    OBJ = _o; \

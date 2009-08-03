@@ -105,8 +105,6 @@ _events_combo_sel(void *data, Evas_Object *obj, void *event_info)
    part_frame_update();
 }
 
-
-
 static void
 _clipto_combo_sel(void *data, Evas_Object *obj, void *event_info)
 {
@@ -128,7 +126,7 @@ _clipto_combo_sel(void *data, Evas_Object *obj, void *event_info)
 Evas_Object*
 part_frame_create(Evas_Object *parent)
 {
-   Evas_Object *tb, *_o, *ic;
+   Evas_Object *tb, *_o;
 
    tb = elm_table_add(parent);
    evas_object_show(tb);
