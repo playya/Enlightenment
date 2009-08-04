@@ -25,6 +25,8 @@ edje_editor_group.c \
 edje_editor_group.h \
 edje_editor_part.c \
 edje_editor_part.h \
+edje_editor_position.c \
+edje_editor_position.h \
 main.c \
 main.h
 

@@ -113,6 +113,7 @@ _tree_model_part_sel(void *data, Evas_Object *obj, void *event_info)
    window_update_frames_visibility();
    
    part_frame_update();
+   position_frame_update();
    canvas_redraw();
 }
 
@@ -133,7 +134,7 @@ _tree_model_state_sel(void *data, Evas_Object *obj, void *event_info)
    edje_edit_part_selected_state_set(ui.edje_o, cur.part, cur.state);  
 
    //~ state_frame_update();
-   //~ position_frame_update();
+   position_frame_update();
    //~ position_comboboxes_update();
 
    
@@ -296,7 +297,7 @@ tree_parts_create(void)
 
    
    //Signal emitter
-   Evas_Object *o, *bx;
+   Evas_Object *o;
 
    o = elm_hoversel_add(ui.win);
    elm_hoversel_hover_parent_set(o, ui.win);

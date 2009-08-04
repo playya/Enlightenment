@@ -391,15 +391,15 @@ collections {
             }
          }
          //EXAMPLE: FRAME (name, w, h, img_name, place_after)
-         FRAME("group", 230, 70, "lbl_group.png", 14, 50, "frames_starter")
-         FRAME("part", 230, 55, "lbl_part.png", 14, 35,"group_frame")
+         FRAME("group", 170, 70, "lbl_group.png", 14, 50, "frames_starter")
+         FRAME("part", 170, 55, "lbl_part.png", 14, 35,"group_frame")
          FRAME("description", 260, 130, "lbl_desc.png", 14, 42, "part_frame")
          FRAME("rect", 120, 77, "lbl_rect.png", 14, 72, "description_frame")
          FRAME("text", 250, 180, "lbl_text.png", 14, 36, "rect_frame")
          FRAME("image", 250, 230, "lbl_image.png", 14, 46, "text_frame")
          FRAME("gradient", 250, 135, "lbl_grad.png", 14, 67, "image_frame")
          FRAME("fill", 250, 45, "lbl_fill.png", 14, 30, "gradient_frame")
-         FRAME("position", 250, 130, "lbl_pos.png", 14, 60, "fill_frame")
+         FRAME("position", 200, 200, "lbl_pos.png", 14, 60, "fill_frame")
          FRAME("program", 250, 250, "lbl_prog.png", 14, 60, "position_frame")
          FRAME("script", 250, 250, "lbl_script.png", 14, 45, "program_frame")
       }

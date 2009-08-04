@@ -33,7 +33,7 @@ _window_edit_obj_signal_cb(void *data, Evas_Object *o, const char *sig, const ch
 void
 window_main_create(void)
 {
-   Evas_Object *logo, *tb, *ly, *emit;
+   Evas_Object *logo, *tb, *ly;
    
    // Main Window
    ui.win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
@@ -64,6 +64,7 @@ window_main_create(void)
    //Right pane
    elm_layout_content_set(ly, "group_frame_swallow", group_frame_create(ui.win));
    elm_layout_content_set(ly, "part_frame_swallow", part_frame_create(ui.win));
+   elm_layout_content_set(ly, "position_frame_swallow", position_frame_create(ui.win));
 
 
    // Logo (keygrabber)

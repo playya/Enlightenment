@@ -67,7 +67,7 @@ _canvas_drag_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
       edje_edit_state_rel1_relative_y_set(ui.edje_o, cur.part,
                   cur.state,(float)(mouse_y - parenty)/(float)parenth);
 
-      //~ position_frame_update(); 
+      position_frame_update(); 
       
    }
    // Move Rel2 Point
@@ -86,7 +86,7 @@ _canvas_drag_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
       edje_edit_state_rel2_relative_y_set(ui.edje_o, cur.part,
                   cur.state, (float)(mouse_y - parenty)/(float)parenth);
 
-      //~ position_frame_update(); TODO
+      position_frame_update();
    }
    // Move Move Handler
    if ((int)(long)data == DRAG_MOVE)
@@ -116,7 +116,7 @@ _canvas_drag_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
                         cur.part, cur.state,
                         (float)(mouse_y - parenty - dy + dy2)/(float)parenth);
 
-      //~ position_frame_update(); TODO
+      position_frame_update();
    }
    // Move First Gradient Point Handler
    if ((int)(long)data == DRAG_GRAD_1 || (int)(long)data == DRAG_GRAD_2 )

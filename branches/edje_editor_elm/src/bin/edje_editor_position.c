@@ -1,4 +1,4 @@
-/*  Copyright (C) 2006-2008 Davide Andreoli (see AUTHORS)
+/*  Copyright (C) 2006-2009 Davide Andreoli (see AUTHORS)
  *
  *  This file is part of Edje_editor.
  *  Edje_editor is free software: you can redistribute it and/or modify
@@ -15,651 +15,254 @@
  *  along with Edje_editor.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string.h>
-#include <Etk.h>
-#include <Edje.h>
-#include <Edje_Edit.h>
 #include "main.h"
 
-/***   Implementation   ***/
-Etk_Widget*
-position_frame_create(void)
+static Evas_Object *_rel1x_entry;
+static Evas_Object *_rel1y_entry;
+static Evas_Object *_off1x_entry;
+static Evas_Object *_off1y_entry;
+static Evas_Object *_to1x_combo;
+static Evas_Object *_to1y_combo;
+
+static Evas_Object *_rel2x_entry;
+static Evas_Object *_rel2y_entry;
+static Evas_Object *_off2x_entry;
+static Evas_Object *_off2y_entry;
+static Evas_Object *_to2x_combo;
+static Evas_Object *_to2y_combo;
+
+
+#define MSG_FLOAT "<b>Can't understand size.</b><br>The number need to be a float:<br> (for ex.) '0.35'"
+#define MSG_INT "<b>Can't understand size.</b><br>The number need to be an integer :<br> (for ex.) '-12'"
+
+/***   Callbacks   ***/
+static void
+_entry_apply(Evas_Object *o)
 {
-   Etk_Widget *vbox;
-   Etk_Widget *hbox;
-   Etk_Widget *label;
+   char *txt;
+   double f;
+   int i;
 
-/*    //Position Notebook
-   notebook = etk_notebook_new();
-   etk_container_add(ETK_CONTAINER(UI_PositionFrame), notebook);
- */
-/*          //Simple TAB
-         vbox = etk_vbox_new(ETK_FALSE, 0);
-         etk_notebook_page_append(ETK_NOTEBOOK(notebook), "Simple", vbox);
+   /* TODO FIX THIS IN ELM */
+   /* I get a <br> at the end of the line */
+   /* Need to fix elm for this, probably a single_line entry must take care of this*/
+   const char *to_fix;
+   to_fix = elm_entry_entry_get(o);
+   txt = strdup(to_fix);
+   if (ecore_str_has_suffix(txt, "<br>"))
+      txt[strlen(txt) - 4] = '\0';
+   printf("Apply entry [%s]\n", txt);
 
-            //hbox
-            hbox = etk_hbox_new(ETK_FALSE, 0);
-            etk_box_append(ETK_BOX(vbox), hbox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
+   // Rel 1
+   if (o == _rel1x_entry)
+   {
+      if (sscanf(txt,"%lf", &f) == 1)
+	 edje_edit_state_rel1_relative_x_set(ui.edje_o, cur.part, cur.state, f);
+      else
+	 dialog_alert_show(MSG_FLOAT);
+   }
+   if (o == _rel1y_entry)
+   {
+      if (sscanf(txt,"%lf", &f) == 1)
+	 edje_edit_state_rel1_relative_y_set(ui.edje_o, cur.part, cur.state, f);
+      else
+	 dialog_alert_show(MSG_FLOAT);
+   }
+   if (o == _off1x_entry)
+   {
+      if (sscanf(txt,"%d", &i) == 1)
+	 edje_edit_state_rel1_offset_x_set(ui.edje_o, cur.part, cur.state, i);
+      else
+	 dialog_alert_show(MSG_INT);
+   }
+   if (o == _off1y_entry)
+   {
+      if (sscanf(txt,"%d", &i) == 1)
+	 edje_edit_state_rel1_offset_y_set(ui.edje_o, cur.part, cur.state, i);
+      else
+	 dialog_alert_show(MSG_INT);
+   }
 
-               label = etk_label_new("Container");
-               etk_object_properties_set(ETK_OBJECT(label), "xalign",0.5,NULL);
-               etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
+   // Rel 2
+   if (o == _rel2x_entry)
+   {
+      if (sscanf(txt,"%lf", &f) == 1)
+	 edje_edit_state_rel2_relative_x_set(ui.edje_o, cur.part, cur.state, f);
+      else
+	 dialog_alert_show(MSG_FLOAT);
+   }
+   if (o == _rel2y_entry)
+   {
+      if (sscanf(txt,"%lf", &f) == 1)
+	 edje_edit_state_rel2_relative_y_set(ui.edje_o, cur.part, cur.state, f);
+      else
+	 dialog_alert_show(MSG_FLOAT);
+   }
+   if (o == _off2x_entry)
+   {
+      if (sscanf(txt,"%d", &i) == 1)
+	 edje_edit_state_rel2_offset_x_set(ui.edje_o, cur.part, cur.state, i);
+      else
+	 dialog_alert_show(MSG_INT);
+   }
+   if (o == _off2y_entry)
+   {
+      if (sscanf(txt,"%d", &i) == 1)
+	 edje_edit_state_rel2_offset_y_set(ui.edje_o, cur.part, cur.state, i);
+      else
+	 dialog_alert_show(MSG_INT);
+   }
 
-               //SimpleParentCombobox
-               SimpleParentComboBox = etk_combobox_new();
-               etk_combobox_column_add(ETK_COMBOBOX(SimpleParentComboBox), ETK_COMBOBOX_LABEL, 75, ETK_TRUE, ETK_FALSE, ETK_FALSE, 0.0, 0.5);
-               etk_combobox_build(ETK_COMBOBOX(SimpleParentComboBox));
-               etk_box_append(ETK_BOX(hbox), SimpleParentComboBox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
- */
-   //ADVANCED TAB
-   //vbox
-   vbox = etk_vbox_new(ETK_FALSE, 0);
-   // etk_notebook_page_append(ETK_NOTEBOOK(notebook), "Advanced", vbox);
+   position_frame_update();
+   canvas_redraw();
+}
 
-   label = etk_label_new("<color=#FF0000><b>First_Point</b></>");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign", 0.5, NULL);
-   etk_box_append(ETK_BOX(vbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
+static void
+_entry_key_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   Evas_Event_Key_Down *ev = event_info;
+   
+   //~ printf("KEY DOWN %s\n", ev->key);
+   if (ecore_str_equal(ev->key, "Return"))
+      _entry_apply(obj);
+   else if(ecore_str_equal(ev->key, "Escape"))
+      position_frame_update();
+}
 
-   //hbox
-   hbox = etk_hbox_new(ETK_FALSE, 0);
-   etk_box_append(ETK_BOX(vbox), hbox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
+static void
+_to_combo_sel(void *data, Evas_Object *obj, void *event_info)
+{
+   Elm_Hoversel_Item *it = event_info;
+   const char *to;
 
-   label = etk_label_new("<color=#FF0000><b>X</b></>");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
+   to = elm_hoversel_item_label_get(it);
+   if (ecore_str_equal(to, cur.part))
+   {
+      dialog_alert_show("A part can't be related to itself.");
+      return;
+   }
 
-   //Rel1XSpinner
-   UI_Rel1XSpinner = etk_spinner_new(-100.0, 100.0, 0.0, 0.01, 0.1);
-   etk_spinner_digits_set(ETK_SPINNER(UI_Rel1XSpinner), 2);
-   etk_widget_size_request_set(UI_Rel1XSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_Rel1XSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
+   if (obj == _to1x_combo)
+      edje_edit_state_rel1_to_x_set(ui.edje_o, cur.part, cur.state, 
+				    ecore_str_equal(to, "unset") ? NULL : to);
+   else if (obj == _to1y_combo)
+      edje_edit_state_rel1_to_y_set(ui.edje_o, cur.part, cur.state, 
+				    ecore_str_equal(to, "unset") ? NULL : to);
+   else if (obj == _to2x_combo)
+      edje_edit_state_rel2_to_x_set(ui.edje_o, cur.part, cur.state, 
+				    ecore_str_equal(to, "unset") ? NULL : to);
+   else if (obj == _to2y_combo)
+      edje_edit_state_rel2_to_y_set(ui.edje_o, cur.part, cur.state, 
+				    ecore_str_equal(to, "unset") ? NULL : to);
+   
+   position_frame_update();
+   edje_edit_part_selected_state_set(ui.edje_o, cur.part, cur.state);  //this make edje redraw (need to update in lib)
+   canvas_redraw();
+}
 
-   label = etk_label_new("<color=#FF0000>+</>");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
+/***   Implementation   ***/
+Evas_Object*
+position_frame_create(Evas_Object *parent)
+{
+   Evas_Object *vbox, *fr, *tb, *_o;
 
-   //Rel1XOffsetEntry
-   UI_Rel1XOffsetSpinner =  etk_spinner_new(-2000, 2000, 0, 1, 10);
-   etk_widget_size_request_set(UI_Rel1XOffsetSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_Rel1XOffsetSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
+   vbox = elm_box_add(parent);
+   elm_box_horizontal_set(vbox, 0);
+   evas_object_size_hint_align_set(vbox, 0.0, 0.0);
+   evas_object_size_hint_weight_set(vbox, 1.0, 1.0);
+   evas_object_show(vbox);
 
-   label = etk_label_new("<color=#FF0000>to</>");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign", 1.0, NULL);
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
+   fr = elm_frame_add(parent);
+   elm_frame_label_set(fr, "Top-Left point");
+   evas_object_size_hint_align_set(fr, 0.0, 0.0);
+   evas_object_size_hint_weight_set(fr, 1.0, 1.0);
+   evas_object_show(fr);
+   elm_box_pack_end(vbox, fr);
 
-   //Rel1ToXCombobox
-   UI_Rel1ToXComboBox = etk_combobox_new();
-   etk_combobox_column_add(ETK_COMBOBOX(UI_Rel1ToXComboBox),
-      ETK_COMBOBOX_IMAGE, 24, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_column_add(ETK_COMBOBOX(UI_Rel1ToXComboBox),
-      ETK_COMBOBOX_LABEL, 75, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_build(ETK_COMBOBOX(UI_Rel1ToXComboBox));
-   etk_box_append(ETK_BOX(hbox), UI_Rel1ToXComboBox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
+   tb = elm_table_add(parent);
+   evas_object_size_hint_align_set(tb, 0.0, 0.0);
+   evas_object_size_hint_weight_set(tb, 1.0, 1.0);
+   elm_frame_content_set(fr,tb);
 
-   //hbox
-   hbox = etk_hbox_new(ETK_FALSE, 0);
-   etk_box_append(ETK_BOX(vbox), hbox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
+   NEW_DOUBLE_ENTRY_TO_TABLE("relative:", 0, 0, _rel1x_entry, _rel1y_entry, EINA_TRUE)
+   NEW_DOUBLE_ENTRY_TO_TABLE("offset:", 0, 1, _off1x_entry, _off1y_entry, EINA_TRUE)
+   NEW_COMBO_TO_TABLE(_to1x_combo, "to x", 0, 2, 2, part_populate_combo_with_parts, _to_combo_sel)
+   NEW_COMBO_TO_TABLE(_to1y_combo, "to y", 0, 3, 2, part_populate_combo_with_parts, _to_combo_sel)
+   
+   fr = elm_frame_add(parent);
+   elm_frame_label_set(fr, "Bottom-Right point");
+   evas_object_size_hint_align_set(fr, 0.0, 0.0);
+   evas_object_size_hint_weight_set(fr, 1.0, 1.0);
+   evas_object_show(fr);
+   elm_box_pack_end(vbox, fr);
 
-   label = etk_label_new("<color=#FF0000><b>Y</b></>");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
+   tb = elm_table_add(parent);
+   evas_object_size_hint_align_set(tb, 0.0, 0.0);
+   evas_object_size_hint_weight_set(tb, 1.0, 1.0);
+   elm_frame_content_set(fr,tb);
 
-   //Rel1YSpinner
-   UI_Rel1YSpinner = etk_spinner_new(-100.0, 100.0, 0.0, 0.01, 0.1);
-   etk_spinner_digits_set(ETK_SPINNER(UI_Rel1YSpinner), 2);
-   etk_widget_size_request_set(UI_Rel1YSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_Rel1YSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   label = etk_label_new("<color=#FF0000>+</>");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //Rel1YOffsetSpinner
-   UI_Rel1YOffsetSpinner =  etk_spinner_new(-2000, 2000, 0, 1, 10);
-   etk_widget_size_request_set(UI_Rel1YOffsetSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_Rel1YOffsetSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   label = etk_label_new("<color=#FF0000>to</> ");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign", 1.0, NULL);
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //Rel1ToYCombobox
-   UI_Rel1ToYComboBox = etk_combobox_new();
-   etk_combobox_column_add(ETK_COMBOBOX(UI_Rel1ToYComboBox),
-      ETK_COMBOBOX_IMAGE, 24, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_column_add(ETK_COMBOBOX(UI_Rel1ToYComboBox),
-      ETK_COMBOBOX_LABEL, 75, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_build(ETK_COMBOBOX(UI_Rel1ToYComboBox));
-   etk_box_append(ETK_BOX(hbox), UI_Rel1ToYComboBox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   label = etk_label_new("<color=#0000FF><b>Second_Point</b></>");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign", 0.5, NULL);
-   etk_box_append(ETK_BOX(vbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //hbox
-   hbox = etk_hbox_new(ETK_FALSE, 0);
-   etk_box_append(ETK_BOX(vbox), hbox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   label = etk_label_new("<color=#0000FF><b>X</b></>");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //Rel2XSpinner
-   UI_Rel2XSpinner = etk_spinner_new(-100.0, 100.0, 0.0, 0.01, 0.1);
-   etk_spinner_digits_set(ETK_SPINNER(UI_Rel2XSpinner), 2);
-   etk_widget_size_request_set(UI_Rel2XSpinner,45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_Rel2XSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   label = etk_label_new("<color=#0000FF>+</>");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //Rel2XOffsetSpinner
-   UI_Rel2XOffsetSpinner = etk_spinner_new(-2000, 2000, 0, 1, 10);
-   etk_widget_size_request_set(UI_Rel2XOffsetSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_Rel2XOffsetSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   label = etk_label_new("<color=#0000FF>to</>");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign", 1.0, NULL);
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //Rel2ToXCombobox
-   UI_Rel2ToXComboBox = etk_combobox_new();
-   etk_combobox_column_add(ETK_COMBOBOX(UI_Rel2ToXComboBox),
-      ETK_COMBOBOX_IMAGE, 24, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_column_add(ETK_COMBOBOX(UI_Rel2ToXComboBox),
-      ETK_COMBOBOX_LABEL, 75, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_build(ETK_COMBOBOX(UI_Rel2ToXComboBox));
-   etk_box_append(ETK_BOX(hbox), UI_Rel2ToXComboBox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //hbox
-   hbox = etk_hbox_new(ETK_FALSE, 0);
-   etk_box_append(ETK_BOX(vbox), hbox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   label = etk_label_new("<color=#0000FF><b>Y</b></>");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //Rel2YSpinner
-   UI_Rel2YSpinner = etk_spinner_new(-100.0, 100.0, 0.0, 0.01, 0.1);
-   etk_spinner_digits_set(ETK_SPINNER(UI_Rel2YSpinner), 2);
-   etk_widget_size_request_set(UI_Rel2YSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_Rel2YSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   label = etk_label_new("<color=#0000FF>+</>");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //Rel2YOffsetSpinner
-   UI_Rel2YOffsetSpinner = etk_spinner_new(-2000, 2000, 0, 1, 10);
-   etk_widget_size_request_set(UI_Rel2YOffsetSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_Rel2YOffsetSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   label = etk_label_new("<color=#0000FF>to</> ");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign", 1.0, NULL);
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //Rel1ToYCombobox
-   UI_Rel2ToYComboBox = etk_combobox_new();
-   etk_combobox_column_add(ETK_COMBOBOX(UI_Rel2ToYComboBox),
-      ETK_COMBOBOX_IMAGE, 24, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_column_add(ETK_COMBOBOX(UI_Rel2ToYComboBox),
-      ETK_COMBOBOX_LABEL, 75, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_build(ETK_COMBOBOX(UI_Rel2ToYComboBox));
-   etk_box_append(ETK_BOX(hbox), UI_Rel2ToYComboBox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_Rel1XOffsetSpinner),
-                      ETK_CALLBACK(_position_RelOffsetSpinners_value_changed_cb),
-                      (void *)REL1X_SPINNER);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_Rel1YOffsetSpinner),
-                      ETK_CALLBACK(_position_RelOffsetSpinners_value_changed_cb),
-                      (void *)REL1Y_SPINNER);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_Rel2XOffsetSpinner),
-                      ETK_CALLBACK(_position_RelOffsetSpinners_value_changed_cb),
-                      (void *)REL2X_SPINNER);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_Rel2YOffsetSpinner),
-                      ETK_CALLBACK(_position_RelOffsetSpinners_value_changed_cb),
-                      (void *)REL2Y_SPINNER);
-
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_Rel1XSpinner),
-                      ETK_CALLBACK(_position_RelSpinners_value_changed_cb),
-                      (void *)REL1X_SPINNER);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_Rel1YSpinner),
-                      ETK_CALLBACK(_position_RelSpinners_value_changed_cb),
-                      (void *)REL1Y_SPINNER);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_Rel2XSpinner),
-                      ETK_CALLBACK(_position_RelSpinners_value_changed_cb),
-                      (void *)REL2X_SPINNER);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_Rel2YSpinner),
-                      ETK_CALLBACK(_position_RelSpinners_value_changed_cb),
-                      (void *)REL2Y_SPINNER);
-
-   etk_signal_connect("active-item-changed", ETK_OBJECT(UI_Rel1ToXComboBox),
-                      ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                      (void *)REL1X_SPINNER);
-   etk_signal_connect("active-item-changed", ETK_OBJECT(UI_Rel1ToYComboBox),
-                      ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                      (void *)REL1Y_SPINNER);
-   etk_signal_connect("active-item-changed", ETK_OBJECT(UI_Rel2ToXComboBox),
-                      ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                      (void *)REL2X_SPINNER);
-   etk_signal_connect("active-item-changed", ETK_OBJECT(UI_Rel2ToYComboBox),
-                      ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                      (void *)REL2Y_SPINNER);
+   NEW_DOUBLE_ENTRY_TO_TABLE("relative:", 0, 0, _rel2x_entry, _rel2y_entry, EINA_TRUE)
+   NEW_DOUBLE_ENTRY_TO_TABLE("offset:", 0, 1, _off2x_entry, _off2y_entry, EINA_TRUE)
+   NEW_COMBO_TO_TABLE(_to2x_combo, "to x", 0, 2, 2, part_populate_combo_with_parts, _to_combo_sel)
+   NEW_COMBO_TO_TABLE(_to2y_combo, "to y", 0, 3, 2, part_populate_combo_with_parts, _to_combo_sel)
 
    return vbox;
 }
 
-
 void
 position_frame_update(void)
 {
-   //printf("Update Position: %s (offset: %d)\n",Cur.eps->name,Cur.eps->rel1.offset.x);
-   //Stop signal propagation
-   etk_signal_block("value-changed", ETK_OBJECT(UI_Rel1XSpinner),
-                    ETK_CALLBACK(_position_RelSpinners_value_changed_cb),
-                    (void*)REL1X_SPINNER);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_Rel1YSpinner),
-                    ETK_CALLBACK(_position_RelSpinners_value_changed_cb),
-                    (void*)REL1Y_SPINNER);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_Rel2XSpinner),
-                    ETK_CALLBACK(_position_RelSpinners_value_changed_cb),
-                    (void*)REL2X_SPINNER);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_Rel2YSpinner),
-                    ETK_CALLBACK(_position_RelSpinners_value_changed_cb),
-                    (void*)REL2Y_SPINNER);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_Rel1XOffsetSpinner),
-                    ETK_CALLBACK(_position_RelOffsetSpinners_value_changed_cb),
-                    (void*)REL1X_SPINNER);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_Rel1YOffsetSpinner),
-                    ETK_CALLBACK(_position_RelOffsetSpinners_value_changed_cb),
-                    (void*)REL1Y_SPINNER);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_Rel2XOffsetSpinner),
-                    ETK_CALLBACK(_position_RelOffsetSpinners_value_changed_cb),
-                    (void*)REL2X_SPINNER);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_Rel2YOffsetSpinner),
-                    ETK_CALLBACK(_position_RelOffsetSpinners_value_changed_cb),
-                    (void*)REL2Y_SPINNER);
+   const char *to;
 
-   if (!etk_string_length_get(Cur.state)) return;
-   if (!etk_string_length_get(Cur.part)) return;
-    //Set relative position spinners
-   etk_range_value_set(ETK_RANGE(UI_Rel1XSpinner),
-      edje_edit_state_rel1_relative_x_get(edje_o, Cur.part->string,Cur.state->string));
-   etk_range_value_set(ETK_RANGE(UI_Rel1YSpinner),
-      edje_edit_state_rel1_relative_y_get(edje_o, Cur.part->string,Cur.state->string));
-   etk_range_value_set(ETK_RANGE(UI_Rel2XSpinner),
-      edje_edit_state_rel2_relative_x_get(edje_o, Cur.part->string,Cur.state->string));
-   etk_range_value_set(ETK_RANGE(UI_Rel2YSpinner),
-      edje_edit_state_rel2_relative_y_get(edje_o, Cur.part->string,Cur.state->string));
+   if (!cur.state || !cur.part) return;
+   //~ printf("Update Position of: %s\n", cur.state);
 
-   etk_range_value_set(ETK_RANGE(UI_Rel1XOffsetSpinner),
-         edje_edit_state_rel1_offset_x_get(edje_o, Cur.part->string,Cur.state->string));
-   etk_range_value_set(ETK_RANGE(UI_Rel1YOffsetSpinner),
-         edje_edit_state_rel1_offset_y_get(edje_o, Cur.part->string,Cur.state->string));
-   etk_range_value_set(ETK_RANGE(UI_Rel2XOffsetSpinner),
-         edje_edit_state_rel2_offset_x_get(edje_o, Cur.part->string,Cur.state->string));
-   etk_range_value_set(ETK_RANGE(UI_Rel2YOffsetSpinner),
-         edje_edit_state_rel2_offset_y_get(edje_o, Cur.part->string,Cur.state->string));
+   // Set position spinners
+   elm_entry_printf(_rel1x_entry, "%.2f", edje_edit_state_rel1_relative_x_get(
+					  ui.edje_o, cur.part, cur.state));
+   elm_entry_printf(_rel1y_entry, "%.2f", edje_edit_state_rel1_relative_y_get(
+					  ui.edje_o, cur.part, cur.state));
+   elm_entry_printf(_off1x_entry, "%d", edje_edit_state_rel1_offset_x_get(
+					  ui.edje_o, cur.part, cur.state));
+   elm_entry_printf(_off1y_entry, "%d", edje_edit_state_rel1_offset_y_get(
+					  ui.edje_o, cur.part, cur.state));
 
-   //Reenable signal propagation
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_Rel1XSpinner),
-                      ETK_CALLBACK(_position_RelSpinners_value_changed_cb),
-                      (void*)REL1X_SPINNER);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_Rel1YSpinner),
-                      ETK_CALLBACK(_position_RelSpinners_value_changed_cb),
-                      (void*)REL1Y_SPINNER);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_Rel2XSpinner),
-                      ETK_CALLBACK(_position_RelSpinners_value_changed_cb),
-                      (void*)REL2X_SPINNER);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_Rel2YSpinner),
-                      ETK_CALLBACK(_position_RelSpinners_value_changed_cb),
-                      (void*)REL2Y_SPINNER);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_Rel1XOffsetSpinner),
-                      ETK_CALLBACK(_position_RelOffsetSpinners_value_changed_cb),
-                      (void*)REL1X_SPINNER);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_Rel1YOffsetSpinner),
-                      ETK_CALLBACK(_position_RelOffsetSpinners_value_changed_cb),
-                      (void*)REL1Y_SPINNER);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_Rel2XOffsetSpinner),
-                      ETK_CALLBACK(_position_RelOffsetSpinners_value_changed_cb),
-                      (void*)REL2X_SPINNER);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_Rel2YOffsetSpinner),
-                      ETK_CALLBACK(_position_RelOffsetSpinners_value_changed_cb),
-                      (void*)REL2Y_SPINNER);
-}
+   elm_entry_printf(_rel2x_entry, "%.2f", edje_edit_state_rel2_relative_x_get(
+					  ui.edje_o, cur.part, cur.state));
+   elm_entry_printf(_rel2y_entry, "%.2f", edje_edit_state_rel2_relative_y_get(
+					  ui.edje_o, cur.part, cur.state));
+   elm_entry_printf(_off2x_entry, "%d", edje_edit_state_rel2_offset_x_get(
+					  ui.edje_o, cur.part, cur.state));
+   elm_entry_printf(_off2y_entry, "%d", edje_edit_state_rel2_offset_y_get(
+					  ui.edje_o, cur.part, cur.state));
 
-void
-position_comboboxes_populate(void)
-{
-   Eina_List *l;
-   char *image_name;
 
-   printf("Populate 4 Rel Comboboxs\n");
-   //Stop signal propagation
-   etk_signal_block("active-item-changed", ETK_OBJECT(UI_Rel1ToXComboBox),
-                    ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                    (void *)REL1X_SPINNER);
-   etk_signal_block("active-item-changed", ETK_OBJECT(UI_Rel1ToYComboBox),
-                    ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                    (void *)REL1Y_SPINNER);
-   etk_signal_block("active-item-changed", ETK_OBJECT(UI_Rel2ToXComboBox),
-                    ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                    (void *)REL2X_SPINNER);
-   etk_signal_block("active-item-changed", ETK_OBJECT(UI_Rel2ToYComboBox),
-                    ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                    (void *)REL2Y_SPINNER);
-   etk_signal_block("item-activated", ETK_OBJECT(UI_CliptoComboBox),
-                    ETK_CALLBACK(_part_CliptoComboBox_item_activated_cb), NULL);
-   etk_signal_block("item-activated", ETK_OBJECT(UI_PartConfineCombo),
-                    ETK_CALLBACK(_part_ConfineCombo_item_activated_cb), NULL);
-   etk_signal_block("item-activated", ETK_OBJECT(UI_PartEventCombo),
-                    ETK_CALLBACK(_part_EventCombo_item_activated_cb), NULL);
+   // Set comboboxes
+   if ((to = edje_edit_state_rel1_to_x_get(ui.edje_o, cur.part, cur.state)))
+   {
+      elm_hoversel_label_set(_to1x_combo, to);
+      edje_edit_string_free(to);
+   }
+   else elm_hoversel_label_set(_to1x_combo, "unset");
    
-   etk_combobox_clear(ETK_COMBOBOX(UI_Rel1ToXComboBox));
-   etk_combobox_clear(ETK_COMBOBOX(UI_Rel1ToYComboBox));
-   etk_combobox_clear(ETK_COMBOBOX(UI_Rel2ToXComboBox));
-   etk_combobox_clear(ETK_COMBOBOX(UI_Rel2ToYComboBox));
-   etk_combobox_clear(ETK_COMBOBOX(UI_CliptoComboBox));
-   etk_combobox_clear(ETK_COMBOBOX(UI_PartConfineCombo));
-   etk_combobox_clear(ETK_COMBOBOX(UI_PartEventCombo));
-
-   if (etk_string_length_get(Cur.group))
+   if ((to = edje_edit_state_rel1_to_y_get(ui.edje_o, cur.part, cur.state)))
    {
-      // Add first element 'Interface' to all the comboboxs
-      etk_combobox_item_append(ETK_COMBOBOX(UI_Rel1ToXComboBox),
-                               etk_image_new_from_edje(EdjeFile,"NONE.PNG"),
-                               "Interface");
-      etk_combobox_item_append(ETK_COMBOBOX(UI_Rel1ToYComboBox),
-                               etk_image_new_from_edje(EdjeFile,"NONE.PNG"),
-                               "Interface");
-      etk_combobox_item_append(ETK_COMBOBOX(UI_Rel2ToXComboBox),
-                               etk_image_new_from_edje(EdjeFile,"NONE.PNG"),
-                               "Interface");
-      etk_combobox_item_append(ETK_COMBOBOX(UI_Rel2ToYComboBox),
-                               etk_image_new_from_edje(EdjeFile,"NONE.PNG"),
-                               "Interface");
-      etk_combobox_item_append(ETK_COMBOBOX(UI_CliptoComboBox), 
-                               etk_image_new_from_edje(EdjeFile,"NONE.PNG"),
-                               "None");
-      etk_combobox_item_append(ETK_COMBOBOX(UI_PartConfineCombo), 
-                               etk_image_new_from_edje(EdjeFile,"NONE.PNG"),
-                               "None");
-      etk_combobox_item_append(ETK_COMBOBOX(UI_PartEventCombo), 
-                               etk_image_new_from_edje(EdjeFile,"NONE.PNG"),
-                               "None");
-      
-      // Add all the part to all the comboboxs
-      Eina_List *parts;
-
-      parts = l = edje_edit_parts_list_get(edje_o);
-      while (l)
-      {
-         //printf("-- %s\n", (char *)l->data);
-         image_name = part_type_image_get((char *)l->data);
-
-         etk_combobox_item_append(ETK_COMBOBOX(UI_Rel1ToXComboBox),
-                                  etk_image_new_from_edje(EdjeFile, image_name),
-                                  (char *)l->data);
-         etk_combobox_item_append(ETK_COMBOBOX(UI_Rel1ToYComboBox),
-                                  etk_image_new_from_edje(EdjeFile, image_name),
-                                  (char *)l->data);
-         etk_combobox_item_append(ETK_COMBOBOX(UI_Rel2ToXComboBox),
-                                  etk_image_new_from_edje(EdjeFile, image_name),
-                                  (char *)l->data);
-         etk_combobox_item_append(ETK_COMBOBOX(UI_Rel2ToYComboBox),
-                                  etk_image_new_from_edje(EdjeFile, image_name),
-                                  (char *)l->data);
-         etk_combobox_item_append(ETK_COMBOBOX(UI_CliptoComboBox),
-                                  etk_image_new_from_edje(EdjeFile, image_name),
-                                  (char *)l->data);
-         etk_combobox_item_append(ETK_COMBOBOX(UI_PartConfineCombo),
-                                  etk_image_new_from_edje(EdjeFile, image_name),
-                                  (char *)l->data);
-         etk_combobox_item_append(ETK_COMBOBOX(UI_PartEventCombo),
-                                  etk_image_new_from_edje(EdjeFile, image_name),
-                                  (char *)l->data);
-         free(image_name);
-         l = l->next;
-      }
-      edje_edit_string_list_free(parts);
+      elm_hoversel_label_set(_to1y_combo, to);
+      edje_edit_string_free(to);
    }
-
-   //Reenable signal propagation
-   etk_signal_unblock("active-item-changed", ETK_OBJECT(UI_Rel1ToXComboBox),
-                      ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                      (void *)REL1X_SPINNER);
-   etk_signal_unblock("active-item-changed", ETK_OBJECT(UI_Rel1ToYComboBox),
-                      ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                      (void *)REL1Y_SPINNER);
-   etk_signal_unblock("active-item-changed", ETK_OBJECT(UI_Rel2ToXComboBox),
-                      ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                      (void *)REL2X_SPINNER);
-   etk_signal_unblock("active-item-changed", ETK_OBJECT(UI_Rel2ToYComboBox),
-                      ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                      (void *)REL2Y_SPINNER);
-   etk_signal_unblock("item-activated", ETK_OBJECT(UI_CliptoComboBox),
-                      ETK_CALLBACK(_part_CliptoComboBox_item_activated_cb), NULL);
-   etk_signal_unblock("item-activated", ETK_OBJECT(UI_PartConfineCombo),
-                      ETK_CALLBACK(_part_ConfineCombo_item_activated_cb), NULL);
-   etk_signal_unblock("item-activated", ETK_OBJECT(UI_PartEventCombo),
-                      ETK_CALLBACK(_part_EventCombo_item_activated_cb), NULL);
-}
-
-
-void
-position_comboboxes_update(void)
-{
-   int i=0;
-   Etk_Combobox_Item *item = NULL;
-
-   printf("SETTING COMBOS\n");
-
-   //Stop signal propagation
-   etk_signal_block("active-item-changed", ETK_OBJECT(UI_Rel1ToXComboBox),
-                    ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                    (void*)REL1X_SPINNER);
-   etk_signal_block("active-item-changed", ETK_OBJECT(UI_Rel1ToYComboBox),
-                    ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                    (void*)REL1Y_SPINNER);
-   etk_signal_block("active-item-changed", ETK_OBJECT(UI_Rel2ToXComboBox),
-                    ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                    (void*)REL2X_SPINNER);
-   etk_signal_block("active-item-changed", ETK_OBJECT(UI_Rel2ToYComboBox),
-                    ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                    (void*)REL2Y_SPINNER);
-
-   if (!etk_string_length_get(Cur.part)) return;
-   if (!etk_string_length_get(Cur.state)) return;
-   const char *rel;
-   char *p;
-
-   //If rel1_to_x is know set the combobox
-   if ((rel = edje_edit_state_rel1_to_x_get(edje_o, Cur.part->string, Cur.state->string)))
-   {
-      //Loop for all the item in the Combobox
-      i=0;
-      while ((item = etk_combobox_nth_item_get(ETK_COMBOBOX(UI_Rel1ToXComboBox),i)))
-      {
-         p = etk_combobox_item_field_get(item, 1);
-         if (strcmp(p,rel) == 0)
-            etk_combobox_active_item_set(ETK_COMBOBOX(UI_Rel1ToXComboBox),item);
-         i++;
-      }
-      edje_edit_string_free(rel);
-   }
-   else
-      etk_combobox_active_item_set(ETK_COMBOBOX(UI_Rel1ToXComboBox), 
-            etk_combobox_nth_item_get(ETK_COMBOBOX(UI_Rel1ToXComboBox),0));
+   else elm_hoversel_label_set(_to1y_combo, "unset");
    
-   //If rel1_to_y is know set the combobox
-   if ((rel = edje_edit_state_rel1_to_y_get(edje_o, Cur.part->string, Cur.state->string)))
+   if ((to = edje_edit_state_rel2_to_x_get(ui.edje_o, cur.part, cur.state)))
    {
-      //Loop for all the item in the Combobox
-      i=0;
-      while ((item = etk_combobox_nth_item_get(ETK_COMBOBOX(UI_Rel1ToYComboBox),i)))
-      {
-         p = etk_combobox_item_field_get(item, 1);
-         if (strcmp(p,rel) == 0)
-            etk_combobox_active_item_set(ETK_COMBOBOX(UI_Rel1ToYComboBox),item);
-         i++;
-      }
-      edje_edit_string_free(rel);
+      elm_hoversel_label_set(_to2x_combo, to);
+      edje_edit_string_free(to);
    }
-   else
-      etk_combobox_active_item_set(ETK_COMBOBOX(UI_Rel1ToYComboBox), 
-            etk_combobox_nth_item_get(ETK_COMBOBOX(UI_Rel1ToYComboBox),0));
-
-   //If rel2_to_x is know set the combobox
-   if ((rel = edje_edit_state_rel2_to_x_get(edje_o, Cur.part->string, Cur.state->string)))
+   else elm_hoversel_label_set(_to2x_combo, "unset");
+   
+   if ((to = edje_edit_state_rel2_to_y_get(ui.edje_o, cur.part, cur.state)))
    {
-      //Loop for all the item in the Combobox
-      i=0;
-      while ((item = etk_combobox_nth_item_get(ETK_COMBOBOX(UI_Rel2ToXComboBox),i)))
-      {
-         p = etk_combobox_item_field_get(item, 1);
-         if (strcmp(p,rel) == 0)
-            etk_combobox_active_item_set(ETK_COMBOBOX(UI_Rel2ToXComboBox),item);
-         i++;
-      }
-      edje_edit_string_free(rel);
+      elm_hoversel_label_set(_to2y_combo, to);
+      edje_edit_string_free(to);
    }
-   else
-      etk_combobox_active_item_set(ETK_COMBOBOX(UI_Rel2ToXComboBox), 
-            etk_combobox_nth_item_get(ETK_COMBOBOX(UI_Rel2ToXComboBox),0));
-
-   //If rel2_to_y is know set the combobox
-   if ((rel = edje_edit_state_rel2_to_y_get(edje_o, Cur.part->string, Cur.state->string)))
-   {
-      //Loop for all the item in the Combobox
-      i=0;
-      while ((item = etk_combobox_nth_item_get(ETK_COMBOBOX(UI_Rel2ToYComboBox),i)))
-      {
-         p = etk_combobox_item_field_get(item, 1);
-         if (strcmp(p,rel) == 0)
-            etk_combobox_active_item_set(ETK_COMBOBOX(UI_Rel2ToYComboBox),item);
-         i++;
-      }
-      edje_edit_string_free(rel);
-   }
-   else
-      etk_combobox_active_item_set(ETK_COMBOBOX(UI_Rel2ToYComboBox), 
-            etk_combobox_nth_item_get(ETK_COMBOBOX(UI_Rel2ToYComboBox),0));
-
-   //Reenable signal propagation
-   etk_signal_unblock("active-item-changed", ETK_OBJECT(UI_Rel1ToXComboBox),
-                      ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                      (void*)REL1X_SPINNER);
-   etk_signal_unblock("active-item-changed", ETK_OBJECT(UI_Rel1ToYComboBox),
-                      ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                      (void*)REL1Y_SPINNER);
-   etk_signal_unblock("active-item-changed", ETK_OBJECT(UI_Rel2ToXComboBox),
-                      ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                      (void*)REL2X_SPINNER);
-   etk_signal_unblock("active-item-changed", ETK_OBJECT(UI_Rel2ToYComboBox),
-                      ETK_CALLBACK(_position_RelToComboBoxes_changed_cb),
-                      (void*)REL2Y_SPINNER);
-}
-
-/***   Callbacks   ***/
-Etk_Bool
-_position_RelOffsetSpinners_value_changed_cb(Etk_Range *range, double value, void *data)
-{
-   printf("Value Changed Signal on Offset Spinner EMITTED\n");
-
-   if (etk_string_length_get(Cur.state) && etk_string_length_get(Cur.part))
-   {
-      switch ((int)(long)data)
-      {
-         case REL1X_SPINNER:
-            edje_edit_state_rel1_offset_x_set(edje_o, 
-                                    Cur.part->string, Cur.state->string,
-                                    etk_range_value_get(range));
-            break;
-         case REL1Y_SPINNER:
-            edje_edit_state_rel1_offset_y_set(edje_o, 
-                                    Cur.part->string, Cur.state->string,
-                                    etk_range_value_get(range));
-            break;
-         case REL2X_SPINNER:
-            edje_edit_state_rel2_offset_x_set(edje_o, 
-                                    Cur.part->string, Cur.state->string,
-                                    etk_range_value_get(range));
-            break;
-         case REL2Y_SPINNER:
-            edje_edit_state_rel2_offset_y_set(edje_o, 
-                                    Cur.part->string, Cur.state->string,
-                                    etk_range_value_get(range));
-            break;
-      }
-      canvas_redraw();
-   }
-   return ETK_TRUE;
-}
-
-Etk_Bool
-_position_RelSpinners_value_changed_cb(Etk_Range *range, double value, void *data)
-{
-   printf("Value Changed Signal on RelSpinner EMITTED (value: %f)\n",etk_range_value_get(range));
-
-   if (etk_string_length_get(Cur.state) && etk_string_length_get(Cur.part))
-   {
-      switch ((int)(long)data)
-      {
-         case REL1X_SPINNER:
-            edje_edit_state_rel1_relative_x_set(edje_o, 
-                                    Cur.part->string, Cur.state->string,
-                                    etk_range_value_get(range));
-            break;
-         case REL1Y_SPINNER:
-            edje_edit_state_rel1_relative_y_set(edje_o, 
-                                    Cur.part->string, Cur.state->string,
-                                    etk_range_value_get(range));
-            break;
-         case REL2X_SPINNER:
-            edje_edit_state_rel2_relative_x_set(edje_o, 
-                                    Cur.part->string, Cur.state->string,
-                                    etk_range_value_get(range));
-            break;
-         case REL2Y_SPINNER:
-            edje_edit_state_rel2_relative_y_set(edje_o, 
-                                    Cur.part->string, Cur.state->string,
-                                    etk_range_value_get(range));
-            break;
-      }
-      canvas_redraw();
-   }
-   return ETK_TRUE;
-}
-
-Etk_Bool
-_position_RelToComboBoxes_changed_cb(Etk_Combobox *combobox, void *data)
-{
-   char *parent;
-   parent = etk_combobox_item_field_get(etk_combobox_active_item_get(combobox), 1);
-
-   if (strcmp(parent,"Interface") == 0)
-        parent = NULL;
-
-   if (parent && (strcmp(parent,Cur.part->string) == 0))
-   {
-      dialog_alert_show("A state can't rel to itself.");
-      return ETK_TRUE;
-   }
-
-   switch ((int)(long)data)
-   {
-      case REL1X_SPINNER:
-         edje_edit_state_rel1_to_x_set(edje_o, Cur.part->string,
-                                       Cur.state->string, parent);
-         break;
-      case REL1Y_SPINNER:
-         edje_edit_state_rel1_to_y_set(edje_o, Cur.part->string,
-                                       Cur.state->string, parent);
-         break;
-      case REL2X_SPINNER:
-         edje_edit_state_rel2_to_x_set(edje_o, Cur.part->string,
-                                       Cur.state->string, parent);
-         break;
-      case REL2Y_SPINNER:
-        edje_edit_state_rel2_to_y_set(edje_o, Cur.part->string,
-                                      Cur.state->string, parent);
-         break;
-   }
-
-   edje_edit_part_selected_state_set(edje_o, Cur.part->string, Cur.state->string);  //this make edje redraw (need to update in lib)
-   canvas_redraw();
-   return ETK_TRUE;
+   else elm_hoversel_label_set(_to2y_combo, "unset");
 }

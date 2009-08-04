@@ -132,9 +132,9 @@ part_frame_create(Evas_Object *parent)
    evas_object_show(tb);
 
    NEW_ENTRY_TO_TABLE("name:", 0, 0, _name_entry, EINA_TRUE)
-   NEW_COMBO_TO_TABLE(_clipto_combo, "clip to:", 0, 1, part_populate_combo_with_parts, _clipto_combo_sel)
+   NEW_COMBO_TO_TABLE(_clipto_combo, "clip to:", 0, 1, 1, part_populate_combo_with_parts, _clipto_combo_sel)
    
-   NEW_COMBO_TO_TABLE( _events_combo, "mouse events:", 0, 2, NULL, NULL)
+   NEW_COMBO_TO_TABLE( _events_combo, "mouse events:", 0, 2, 1, NULL, NULL)
    elm_hoversel_item_add(_events_combo, "no", NULL, ELM_ICON_NONE,
                          _events_combo_sel, (void*)EVENTS_NO);
    elm_hoversel_item_add(_events_combo, "yes", NULL, ELM_ICON_NONE,
@@ -439,9 +439,11 @@ part_populate_combo_with_parts(void *data, Evas_Object *obj, void *event_info)
    Eina_List *parts, *l;
    const char *name;
    parts = edje_edit_parts_list_get(ui.edje_o);
+   
+   elm_hoversel_item_add(obj, "unset", NULL, ELM_ICON_NONE, NULL, NULL);
    EINA_LIST_FOREACH(parts, l, name)
       //TODO Fix icons
-      elm_hoversel_item_add(_clipto_combo, name, "home", ELM_ICON_STANDARD, NULL, NULL);
+      elm_hoversel_item_add(obj, name, "home", ELM_ICON_STANDARD, NULL, NULL);
    edje_edit_string_list_free(parts);
 }
 
