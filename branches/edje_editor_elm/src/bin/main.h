@@ -30,7 +30,7 @@
 #include "edje_editor_tree.h"
 #include "edje_editor_group.h"
 #include "edje_editor_part.h"
-//~ #include "edje_editor_state.h"
+#include "edje_editor_state.h"
 #include "edje_editor_position.h"
 //~ #include "edje_editor_text.h"
 //~ #include "edje_editor_rect.h"
@@ -60,6 +60,10 @@
 //~ #endif
 
 #define IFREE(ptr) { free(ptr); ptr = NULL; }
+
+#define MSG_FLOAT "<b>Can't understand size.</b><br>The number need to be a float:<br> (for ex.) '0.35'"
+#define MSG_INT "<b>Can't understand size.</b><br>The number need to be an integer :<br> (for ex.) '-12'"
+#define MSG_SIZE "<b>Can't understand sizes.</b><br>The format need to be:<br> (for ex.) '100x120'"
 
 //All the enum used are declared here
 enum various

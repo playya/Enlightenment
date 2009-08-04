@@ -134,7 +134,7 @@ part_frame_create(Evas_Object *parent)
    NEW_ENTRY_TO_TABLE("name:", 0, 0, _name_entry, EINA_TRUE)
    NEW_COMBO_TO_TABLE(_clipto_combo, "clip to:", 0, 1, 1, part_populate_combo_with_parts, _clipto_combo_sel)
    
-   NEW_COMBO_TO_TABLE( _events_combo, "mouse events:", 0, 2, 1, NULL, NULL)
+   NEW_COMBO_TO_TABLE( _events_combo, "events:", 0, 2, 1, NULL, NULL)
    elm_hoversel_item_add(_events_combo, "no", NULL, ELM_ICON_NONE,
                          _events_combo_sel, (void*)EVENTS_NO);
    elm_hoversel_item_add(_events_combo, "yes", NULL, ELM_ICON_NONE,

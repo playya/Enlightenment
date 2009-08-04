@@ -113,6 +113,7 @@ _tree_model_part_sel(void *data, Evas_Object *obj, void *event_info)
    window_update_frames_visibility();
    
    part_frame_update();
+   state_frame_update();
    position_frame_update();
    canvas_redraw();
 }
@@ -133,7 +134,7 @@ _tree_model_state_sel(void *data, Evas_Object *obj, void *event_info)
    
    edje_edit_part_selected_state_set(ui.edje_o, cur.part, cur.state);  
 
-   //~ state_frame_update();
+   state_frame_update();
    position_frame_update();
    //~ position_comboboxes_update();
 
@@ -310,8 +311,6 @@ tree_parts_create(void)
    //~ elm_hoversel_item_add(o, "asd", NULL, ELM_ICON_NONE, /*on_hover_signal_select*/NULL, NULL);
    //~ elm_hoversel_item_add(o, "asd3", NULL, ELM_ICON_NONE, /*on_hover_signal_select*/NULL, NULL);
 
-
-   //
 
    parts = edje_edit_parts_list_get(ui.edje_o);
    EINA_LIST_FOREACH(parts, l, name)
@@ -587,7 +586,7 @@ tree_groups_create(void)
          //~ edje_object_signal_emit(edje_ui,"group_frame_show","edje_editor");
          //~ edje_object_signal_emit(edje_ui,"program_frame_hide","edje_editor");
          //~ edje_object_signal_emit(edje_ui,"script_frame_hide","edje_editor");
-         //~ edje_object_signal_emit(edje_ui,"description_frame_show","edje_editor");
+         //~ edje_object_signal_emit(edje_ui,"state_frame_show","edje_editor");
          //~ edje_object_signal_emit(edje_ui,"position_frame_show","edje_editor");
          //~ break;
 //~ 
@@ -597,7 +596,7 @@ tree_groups_create(void)
          //~ Cur.state = etk_string_clear(Cur.state);
          //~ Cur.tween = etk_string_clear(Cur.tween);
 //~ 
-         //~ edje_object_signal_emit(edje_ui,"description_frame_hide","edje_editor");
+         //~ edje_object_signal_emit(edje_ui,"state_frame_hide","edje_editor");
          //~ edje_object_signal_emit(edje_ui,"position_frame_hide","edje_editor");
          //~ edje_object_signal_emit(edje_ui,"rect_frame_hide","edje_editor");
          //~ edje_object_signal_emit(edje_ui,"image_frame_hide","edje_editor");

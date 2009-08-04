@@ -65,6 +65,7 @@ window_main_create(void)
    elm_layout_content_set(ly, "group_frame_swallow", group_frame_create(ui.win));
    elm_layout_content_set(ly, "part_frame_swallow", part_frame_create(ui.win));
    elm_layout_content_set(ly, "position_frame_swallow", position_frame_create(ui.win));
+   elm_layout_content_set(ly, "state_frame_swallow", state_frame_create(ui.win));
 
 
    // Logo (keygrabber)
@@ -109,18 +110,18 @@ window_update_frames_visibility(void)
       
    if (cur.state)
    {
-      edje_object_signal_emit(ui.edje_ui, "description_frame_show", "edje_editor");
+      edje_object_signal_emit(ui.edje_ui, "state_frame_show", "edje_editor");
       edje_object_signal_emit(ui.edje_ui, "position_frame_show", "edje_editor");
    }
    else
    {
-      edje_object_signal_emit(ui.edje_ui, "description_frame_hide", "edje_editor");
+      edje_object_signal_emit(ui.edje_ui, "state_frame_hide", "edje_editor");
       edje_object_signal_emit(ui.edje_ui, "position_frame_hide", "edje_editor");
    }
    
    if (cur.part && cur.state)
    {
-      edje_object_signal_emit(ui.edje_ui,"description_frame_show","edje_editor");
+      edje_object_signal_emit(ui.edje_ui,"state_frame_show","edje_editor");
       edje_object_signal_emit(ui.edje_ui,"position_frame_show","edje_editor");
 
       switch(edje_edit_part_type_get(ui.edje_o, cur.part))
@@ -164,7 +165,7 @@ window_update_frames_visibility(void)
    }
    else
    {
-      edje_object_signal_emit(ui.edje_ui,"description_frame_hide","edje_editor");
+      edje_object_signal_emit(ui.edje_ui,"state_frame_hide","edje_editor");
       edje_object_signal_emit(ui.edje_ui,"position_frame_hide","edje_editor");
       
       edje_object_signal_emit(ui.edje_ui,"rect_frame_hide","edje_editor");

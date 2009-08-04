@@ -1,4 +1,4 @@
-/*  Copyright (C) 2006-2008 Davide Andreoli (see AUTHORS)
+/*  Copyright (C) 2006-2009 Davide Andreoli (see AUTHORS)
  *
  *  This file is part of Edje_editor.
  *  Edje_editor is free software: you can redistribute it and/or modify
@@ -15,425 +15,296 @@
  *  along with Edje_editor.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string.h>
-#include <Etk.h>
-#include <Edje.h>
-#include <Edje_Edit.h>
 #include "main.h"
 
+static Evas_Object *_name_entry;
+static Evas_Object *_aspect_min_entry;
+static Evas_Object *_aspect_max_entry;
+static Evas_Object *_aspect_combo;
+static Evas_Object *_size_min_entry;
+static Evas_Object *_size_max_entry;
+static Evas_Object *_align_x_entry;
+static Evas_Object *_align_y_entry;
+static Evas_Object *_color_class_entry;
+static Evas_Object *_visible_toggle;
+
+/***   Callbacks   ***/
+static void
+_entry_apply(Evas_Object *o)
+{
+   char *txt;
+   double f;
+   int w, h;
+
+   /* TODO FIX THIS IN ELM */
+   /* I get a <br> at the end of the line */
+   /* Need to fix elm for this, maybe a single_line entry must take care of this*/
+   const char *to_fix;
+   to_fix = elm_entry_entry_get(o);
+   txt = strdup(to_fix);
+   if (ecore_str_has_suffix(txt, "<br>"))
+      txt[strlen(txt) - 4] = '\0';
+   printf("Apply entry [%s]\n", txt);
+
+   if (!txt || !cur.state) return;
+   
+   // Apply Name
+   if (o == _name_entry)
+   {
+      if (ecore_str_equal(txt, cur.state)) return;
+
+      if (ecore_str_equal(cur.state, "default 0.0"))
+      {
+	 dialog_alert_show("You can't rename default 0.0");
+	 state_frame_update();
+	 return;
+      }
+
+      if (edje_edit_state_name_set(ui.edje_o, cur.part, cur.state, txt))
+      {
+	 /* update tree  TODO */
+	 //~ Etk_Tree_Row *row;
+	 //~ row = etk_tree_selected_row_get(ETK_TREE(UI_PartsTree));
+	 //~ etk_tree_row_fields_set(row,TRUE,
+                                    //~ COL_NAME, EdjeFile, "DESC.PNG", name,
+                                    //~ NULL);
+	 set_current_state(txt);
+      }
+      else
+	 dialog_alert_show("<b>Wrong name format</b><br>Name must be in the form:<br>\"default 0.00\"");
+   }
+
+   // Apply Aspect 
+   else if (o == _aspect_min_entry)
+   {
+      if (sscanf(txt,"%lf", &f) == 1)
+	 edje_edit_state_aspect_min_set(ui.edje_o, cur.part, cur.state, f);
+      else
+	 dialog_alert_show(MSG_FLOAT);
+   }
+   else if (o == _aspect_max_entry)
+   {
+      if (sscanf(txt,"%lf", &f) == 1)
+	 edje_edit_state_aspect_max_set(ui.edje_o, cur.part, cur.state, f);
+      else
+	 dialog_alert_show(MSG_FLOAT);
+   }
+
+   // Apply SizeMin
+   else if (o == _size_min_entry)
+   {
+      if (ecore_str_equal(txt, "unset"))
+	 w = h = 0;
+      else if (sscanf(txt,"%dx%d", &w, &h) != 2)
+      {
+	 dialog_alert_show(MSG_SIZE);
+	 return;
+      }
+      edje_edit_state_min_w_set(ui.edje_o, cur.part, cur.state, w);
+      edje_edit_state_min_h_set(ui.edje_o, cur.part, cur.state, h);
+   }
+
+   // Apply SizeMax
+   else if (o == _size_max_entry )
+   {
+      if (ecore_str_equal(txt, "unset"))
+	 w = h = -1;
+      else if (sscanf(txt,"%dx%d", &w, &h) != 2)
+      {
+	 dialog_alert_show(MSG_SIZE);
+	 return;
+      }
+      edje_edit_state_max_w_set(ui.edje_o, cur.part, cur.state, w);
+      edje_edit_state_max_h_set(ui.edje_o, cur.part, cur.state, h);
+   }
+
+   // Apply Align
+   else if (o == _align_x_entry)
+   {
+      if (sscanf(txt,"%lf", &f) == 1)
+	 edje_edit_state_align_x_set(ui.edje_o, cur.part, cur.state, f);
+      else
+	 dialog_alert_show(MSG_FLOAT);
+   }
+   else if (o == _align_y_entry)
+   {
+      if (sscanf(txt,"%lf", &f) == 1)
+	 edje_edit_state_align_y_set(ui.edje_o, cur.part, cur.state, f);
+      else
+	 dialog_alert_show(MSG_FLOAT);
+   }
+
+   // Apply ColorClass
+   else if (o == _color_class_entry)
+   {
+      if (ecore_str_equal(txt, "unset") || strlen(txt) < 1)
+	 edje_edit_state_color_class_set(ui.edje_o, cur.part, cur.state, NULL);
+      else
+	 edje_edit_state_color_class_set(ui.edje_o, cur.part, cur.state, txt);
+   }
+   
+   canvas_redraw();
+}
+
+static void
+_entry_key_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   Evas_Event_Key_Down *ev = event_info;
+   
+   //~ printf("KEY DOWN %s\n", ev->key);
+   if (ecore_str_equal(ev->key, "Return"))
+   {
+      _entry_apply(obj);
+   }
+   else if(ecore_str_equal(ev->key, "Escape"))
+   {
+      state_frame_update();
+   }
+}
+
+static void
+_aspect_combo_sel(void *data, Evas_Object *obj, void *event_info)
+{
+   edje_edit_state_aspect_pref_set(ui.edje_o, cur.part, cur.state,
+				   (int)(long)data);
+   state_frame_update();
+}
+
+static void
+_visible_toggle_changed(void *data, Evas_Object *obj, void *event_info)
+{
+   if (!cur.part || !cur.state) return;
+   edje_edit_state_visible_set(ui.edje_o, cur.part, cur.state,
+			       elm_toggle_state_get(_visible_toggle));
+   canvas_redraw();
+}
 
 /***   Implementation   ***/
-Etk_Widget*
-state_frame_create(void)
+Evas_Object*
+state_frame_create(Evas_Object *parent)
 {
-   Etk_Widget *vbox;
-   Etk_Widget *hbox;
-   Etk_Widget *label;
-   Etk_Combobox_Item *ComboItem;
+   Evas_Object *tb, *_o, *p;
 
-   //vbox
-   vbox = etk_vbox_new(ETK_FALSE, 0);
-  // etk_container_add(ETK_CONTAINER(UI_DescriptionFrame), vbox);
+   tb = elm_table_add(parent);
+   evas_object_show(tb);
 
-   //hbox
-   hbox = etk_hbox_new(ETK_FALSE, 0);
-   etk_box_append(ETK_BOX(vbox), hbox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   label = etk_label_new("<b>Name</b>");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //StateEntry
-   UI_StateEntry = etk_entry_new();
-   UI_StateEntryImage = etk_image_new_from_stock(ETK_STOCK_DIALOG_OK,
-                                                   ETK_STOCK_SMALL);
-   etk_entry_image_set(ETK_ENTRY(UI_StateEntry), ETK_ENTRY_IMAGE_SECONDARY,
-                       ETK_IMAGE(UI_StateEntryImage));
-   etk_box_append(ETK_BOX(hbox), UI_StateEntry, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //UI_StateIndexSpinner
-   //~ UI_StateIndexSpinner = etk_spinner_new(0.0, 1.0, 0.0, 0.1, 1.0);
-   //~ etk_spinner_digits_set(ETK_SPINNER(UI_StateIndexSpinner), 1);
-   //~ etk_widget_size_request_set(UI_StateIndexSpinner,45, 20);
-   //~ etk_box_append(ETK_BOX(hbox),UI_StateIndexSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //hbox
-   hbox = etk_hbox_new(ETK_FALSE, 0);
-   etk_box_append(ETK_BOX(vbox), hbox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   label = etk_label_new("<b>Aspect</b>");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   label = etk_label_new("min:");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign", 1.0, NULL);
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //UI_AspectMinSpinner
-   UI_AspectMinSpinner = etk_spinner_new(0.0, 100.0, 0.0, 0.1, 1.0);
-   etk_spinner_digits_set(ETK_SPINNER(UI_AspectMinSpinner), 1);
-   etk_widget_size_request_set(UI_AspectMinSpinner,45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_AspectMinSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   label = etk_label_new("max:");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign", 1.0, NULL);
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //UI_AspectMaxSpinner
-   UI_AspectMaxSpinner = etk_spinner_new(0.0, 100.0, 0.0, 0.1, 1.0);
-   etk_spinner_digits_set(ETK_SPINNER(UI_AspectMaxSpinner), 1);
-   etk_widget_size_request_set(UI_AspectMaxSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_AspectMaxSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //UI_AspectCombo
-   UI_AspectComboBox = etk_combobox_new();
-   etk_combobox_column_add(ETK_COMBOBOX(UI_AspectComboBox), ETK_COMBOBOX_LABEL, 30, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_build(ETK_COMBOBOX(UI_AspectComboBox));
-   etk_box_append(ETK_BOX(hbox), UI_AspectComboBox, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_AspectComboBox), "None");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_ASPECT_PREFER_NONE);
-
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_AspectComboBox), "Vertical");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_ASPECT_PREFER_VERTICAL);
-
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_AspectComboBox), "Horizontal");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_ASPECT_PREFER_HORIZONTAL);
-
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_AspectComboBox), "Both");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_ASPECT_PREFER_BOTH);
+   NEW_ENTRY_TO_TABLE("name:", 0, 0, _name_entry, EINA_TRUE)
+   NEW_DOUBLE_ENTRY_TO_TABLE("aspect:", 0, 1, _aspect_min_entry, _aspect_max_entry, EINA_TRUE)
+   NEW_COMBO_TO_TABLE(_aspect_combo,"preference:", 0, 2, 2, NULL, NULL);
+   elm_hoversel_item_add(_aspect_combo, "None", NULL, ELM_ICON_NONE,
+                         _aspect_combo_sel, (void*)EDJE_ASPECT_PREFER_NONE);
+   elm_hoversel_item_add(_aspect_combo, "Vertical", NULL, ELM_ICON_NONE,
+                         _aspect_combo_sel, (void*)EDJE_ASPECT_PREFER_VERTICAL);
+   elm_hoversel_item_add(_aspect_combo, "Horizontal", NULL, ELM_ICON_NONE,
+                         _aspect_combo_sel, (void*)EDJE_ASPECT_PREFER_HORIZONTAL);
+   elm_hoversel_item_add(_aspect_combo, "Both", NULL, ELM_ICON_NONE,
+                         _aspect_combo_sel, (void*)EDJE_ASPECT_PREFER_BOTH);
    
-   //hbox
-   hbox = etk_hbox_new(ETK_FALSE, 0);
-   etk_box_append(ETK_BOX(vbox), hbox, ETK_BOX_START, ETK_BOX_NONE, 0);
+   NEW_ENTRY_TO_TABLE("min:", 0, 3, _size_min_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("max:", 0, 4, _size_max_entry, EINA_TRUE)
+   NEW_DOUBLE_ENTRY_TO_TABLE("align:", 0, 5, _align_x_entry, _align_y_entry, EINA_TRUE)
 
-   label = etk_label_new("<b>Size</b> min");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //UI_StateMinWSpinner
-   UI_StateMinWSpinner = etk_spinner_new(0, 2000, 0, 1, 10);
-   etk_widget_size_request_set(UI_StateMinWSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_StateMinWSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   label = etk_label_new("x");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign", 0.5, NULL);
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //UI_StateMinHSpinner
-   UI_StateMinHSpinner = etk_spinner_new(0, 2000, 0, 1, 10);
-   etk_widget_size_request_set(UI_StateMinHSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_StateMinHSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   label = etk_label_new("max");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign", 1.0, NULL);
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //UI_StateMaxWSpinner
-   UI_StateMaxWSpinner = etk_spinner_new(0, 2000, 0, 1, 10);
-   etk_widget_size_request_set(UI_StateMaxWSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_StateMaxWSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   label = etk_label_new("x");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign", 0.5, NULL);
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //UI_StateMaxHspinner
-   UI_StateMaxHSpinner = etk_spinner_new(0, 2000, 0, 1, 10);
-   etk_widget_size_request_set(UI_StateMaxHSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_StateMaxHSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //hbox
-   hbox = etk_hbox_new(ETK_FALSE, 0);
-   etk_box_append(ETK_BOX(vbox), hbox, ETK_BOX_START, ETK_BOX_NONE, 0);
+   //// NEW_TOGGLE_TO_TABLE            // TODO
+   _o = elm_label_add(parent);
+   elm_label_label_set(_o, "visible:  ");
+   evas_object_size_hint_weight_set(_o, 0.0, 0.0);
+   evas_object_size_hint_align_set(_o, 1.0, 0.0);
+   elm_table_pack(tb, _o, 0, 6, 1, 1);
+   evas_object_show(_o);
    
-   //UI_StateAlignHSpinner
-   label = etk_label_new("<b>Align</b> H");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
+   p = elm_frame_add(parent);
+   elm_frame_style_set(p, "pad_small");
+   evas_object_size_hint_weight_set(p, 1.0, 1.0);
+   evas_object_size_hint_align_set(p, 0.0, 0.0);
+   elm_table_pack(tb, p, 1, 6, 2, 1);
+   evas_object_show(p);
 
-   UI_StateAlignHSpinner = etk_spinner_new(0, 1, 0, 0.01, 0.1);
-   etk_spinner_digits_set(ETK_SPINNER(UI_StateAlignHSpinner), 2);
-   etk_widget_size_request_set(UI_StateAlignHSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_StateAlignHSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
+   _o = elm_toggle_add(parent);
+   elm_toggle_states_labels_set(_o, "visible", "hidden");
+   
+   evas_object_size_hint_weight_set(_o, 1.0, 0.0);
+   evas_object_size_hint_align_set(_o, 0.0, 0.0);
+   elm_frame_content_set(p, _o);
+   _visible_toggle = _o;
+   evas_object_show(_o);
+   evas_object_smart_callback_add(_o, "changed", _visible_toggle_changed, NULL);
+   ////
+   
+   NEW_ENTRY_TO_TABLE("color class:", 0, 7, _color_class_entry, EINA_TRUE)
 
-   //UI_StateAlignVSpinner
-   label = etk_label_new("V");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   UI_StateAlignVSpinner = etk_spinner_new(0, 1, 0, 0.01, 0.1);
-   etk_spinner_digits_set(ETK_SPINNER(UI_StateAlignVSpinner), 2);
-   etk_widget_size_request_set(UI_StateAlignVSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_StateAlignVSpinner, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //UI_StateVisibleCheck
-   UI_StateVisibleCheck = etk_check_button_new_with_label("Visible");
-   etk_widget_padding_set(UI_StateVisibleCheck, 20, 0, 0, 0);
-   etk_box_append(ETK_BOX(hbox), UI_StateVisibleCheck, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //hbox
-   hbox = etk_hbox_new(ETK_FALSE, 0);
-   etk_box_append(ETK_BOX(vbox), hbox, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   //UI_StateCCEntry
-   label = etk_label_new("Color Class");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   UI_StateCCEntry = etk_entry_new();
-   etk_box_append(ETK_BOX(hbox), UI_StateCCEntry, ETK_BOX_START, ETK_BOX_NONE, 0);
-
-   etk_signal_connect("key-down", ETK_OBJECT(UI_StateEntry),
-                      ETK_CALLBACK(_state_Entry_key_down_cb), NULL);
-   etk_signal_connect("mouse-click", ETK_OBJECT(UI_StateEntryImage),
-                      ETK_CALLBACK(_state_EntryImage_clicked_cb), NULL);
-   etk_signal_connect("text-changed", ETK_OBJECT(UI_StateEntry),
-                      ETK_CALLBACK(_group_NamesEntry_text_changed_cb), NULL);
-
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_AspectMinSpinner),
-                      ETK_CALLBACK(_state_AspectSpinner_value_changed_cb), NULL);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_AspectMaxSpinner),
-                      ETK_CALLBACK(_state_AspectSpinner_value_changed_cb), NULL);
-   etk_signal_connect("active-item-changed", ETK_OBJECT(UI_AspectComboBox),
-                      ETK_CALLBACK(_state_AspectComboBox_changed_cb), NULL);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_StateMinWSpinner),
-                      ETK_CALLBACK(_state_MinMaxSpinner_value_changed_cb), NULL);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_StateMinHSpinner),
-                      ETK_CALLBACK(_state_MinMaxSpinner_value_changed_cb), NULL);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_StateMaxWSpinner),
-                      ETK_CALLBACK(_state_MinMaxSpinner_value_changed_cb), NULL);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_StateMaxHSpinner),
-                      ETK_CALLBACK(_state_MinMaxSpinner_value_changed_cb), NULL);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_StateAlignVSpinner),
-                      ETK_CALLBACK(_text_FontAlignSpinner_value_changed_cb),
-                      (void*)STATE_ALIGNV_SPINNER);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_StateAlignHSpinner),
-                      ETK_CALLBACK(_text_FontAlignSpinner_value_changed_cb),
-                      (void*)STATE_ALIGNH_SPINNER);
-   etk_signal_connect("toggled", ETK_OBJECT(UI_StateVisibleCheck),
-                      ETK_CALLBACK(_state_VisibleCheck_toggled_cb), NULL);
-   etk_signal_connect("text-changed", ETK_OBJECT(UI_StateCCEntry),
-                      ETK_CALLBACK(_state_CCEntry_text_changed_cb), NULL);
-
-   return vbox;
+   return tb;
 }
 
 void
 state_frame_update(void)
 {
    const char* cc;
+
+
+   if (!cur.state) return;
    
-   //Stop signal propagation
-   etk_signal_block("text-changed", ETK_OBJECT(UI_StateEntry),
-                    _group_NamesEntry_text_changed_cb, NULL);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_AspectMinSpinner),
-                    ETK_CALLBACK(_state_AspectSpinner_value_changed_cb), NULL);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_AspectMaxSpinner),
-                    ETK_CALLBACK(_state_AspectSpinner_value_changed_cb), NULL);
-   etk_signal_block("active-item-changed", ETK_OBJECT(UI_AspectComboBox),
-                    ETK_CALLBACK(_state_AspectComboBox_changed_cb), NULL);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_StateMinWSpinner),
-                    ETK_CALLBACK(_state_MinMaxSpinner_value_changed_cb), NULL);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_StateMinHSpinner),
-                    ETK_CALLBACK(_state_MinMaxSpinner_value_changed_cb), NULL);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_StateMaxWSpinner),
-                    ETK_CALLBACK(_state_MinMaxSpinner_value_changed_cb), NULL);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_StateMaxHSpinner),
-                    ETK_CALLBACK(_state_MinMaxSpinner_value_changed_cb), NULL);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_StateAlignVSpinner),
-                    ETK_CALLBACK(_text_FontAlignSpinner_value_changed_cb),
-                    (void*)STATE_ALIGNV_SPINNER);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_StateAlignHSpinner),
-                    ETK_CALLBACK(_text_FontAlignSpinner_value_changed_cb),
-                    (void*)STATE_ALIGNH_SPINNER);
-   etk_signal_block("toggled", ETK_OBJECT(UI_StateVisibleCheck),
-                    ETK_CALLBACK(_state_VisibleCheck_toggled_cb), NULL);
-   etk_signal_block("text-changed", ETK_OBJECT(UI_StateCCEntry),
-                    ETK_CALLBACK(_state_CCEntry_text_changed_cb), NULL);
+   //Set description name & index
+   elm_entry_entry_set(_name_entry, cur.state);
 
-   if (etk_string_length_get(Cur.state))
+   //TODO reenable this
+   //~ if (!strcmp(Cur.state->string, "default 0.00"))
+      //~ etk_widget_disabled_set(ETK_WIDGET(UI_StateEntry), ETK_TRUE);
+   //~ else
+      //~ etk_widget_disabled_set(ETK_WIDGET(UI_StateEntry), ETK_FALSE);
+
+   //Set aspect min & max
+   elm_entry_printf(_aspect_min_entry, "%.1f",
+		    edje_edit_state_aspect_min_get(ui.edje_o, cur.part, cur.state));
+   elm_entry_printf(_aspect_max_entry, "%.1f",
+		    edje_edit_state_aspect_max_get(ui.edje_o, cur.part, cur.state));
+   
+   //Set aspect preference
+   switch (edje_edit_state_aspect_pref_get(ui.edje_o, cur.part, cur.state))
    {
-      //Set description name & index
-      etk_entry_text_set(ETK_ENTRY(UI_StateEntry),Cur.state->string);
-      etk_widget_hide(ETK_WIDGET(UI_StateEntryImage));
-      if (!strcmp(Cur.state->string, "default 0.00"))
-         etk_widget_disabled_set(ETK_WIDGET(UI_StateEntry), ETK_TRUE);
-      else
-         etk_widget_disabled_set(ETK_WIDGET(UI_StateEntry), ETK_FALSE);
-
-      //Set aspect min & max
-      etk_range_value_set(ETK_RANGE(UI_AspectMinSpinner),
-         edje_edit_state_aspect_min_get(edje_o, Cur.part->string, Cur.state->string));
-      etk_range_value_set(ETK_RANGE(UI_AspectMaxSpinner),
-         edje_edit_state_aspect_max_get(edje_o, Cur.part->string, Cur.state->string));
-
-      //Set aspect pref Combo
-      etk_combobox_active_item_set(ETK_COMBOBOX(UI_AspectComboBox),
-         etk_combobox_nth_item_get(ETK_COMBOBOX(UI_AspectComboBox), 
-            edje_edit_state_aspect_pref_get(edje_o, Cur.part->string, Cur.state->string)));
-
-      //Set min e max size
-      etk_range_value_set(ETK_RANGE(UI_StateMinWSpinner),
-         edje_edit_state_min_w_get(edje_o, Cur.part->string, Cur.state->string));
-      etk_range_value_set(ETK_RANGE(UI_StateMinHSpinner),
-         edje_edit_state_min_h_get(edje_o, Cur.part->string, Cur.state->string));
-      etk_range_value_set(ETK_RANGE(UI_StateMaxWSpinner),
-         edje_edit_state_max_w_get(edje_o, Cur.part->string, Cur.state->string));
-      etk_range_value_set(ETK_RANGE(UI_StateMaxHSpinner),
-         edje_edit_state_max_h_get(edje_o, Cur.part->string, Cur.state->string));
-
-      //Set description align & valign
-      etk_range_value_set(ETK_RANGE(UI_StateAlignHSpinner),
-         edje_edit_state_align_x_get(edje_o, Cur.part->string, Cur.state->string));
-      etk_range_value_set(ETK_RANGE(UI_StateAlignVSpinner),
-         edje_edit_state_align_y_get(edje_o, Cur.part->string, Cur.state->string));
-
-      //Set visible checkbox
-      etk_toggle_button_active_set(ETK_TOGGLE_BUTTON(UI_StateVisibleCheck),
-         edje_edit_state_visible_get(edje_o, Cur.part->string, Cur.state->string));
-      
-      //Set Color Class Entry
-      cc = edje_edit_state_color_class_get(edje_o, Cur.part->string, Cur.state->string);
-      etk_entry_text_set(ETK_ENTRY(UI_StateCCEntry), cc);
-      edje_edit_string_free(cc);
+      case EDJE_ASPECT_PREFER_HORIZONTAL:
+	 elm_hoversel_label_set(_aspect_combo, "horizontal");
+	 break;
+      case EDJE_ASPECT_PREFER_VERTICAL:
+	 elm_hoversel_label_set(_aspect_combo, "vertical");
+	 break;
+      case EDJE_ASPECT_PREFER_BOTH:
+	 elm_hoversel_label_set(_aspect_combo, "both");
+	 break;
+      case EDJE_ASPECT_PREFER_NONE: default:
+	 elm_hoversel_label_set(_aspect_combo, "none");
+	 break;
    }
 
-   //ReEnable Signal Propagation
-   etk_signal_unblock("text-changed", ETK_OBJECT(UI_StateEntry),
-                      _group_NamesEntry_text_changed_cb, NULL);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_AspectMinSpinner),
-                      ETK_CALLBACK(_state_AspectSpinner_value_changed_cb), NULL);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_AspectMaxSpinner),
-                      ETK_CALLBACK(_state_AspectSpinner_value_changed_cb), NULL);
-   etk_signal_unblock("active-item-changed", ETK_OBJECT(UI_AspectComboBox),
-                      ETK_CALLBACK(_state_AspectComboBox_changed_cb), NULL);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_StateMinWSpinner),
-                      ETK_CALLBACK(_state_MinMaxSpinner_value_changed_cb), NULL);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_StateMinHSpinner),
-                      ETK_CALLBACK(_state_MinMaxSpinner_value_changed_cb), NULL);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_StateMaxWSpinner),
-                      ETK_CALLBACK(_state_MinMaxSpinner_value_changed_cb), NULL);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_StateMaxHSpinner),
-                      ETK_CALLBACK(_state_MinMaxSpinner_value_changed_cb), NULL);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_StateAlignVSpinner),
-                      ETK_CALLBACK(_text_FontAlignSpinner_value_changed_cb),
-                      (void*)STATE_ALIGNV_SPINNER);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_StateAlignHSpinner),
-                      ETK_CALLBACK(_text_FontAlignSpinner_value_changed_cb),
-                      (void*)STATE_ALIGNH_SPINNER);
-   etk_signal_unblock("toggled", ETK_OBJECT(UI_StateVisibleCheck),
-                      ETK_CALLBACK(_state_VisibleCheck_toggled_cb), NULL);
-   etk_signal_unblock("text-changed", ETK_OBJECT(UI_StateCCEntry),
-                      ETK_CALLBACK(_state_CCEntry_text_changed_cb), NULL);
-
-}
-
-
-/***   Callbacks   ***/
-Etk_Bool
-_state_Entry_key_down_cb(Etk_Object *object, Etk_Event_Key_Down *event, void *data)
-{
-   printf("PRESSED %s\n", event->keyname);
-   if (!strcmp("default 0.00", Cur.state->string))
-   {
-      dialog_alert_show("You can't rename default 0.0");
-      return ETK_TRUE;
-   }
-
-   if (!strcmp(event->keyname, "Return"))
-      _state_EntryImage_clicked_cb(ETK_OBJECT(ETK_ENTRY(object)->secondary_image),
-                                   NULL);
-   return ETK_TRUE;
-}
-
-Etk_Bool
-_state_EntryImage_clicked_cb(Etk_Object *object, void *data)
-{
-   const char *name;
-
-   printf("Mouse Click Signal on StateEntryImage Emitted\n");
-
-   name = etk_entry_text_get(ETK_ENTRY(UI_StateEntry));
-
-   if (!name || !etk_string_length_get(Cur.state)) return ETK_TRUE;
-
-   if (!strcmp(name, Cur.state->string))
-   {
-      etk_widget_hide(ETK_WIDGET(UI_StateEntryImage));
-      return ETK_TRUE;
-   }
-
-   /* Change state name */
-   if (strcmp("default 0.00", Cur.state->string))
-   {
-      if (edje_edit_state_name_set(edje_o, Cur.part->string, Cur.state->string, name))
-      {
-         /* update tree */
-         Etk_Tree_Row *row;
-         row = etk_tree_selected_row_get(ETK_TREE(UI_PartsTree));
-         etk_tree_row_fields_set(row,TRUE,
-                                    COL_NAME, EdjeFile, "DESC.PNG", name,
-                                    NULL);
-         /* update Cur */
-         Cur.state = etk_string_set(Cur.state, name);
-         /* Hide the entry image */
-         etk_widget_hide(ETK_WIDGET(UI_StateEntryImage));
-      }
-      else
-         dialog_alert_show("<b>Wrong name format</b><br>Name must be in the form:<br>\"default 0.00\"");
-   }
+   //Set SizeMin
+   int w, h;
+   w = edje_edit_state_min_w_get(ui.edje_o, cur.part, cur.state);
+   h = edje_edit_state_min_h_get(ui.edje_o, cur.part, cur.state);
+   if (w == 0 && h == 0)
+      elm_entry_entry_set(_size_min_entry, "unset");
    else
-      dialog_alert_show("You can't rename default 0.0");
+      elm_entry_printf(_size_min_entry, "%dx%d", w, h);
 
-   return ETK_TRUE;
-}
+   //Set SizeMax
+   w = edje_edit_state_max_w_get(ui.edje_o, cur.part, cur.state);
+   h = edje_edit_state_max_h_get(ui.edje_o, cur.part, cur.state);
+   if (w == -1 && h == -1)
+      elm_entry_entry_set(_size_max_entry, "unset");
+   else
+      elm_entry_printf(_size_max_entry, "%dx%d", w, h);
 
-Etk_Bool
-_state_AspectSpinner_value_changed_cb(Etk_Range *range, double value, void *data)
-{
-   printf("Value Changed Signal on AspectMinSpinner EMITTED\n");
-   edje_edit_state_aspect_min_set(edje_o, Cur.part->string, Cur.state->string,
-                           etk_range_value_get(ETK_RANGE(UI_AspectMinSpinner)));
-   edje_edit_state_aspect_max_set(edje_o, Cur.part->string, Cur.state->string,
-                           etk_range_value_get(ETK_RANGE(UI_AspectMaxSpinner)));
-   return ETK_TRUE;
-}
+   //Set align & valign
+   elm_entry_printf(_align_x_entry, "%.3f",
+	 edje_edit_state_align_x_get(ui.edje_o, cur.part, cur.state));
+   elm_entry_printf(_align_y_entry, "%.3f",
+	 edje_edit_state_align_y_get(ui.edje_o, cur.part, cur.state));
 
-Etk_Bool
-_state_AspectComboBox_changed_cb(Etk_Combobox *combobox, void *data)
-{
-   printf("Active Item Changed Signal on AspectComboBox EMITTED\n");
-   int pref;
-   pref = (int)(long)etk_combobox_item_data_get(etk_combobox_active_item_get (combobox));
-   edje_edit_state_aspect_pref_set(edje_o, Cur.part->string, Cur.state->string, pref);
-   return ETK_TRUE;
-}
+   //Set visible checkbox
+   elm_toggle_state_set(_visible_toggle,
+		edje_edit_state_visible_get(ui.edje_o, cur.part, cur.state));
 
-Etk_Bool
-_state_MinMaxSpinner_value_changed_cb(Etk_Range *range, double value, void *data)
-{
-   printf("Active Item Changed Signal on MinMaxSpinners EMITTED\n");
-
-   edje_edit_state_min_w_set(edje_o, Cur.part->string, Cur.state->string,
-                           etk_range_value_get(ETK_RANGE(UI_StateMinWSpinner)));
-   edje_edit_state_min_h_set(edje_o, Cur.part->string, Cur.state->string,
-                           etk_range_value_get(ETK_RANGE(UI_StateMinHSpinner)));
-   edje_edit_state_max_w_set(edje_o, Cur.part->string, Cur.state->string,
-                           etk_range_value_get(ETK_RANGE(UI_StateMaxWSpinner)));
-   edje_edit_state_max_h_set(edje_o, Cur.part->string, Cur.state->string,
-                           etk_range_value_get(ETK_RANGE(UI_StateMaxHSpinner)));
-
-   canvas_redraw();
-   return ETK_TRUE;
-}
-
-Etk_Bool
-_state_VisibleCheck_toggled_cb(Etk_Toggle_Button *button, void *data)
-{
-   edje_edit_state_visible_set(edje_o, Cur.part->string, Cur.state->string,
-                               etk_toggle_button_active_get(button));
-   return ETK_TRUE;
-}
-Etk_Bool
-_state_CCEntry_text_changed_cb(Etk_Object *object, void *data)
-{
-   printf("Text Changed Signal on CC Entry Emitted\n");
-   edje_edit_state_color_class_set(edje_o, Cur.part->string, Cur.state->string,
-                                   etk_entry_text_get(ETK_ENTRY(UI_StateCCEntry)));
-   return ETK_TRUE;
+   //Set Color Class Entry
+   cc = edje_edit_state_color_class_get(ui.edje_o, cur.part, cur.state);
+   elm_entry_entry_set(_color_class_entry, cc ? cc : "unset");
+   edje_edit_string_free(cc);
+   
 }

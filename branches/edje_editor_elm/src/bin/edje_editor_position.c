@@ -32,9 +32,6 @@ static Evas_Object *_to2x_combo;
 static Evas_Object *_to2y_combo;
 
 
-#define MSG_FLOAT "<b>Can't understand size.</b><br>The number need to be a float:<br> (for ex.) '0.35'"
-#define MSG_INT "<b>Can't understand size.</b><br>The number need to be an integer :<br> (for ex.) '-12'"
-
 /***   Callbacks   ***/
 static void
 _entry_apply(Evas_Object *o)
