@@ -33,7 +33,7 @@ _window_edit_obj_signal_cb(void *data, Evas_Object *o, const char *sig, const ch
 void
 window_main_create(void)
 {
-   Evas_Object *logo, *tb, *ly;
+   Evas_Object *logo, *ly;
    
    // Main Window
    ui.win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
@@ -51,14 +51,11 @@ window_main_create(void)
    ui.edje_ui = elm_layout_edje_get(ly);
 
    // Toolbar
-   tb = toolbar_create();
-   elm_toolbar_scrollable_set(tb, 0); // TODO This doesn't work
-   elm_layout_content_set(ly, "toolbar", tb);
-
+   elm_layout_content_set(ly, "toolbar_swallow", toolbar_create(ui.win));
 
    // Tree Pager
    ui.tree_pager = elm_pager_add(ui.win);
-   elm_layout_content_set(ly, "tree", ui.tree_pager); //TODO rename all to _swallow
+   elm_layout_content_set(ly, "tree_swallow", ui.tree_pager);
    evas_object_show(ui.tree_pager);
 
    //Right pane
@@ -66,6 +63,7 @@ window_main_create(void)
    elm_layout_content_set(ly, "part_frame_swallow", part_frame_create(ui.win));
    elm_layout_content_set(ly, "position_frame_swallow", position_frame_create(ui.win));
    elm_layout_content_set(ly, "state_frame_swallow", state_frame_create(ui.win));
+   elm_layout_content_set(ly, "text_frame_swallow", text_frame_create(ui.win));
 
 
    // Logo (keygrabber)
@@ -154,7 +152,7 @@ window_update_frames_visibility(void)
 	    //~ edje_object_signal_emit(edje_ui,"image_frame_hide","edje_editor");
 	    //~ break;
 	 case EDJE_PART_TYPE_TEXT:
-	    //~ text_frame_update();
+	    text_frame_update();
 	    edje_object_signal_emit(ui.edje_ui,"text_frame_show","edje_editor");
 	    edje_object_signal_emit(ui.edje_ui,"fill_frame_hide","edje_editor");
 	    edje_object_signal_emit(ui.edje_ui,"image_frame_hide","edje_editor");

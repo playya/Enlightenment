@@ -85,19 +85,13 @@ _dialog_filechooser_done(void *data, Evas_Object *obj, void *event_info)
             //~ etk_iconbox_icon_select(icon);
 //~ 
             //~ break;
-         //~ case FILECHOOSER_FONT:
-            //~ snprintf(cmd, 4096, "%s/%s", 
-               //~ etk_filechooser_widget_current_folder_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)),
-               //~ etk_filechooser_widget_selected_file_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
-            //~ if (!edje_edit_font_add(edje_o, cmd))
-            //~ {
-               //~ dialog_alert_show("ERROR: Can't import font file.");
-               //~ break;
-            //~ }
-            //~ text_font_combo_populate();
-            //~ etk_combobox_active_item_set(ETK_COMBOBOX(UI_FontComboBox),
-                  //~ etk_combobox_last_item_get(ETK_COMBOBOX(UI_FontComboBox)));
-         //~ break;
+	 case FILECHOOSER_FONT:
+	    if (!ecore_str_has_suffix(selected, ".ttf") ||
+	        (!edje_edit_font_add(ui.edje_o, selected)))
+	       dialog_alert_show("ERROR: Can't import font file.");
+	    evas_object_del(data);
+	    fonts_browser_show(ui.win);
+         break;
    }
 }
 

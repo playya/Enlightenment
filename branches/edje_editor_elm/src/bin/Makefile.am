@@ -29,6 +29,10 @@ edje_editor_position.c \
 edje_editor_position.h \
 edje_editor_state.c \
 edje_editor_state.h \
+edje_editor_text.c \
+edje_editor_text.h \
+edje_editor_fonts.c \
+edje_editor_fonts.h \
 main.c \
 main.h
 

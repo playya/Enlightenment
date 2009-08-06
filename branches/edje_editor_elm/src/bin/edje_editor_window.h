@@ -54,22 +54,22 @@ void _window_logo_key_press(void *data, Evas *e, Evas_Object *obj, void *event_i
 //~ 
 //~ void     _window_confirm_save        (Etk_Dialog *dialog, int response_id, void *data);
 
-//TODO describe this
-#define NEW_ENTRY_TO_TABLE(TITLE, X, Y, ENTRY, EDITABLE) \
+//TODO describe all this
+#define NEW_ENTRY_TO_TABLE(TITLE, X, Y, W, ENTRY, EDITABLE) \
    _o = elm_label_add(parent); \
    elm_label_label_set(_o, TITLE"  "); \
    elm_table_pack(tb, _o, X, Y, 1, 1); \
    evas_object_size_hint_weight_set(_o, 0.0, 0.0); \
-   evas_object_size_hint_align_set(_o, 1.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 1.0, 0.5); \
    evas_object_show(_o); \
     \
    _o = elm_entry_add(parent); \
    elm_entry_single_line_set(_o, 1); \
    elm_entry_editable_set(_o, EDITABLE); \
    elm_entry_entry_set(_o, "----"); \
-   elm_table_pack(tb, _o, X+1, Y, 1, 1); \
+   elm_table_pack(tb, _o, X+1, Y, W, 1); \
    evas_object_size_hint_weight_set(_o, 1.0, 0.0); \
-   evas_object_size_hint_align_set(_o, 0.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 0.0, 0.5); \
    evas_object_show(_o); \
    ENTRY = _o; \
    evas_object_event_callback_add(_o, EVAS_CALLBACK_KEY_DOWN, _entry_key_down, NULL);
@@ -79,7 +79,7 @@ void _window_logo_key_press(void *data, Evas *e, Evas_Object *obj, void *event_i
    elm_label_label_set(_o, TITLE"  "); \
    elm_table_pack(tb, _o, X, Y, 1, 1); \
    evas_object_size_hint_weight_set(_o, 0.0, 0.0); \
-   evas_object_size_hint_align_set(_o, 1.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 1.0, 0.5); \
    evas_object_show(_o); \
     \
    _o = elm_entry_add(parent); \
@@ -88,7 +88,7 @@ void _window_logo_key_press(void *data, Evas *e, Evas_Object *obj, void *event_i
    elm_entry_entry_set(_o, "----"); \
    elm_table_pack(tb, _o, X+1, Y, 1, 1); \
    evas_object_size_hint_weight_set(_o, 1.0, 0.0); \
-   evas_object_size_hint_align_set(_o, 0.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 0.0, 0.5); \
    evas_object_show(_o); \
    ENTRY1 = _o; \
    evas_object_event_callback_add(_o, EVAS_CALLBACK_KEY_DOWN, _entry_key_down, NULL); \
@@ -99,7 +99,7 @@ void _window_logo_key_press(void *data, Evas *e, Evas_Object *obj, void *event_i
    elm_entry_entry_set(_o, "----"); \
    elm_table_pack(tb, _o, X+2, Y, 1, 1); \
    evas_object_size_hint_weight_set(_o, 1.0, 0.0); \
-   evas_object_size_hint_align_set(_o, 0.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 0.0, 0.5); \
    evas_object_show(_o); \
    ENTRY2 = _o; \
    evas_object_event_callback_add(_o, EVAS_CALLBACK_KEY_DOWN, _entry_key_down, NULL);
@@ -109,13 +109,13 @@ void _window_logo_key_press(void *data, Evas *e, Evas_Object *obj, void *event_i
    elm_label_label_set(_o, TITLE"  "); \
    elm_table_pack(tb, _o, X, Y, 1, 1); \
    evas_object_size_hint_weight_set(_o, 0.0, 0.0); \
-   evas_object_size_hint_align_set(_o, 1.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 1.0, 0.5); \
    evas_object_show(_o); \
     \
    _o = elm_hoversel_add(parent); \
    elm_hoversel_hover_parent_set(_o, ui.win); \
    evas_object_size_hint_weight_set(_o, 1.0, 0.0); \
-   evas_object_size_hint_align_set(_o, 0.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 0.0, 0.5); \
    elm_table_pack(tb, _o, X+1, Y, W, 1); \
    evas_object_show(_o); \
    OBJ = _o; \

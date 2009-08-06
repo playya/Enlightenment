@@ -36,15 +36,15 @@ _toolbar_cb(void *data, Evas_Object *obj, void *event_info)
          dialog_filechooser_show(FILECHOOSER_OPEN);
          break;
       //~ case TOOLBAR_SAVE:
-         //~ if (!etk_string_length_get(Cur.edj_file_name))
+         //~ if (!cur.open_file_name)
          //~ {
-            //~ dialog_filechooser_show(FILECHOOSER_SAVE_EDJ);
+            //~ dialog_filechooser_show(FILECHOOSER_SAVE_EDJ); //TODO
             //~ break;
          //~ }
-
-         compiler = edje_edit_compiler_get(ui.edje_o);
-         if (strcmp(compiler, "edje_edit"))
-         {
+//~ 
+         //~ compiler = edje_edit_compiler_get(ui.edje_o);
+         //~ if (strcmp(compiler, "edje_edit"))
+         //~ {
             //~ dialog = etk_message_dialog_new(ETK_MESSAGE_DIALOG_WARNING,
                                           //~ ETK_MESSAGE_DIALOG_OK_CANCEL,
                      //~ "<b>Warning</b><br>"
@@ -61,29 +61,65 @@ _toolbar_cb(void *data, Evas_Object *obj, void *event_info)
                             //~ ETK_CALLBACK(_window_confirm_save), NULL);
             //~ etk_widget_show_all(dialog);
             //~ break;
-         }
-         edje_edit_string_free(compiler);
+         //~ }
+         //~ edje_edit_string_free(compiler);
 
          //~ _window_confirm_save(NULL, ETK_RESPONSE_OK, NULL);
-         break;
+         //~ break;
       case TOOLBAR_SAVE_EDC:
          dialog_alert_show("Not yet reimplemented ;)");
          break;
       //~ case TOOLBAR_SAVE_EDJ:
          //~ dialog_filechooser_show(FILECHOOSER_SAVE_EDJ);
          //~ break;
+      case TOOLBAR_EXIT:
+	 elm_exit();
+	 break;
+      default: break;
    }
 
 }
 
 #define TOOLBAR_ITEM(LABEL, IMAGE, DATA) \
-   icon = elm_icon_add(ui.win); \
-   elm_icon_file_set(icon, EdjeFile, IMAGE); \
-   elm_toolbar_item_add(tb, icon, LABEL, _toolbar_cb, (void*)DATA);
-
+   bt = elm_button_add(parent); \
+   elm_button_label_set(bt, LABEL); \
+   ic = elm_icon_add(parent); \
+   elm_icon_file_set(ic, EdjeFile, IMAGE); \
+   elm_button_icon_set(bt, ic); \
+   elm_button_style_set(bt, "toolbar_horizontal"); \
+   elm_box_pack_end(box, bt); \
+   evas_object_show(bt); \
+   evas_object_smart_callback_add(bt, "clicked", _toolbar_cb, DATA);
 
 Evas_Object*
-toolbar_create()
+toolbar_create(Evas_Object *parent)
+{
+   Evas_Object *box, *bt, *ic;
+
+   box = elm_box_add(parent);
+   elm_box_horizontal_set(box, 1);
+   elm_box_homogenous_set(box, 0);
+   evas_object_show(box);
+
+
+   TOOLBAR_ITEM("New", "DOC_NEW.PNG", (void*)TOOLBAR_NEW)
+   TOOLBAR_ITEM("Open", "", (void*)TOOLBAR_OPEN)
+   TOOLBAR_ITEM("Save", "DOC_SAVE.PNG", (void*)TOOLBAR_SAVE)
+   TOOLBAR_ITEM("d", "DOC_SAVE_AS.PNG", (void*)TOOLBAR_SAVE_EDJ)
+   /*TOOLBAR_ITEM("Export edc", "DOC_SAVE_AS.PNG", TOOLBAR_SAVE_EDC)*/
+   
+   
+   
+   TOOLBAR_ITEM("Exit", "EXIT.PNG", (void*)TOOLBAR_EXIT)
+   // these apply to the last item created (Exit) an put it at the end
+   evas_object_size_hint_align_set(bt, 1.0, 0.5);
+   evas_object_size_hint_weight_set(bt, 1.0, 1.0);
+
+   return box;
+}
+
+Evas_Object*
+toolbar_create_old()
 {
    Evas_Object *tb, *icon;
 
@@ -92,17 +128,15 @@ toolbar_create()
    elm_toolbar_scrollable_set(tb, 0);
 
 
-   TOOLBAR_ITEM("New", "DOC_NEW.PNG", TOOLBAR_NEW)
-   TOOLBAR_ITEM("Open", "DOC_OPEN.PNG", TOOLBAR_OPEN)
-   TOOLBAR_ITEM("Save", "DOC_SAVE.PNG", TOOLBAR_SAVE)
-   TOOLBAR_ITEM("Save as", "DOC_SAVE_AS.PNG", TOOLBAR_SAVE_EDJ)
+   //~ TOOLBAR_ITEM("Save", "DOC_SAVE.PNG", TOOLBAR_SAVE)
+   //~ TOOLBAR_ITEM("Save as", "DOC_SAVE_AS.PNG", TOOLBAR_SAVE_EDJ)
    /*TOOLBAR_ITEM("Export edc", "DOC_SAVE_AS.PNG", TOOLBAR_SAVE_EDC)*/
 
    //~ sep = etk_vseparator_new();
    //~ etk_toolbar_append(ETK_TOOLBAR(UI_Toolbar), sep, ETK_BOX_START);
  
-   TOOLBAR_ITEM("Add", "ADD.PNG", TOOLBAR_ADD)
-   TOOLBAR_ITEM("Remove", "REMOVE.PNG", TOOLBAR_REMOVE)
+   //~ TOOLBAR_ITEM("Add", "ADD.PNG", TOOLBAR_ADD)
+   //~ TOOLBAR_ITEM("Remove", "REMOVE.PNG", TOOLBAR_REMOVE)
    
    //AddMenu
    //~ UI_AddMenu = etk_menu_new();

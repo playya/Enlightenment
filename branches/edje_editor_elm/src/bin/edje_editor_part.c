@@ -131,7 +131,7 @@ part_frame_create(Evas_Object *parent)
    tb = elm_table_add(parent);
    evas_object_show(tb);
 
-   NEW_ENTRY_TO_TABLE("name:", 0, 0, _name_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("name:", 0, 0, 1, _name_entry, EINA_TRUE)
    NEW_COMBO_TO_TABLE(_clipto_combo, "clip to:", 0, 1, 1, part_populate_combo_with_parts, _clipto_combo_sel)
    
    NEW_COMBO_TO_TABLE( _events_combo, "events:", 0, 2, 1, NULL, NULL)

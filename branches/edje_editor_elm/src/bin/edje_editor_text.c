@@ -1,4 +1,4 @@
-/*  Copyright (C) 2006-2008 Davide Andreoli (see AUTHORS)
+/*  Copyright (C) 2006-2009 Davide Andreoli (see AUTHORS)
  *
  *  This file is part of Edje_editor.
  *  Edje_editor is free software: you can redistribute it and/or modify
@@ -15,460 +15,305 @@
  *  along with Edje_editor.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string.h>
-#include <Etk.h>
-#include <Edje.h>
-#include <Edje_Edit.h>
 #include "main.h"
 
+static Evas_Object *_text_entry;
+static Evas_Object *_font_entry;
+static Evas_Object *_size_entry;
+static Evas_Object *_alignx_entry;
+static Evas_Object *_aligny_entry;
+static Evas_Object *_fit_combo;
+static Evas_Object *_effect_combo;
+static Evas_Object *_color_entry;
+static Evas_Object *_color2_entry;
+static Evas_Object *_color3_entry;
+static Evas_Object *_elipsis_entry;
 
-/***   Implementation   ***/
-Etk_Widget*
-text_frame_create(Evas *evas)
+/***   Callbacks   ***/
+static void
+_entry_apply(Evas_Object *o)
 {
-   Etk_Widget *vbox;
-   Etk_Widget *hbox;
-   Etk_Widget *label;
-   Etk_Widget *table;
-   Etk_Combobox_Item *ComboItem;
+   char *txt;
+   int i, r, g, b, a;
+   double f;
 
-   //vbox
-   vbox = etk_vbox_new(ETK_FALSE, 5);
+   /* TODO FIX THIS IN ELM */
+   /* I get a <br> at the end of the line */
+   /* Need to fix elm for this, probably a single_line entry must take care of this*/
+   const char *to_fix;
+   to_fix = elm_entry_entry_get(o);
+   txt = strdup(to_fix);
+   if (ecore_str_has_suffix(txt, "<br>"))
+      txt[strlen(txt) - 4] = '\0';
+   printf("Apply entry [%s]\n", txt);
 
-   //table
-   table = etk_table_new(5, 5, ETK_TABLE_NOT_HOMOGENEOUS);
-   etk_box_append(ETK_BOX(vbox), table, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   label = etk_label_new("Text");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign",0.5,NULL);
-   etk_table_attach_default(ETK_TABLE(table),label, 0, 0, 0,0);
-
-   //Text Entry
-   UI_TextEntry = etk_entry_new ();
-   //etk_widget_size_request_set(UI_TextEntry,30, 30);
-   etk_table_attach_default(ETK_TABLE(table),UI_TextEntry, 1, 4, 0,0);
-
-   label = etk_label_new("Font");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign",0.5,NULL);
-   etk_table_attach_default(ETK_TABLE(table),label, 0, 0, 1,1);
-
-   //FontComboBox
-   UI_FontComboBox = etk_combobox_new();
-   etk_combobox_column_add(ETK_COMBOBOX(UI_FontComboBox),
-                           ETK_COMBOBOX_IMAGE, 20, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_column_add(ETK_COMBOBOX(UI_FontComboBox),
-                           ETK_COMBOBOX_LABEL, 75, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_build(ETK_COMBOBOX(UI_FontComboBox));
-   etk_table_attach_default(ETK_TABLE(table),UI_FontComboBox, 1, 1, 1, 1);
-
-   //FontAddButton
-   UI_FontAddButton = etk_button_new_from_stock(ETK_STOCK_DOCUMENT_OPEN);
-   etk_object_properties_set(ETK_OBJECT(UI_FontAddButton), "label","",NULL);
-   etk_table_attach_default(ETK_TABLE(table),UI_FontAddButton, 2, 2, 1, 1);
-
-
-   label = etk_label_new("Size");
-   etk_object_properties_set(ETK_OBJECT(label), "xalign",0.5,NULL);
-   etk_table_attach_default(ETK_TABLE(table),label, 3, 3, 1,1);
-
-   //FontSizeSpinner
-   UI_FontSizeSpinner = etk_spinner_new(0, 200, 0, 1, 10);
-   etk_widget_size_request_set(UI_FontSizeSpinner, 45, 20);
-   etk_table_attach_default(ETK_TABLE(table),UI_FontSizeSpinner, 4, 4, 1,1);
-
-   hbox = etk_hbox_new(ETK_FALSE, 0);
-   etk_table_attach_default(ETK_TABLE(table),hbox, 0, 5, 2,2);
-
-   //FontAlignHSpinner
-   label = etk_label_new("Align");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-   UI_FontAlignHSpinner = etk_spinner_new(0, 1, 0, 0.01, 0.1);
-   etk_spinner_digits_set(ETK_SPINNER(UI_FontAlignHSpinner), 2);
-   etk_widget_size_request_set(UI_FontAlignHSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_FontAlignHSpinner, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //FontAlignVSpinner
-   label = etk_label_new("Valign");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-   UI_FontAlignVSpinner =  etk_spinner_new (0, 1, 0, 0.01, 0.1);
-   etk_spinner_digits_set(ETK_SPINNER(UI_FontAlignVSpinner), 2);
-   etk_widget_size_request_set(UI_FontAlignVSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_FontAlignVSpinner, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //FontElipsis
-   label = etk_label_new("Elipsis");
-   etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-   UI_FontElipsisSpinner = etk_spinner_new (0, 1, 0, 0.1, 0.4);
-   etk_spinner_digits_set(ETK_SPINNER(UI_FontElipsisSpinner), 1);
-   etk_widget_size_request_set(UI_FontElipsisSpinner, 45, 20);
-   etk_box_append(ETK_BOX(hbox), UI_FontElipsisSpinner, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //Fit + min max
-   hbox = etk_hbox_new(ETK_FALSE, 0);
-   etk_table_attach_default(ETK_TABLE(table),hbox, 0, 5, 3,3);
-
-   UI_FontFitXCheck = etk_check_button_new_with_label("Fit X");
-   etk_box_append(ETK_BOX(hbox), UI_FontFitXCheck, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   UI_FontFitYCheck = etk_check_button_new_with_label("Fit Y");
-   etk_box_append(ETK_BOX(hbox), UI_FontFitYCheck, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //~ label = etk_check_button_new_with_label("Min X");
-   //~ etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
+   if (!txt || !cur.part || !cur.state) return;
    
-   //~ label = etk_check_button_new_with_label("Min Y");
-   //~ etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-   
-   //~ label = etk_check_button_new_with_label("Max X");
-   //~ etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-   
-   //~ label = etk_check_button_new_with_label("Max Y");
-   //~ etk_box_append(ETK_BOX(hbox), label, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //PartEffectComboBox
-   label = etk_label_new("Effect");
-   etk_table_attach_default(ETK_TABLE(table),label, 0, 0, 4, 4);
-
-   UI_EffectComboBox = etk_combobox_new();
-   etk_combobox_column_add(ETK_COMBOBOX(UI_EffectComboBox), 
-      ETK_COMBOBOX_IMAGE, 24, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_column_add(ETK_COMBOBOX(UI_EffectComboBox),
-      ETK_COMBOBOX_LABEL, 75, ETK_COMBOBOX_NONE, 0.0);
-   etk_combobox_build(ETK_COMBOBOX(UI_EffectComboBox));
-
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_EffectComboBox),
-      etk_image_new_from_edje(EdjeFile,"NONE.PNG"), "Plain");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_TEXT_EFFECT_PLAIN);
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_EffectComboBox),
-      etk_image_new_from_edje(EdjeFile,"NONE.PNG"), "Outline");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_TEXT_EFFECT_OUTLINE);
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_EffectComboBox),
-      etk_image_new_from_edje(EdjeFile,"NONE.PNG"), "Soft Outline");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_TEXT_EFFECT_SOFT_OUTLINE);
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_EffectComboBox),
-      etk_image_new_from_edje(EdjeFile,"NONE.PNG"), "Shadow");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_TEXT_EFFECT_SHADOW);
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_EffectComboBox),
-      etk_image_new_from_edje(EdjeFile,"NONE.PNG"), "Soft Shadow");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_TEXT_EFFECT_SOFT_SHADOW);
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_EffectComboBox),
-      etk_image_new_from_edje(EdjeFile,"NONE.PNG"), "Outline Shadow");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_TEXT_EFFECT_OUTLINE_SHADOW);
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_EffectComboBox),
-      etk_image_new_from_edje(EdjeFile,"NONE.PNG"), "Outline Soft Shadow");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_TEXT_EFFECT_OUTLINE_SOFT_SHADOW);
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_EffectComboBox),
-      etk_image_new_from_edje(EdjeFile,"NONE.PNG"), "Far Shadow");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_TEXT_EFFECT_FAR_SHADOW);
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_EffectComboBox),
-      etk_image_new_from_edje(EdjeFile,"NONE.PNG"), "Far Soft Shadow");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_TEXT_EFFECT_FAR_SOFT_SHADOW);
-   ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_EffectComboBox),
-      etk_image_new_from_edje(EdjeFile,"NONE.PNG"), "Glow");
-   etk_combobox_item_data_set(ComboItem, (void*)EDJE_TEXT_EFFECT_GLOW);
-
-   etk_table_attach_default(ETK_TABLE(table), UI_EffectComboBox, 1, 4, 4, 4);
-
-   //hbox
-   hbox = etk_hbox_new(ETK_FALSE, 0);
-   etk_box_append(ETK_BOX(vbox), hbox, ETK_BOX_START, ETK_BOX_EXPAND_FILL, 0);
-
-   //Color buttons
-   etk_box_append(ETK_BOX(hbox),
-                  window_color_button_create("Text",
-                                             COLOR_OBJECT_TEXT, 30, 30, evas),
-                  ETK_BOX_START, ETK_BOX_EXPAND, 0);
-   etk_box_append(ETK_BOX(hbox),
-                  window_color_button_create("Shadow",
-                                             COLOR_OBJECT_SHADOW, 30, 30, evas),
-                  ETK_BOX_START, ETK_BOX_EXPAND, 0);
-   etk_box_append(ETK_BOX(hbox),
-                  window_color_button_create("Outline",
-                                             COLOR_OBJECT_OUTLINE, 30, 30, evas),
-                  ETK_BOX_START, ETK_BOX_EXPAND, 0);
-
-   etk_signal_connect("clicked", ETK_OBJECT(UI_FontAddButton),
-                      ETK_CALLBACK(_window_all_button_click_cb),
-                      (void*)TOOLBAR_FONT_FILE_ADD);
-   etk_signal_connect("item-activated", ETK_OBJECT(UI_FontComboBox),
-                      ETK_CALLBACK(_text_FontComboBox_item_activated_cb), NULL);
-   etk_signal_connect("active-item-changed", ETK_OBJECT(UI_EffectComboBox),
-                      ETK_CALLBACK(_text_EffectComboBox_changed_cb), NULL);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_FontSizeSpinner),
-                      ETK_CALLBACK(_text_FontSizeSpinner_value_changed_cb), NULL);
-   etk_signal_connect("text-changed", ETK_OBJECT(UI_TextEntry),
-                      ETK_CALLBACK(_text_Entry_text_changed_cb), NULL);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_FontAlignVSpinner),
-                      ETK_CALLBACK(_text_FontAlignSpinner_value_changed_cb),
-                      (void*)TEXT_ALIGNV_SPINNER);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_FontAlignHSpinner),
-                      ETK_CALLBACK(_text_FontAlignSpinner_value_changed_cb),
-                      (void*)TEXT_ALIGNH_SPINNER);
-   etk_signal_connect("value-changed", ETK_OBJECT(UI_FontElipsisSpinner),
-                      ETK_CALLBACK(_text_FontElipsisSpinner_value_changed_cb),
-                      NULL);
-   etk_signal_connect("toggled", ETK_OBJECT(UI_FontFitXCheck),
-                      ETK_CALLBACK(_text_FitXCheck_toggled_cb), NULL);
-   etk_signal_connect("toggled", ETK_OBJECT(UI_FontFitYCheck),
-                      ETK_CALLBACK(_text_FitYCheck_toggled_cb), NULL);
-
-   return vbox;
+   /* Apply Text */
+   if (o == _text_entry)
+   {
+      if (ecore_str_equal(txt, "unset"))
+        edje_edit_state_text_set(ui.edje_o, cur.part, cur.state, "");
+      else
+        edje_edit_state_text_set(ui.edje_o, cur.part, cur.state, txt);
+   }
+   /* Apply Font */
+   else if (o  == _font_entry)
+      edje_edit_state_font_set(ui.edje_o, cur.part, cur.state, txt);
+   /* Apply Font Size */
+   else if (o == _size_entry)
+   {
+      if (sscanf(txt, "%d", &i) != 1)
+        dialog_alert_show(MSG_INT);
+      else
+        edje_edit_state_text_size_set(ui.edje_o, cur.part, cur.state, i);
+   }
+   /* Apply AlignX */
+   else if (o == _alignx_entry)
+   {
+      if (sscanf(txt, "%lf", &f) != 1)
+        dialog_alert_show(MSG_FLOAT);
+      else
+        edje_edit_state_text_align_x_set(ui.edje_o, cur.part, cur.state, f);
+   }
+   /* Apply AlignY */
+   else if (o == _aligny_entry)
+   {
+      if (sscanf(txt, "%lf", &f) != 1)
+        dialog_alert_show(MSG_FLOAT);
+      else
+        edje_edit_state_text_align_y_set(ui.edje_o, cur.part, cur.state, f);
+   }
+   /* Apply Colors*/
+   else if (o == _color_entry)
+   {
+      if (sscanf(txt, "%d %d %d %d", &r, &g, &b, &a) != 4)
+        dialog_alert_show(MSG_COLOR);
+      else
+        edje_edit_state_color_set(ui.edje_o, cur.part, cur.state, r, g, b, a);
+   }
+   else if (o == _color2_entry)
+   {
+      if (sscanf(txt, "%d %d %d %d", &r, &g, &b, &a) != 4)
+        dialog_alert_show(MSG_COLOR);
+      else
+        edje_edit_state_color2_set(ui.edje_o, cur.part, cur.state, r, g, b, a);
+   }
+   else if (o == _color3_entry)
+   {
+      if (sscanf(txt, "%d %d %d %d", &r, &g, &b, &a) != 4)
+        dialog_alert_show(MSG_COLOR);
+      else
+        edje_edit_state_color3_set(ui.edje_o, cur.part, cur.state, r, g, b, a);
+   }
+   /* Apply Elipsis*/
+   else if (o == _elipsis_entry)
+   {
+      if (sscanf(txt, "%lf", &f) != 1)
+        dialog_alert_show(MSG_FLOAT);
+      else
+        edje_edit_state_text_elipsis_set(ui.edje_o, cur.part, cur.state, f);
+   }
+   canvas_redraw();
+   text_frame_update();
 }
 
-void 
-text_font_combo_populate(void)
+static void
+_entry_key_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
-   Eina_List *l;
-   Etk_Combobox_Item *ComboItem;
-
-   //Stop signal propagation
-   etk_signal_disconnect("item-activated", ETK_OBJECT(UI_FontComboBox),
-                         ETK_CALLBACK(_text_FontComboBox_item_activated_cb), NULL);
-
-   printf("Populate Fonts Combo\n");
-
-   etk_combobox_clear(ETK_COMBOBOX(UI_FontComboBox));
-
-   Eina_List *fonts;
-   fonts = l = edje_edit_fonts_list_get(edje_o);
-   while (l)
+   Evas_Event_Key_Down *ev = event_info;
+   
+   //~ printf("KEY DOWN %s\n", ev->key);
+   if (ecore_str_equal(ev->key, "Return"))
    {
-      ComboItem = etk_combobox_item_append(ETK_COMBOBOX(UI_FontComboBox),
-                     etk_image_new_from_stock(ETK_STOCK_PREFERENCES_DESKTOP_FONT,ETK_STOCK_SMALL), 
-                     l->data);
-      l = l->next;
+      _entry_apply(obj);
    }
-   edje_edit_string_list_free(fonts);
+   else if(ecore_str_equal(ev->key, "Escape"))
+   {
+      text_frame_update();
+   }
+}
 
-   //Renable  signal propagation
-   etk_signal_connect("item-activated", ETK_OBJECT(UI_FontComboBox),
-                      ETK_CALLBACK(_text_FontComboBox_item_activated_cb), NULL);
+static void
+_fit_combo_sel(void *data, Evas_Object *obj, void *event_info)
+{
+   switch ((int)(long)data)
+   {
+      case FIT_X:
+         edje_edit_state_text_fit_x_set(ui.edje_o, cur.part, cur.state, 1);
+         edje_edit_state_text_fit_y_set(ui.edje_o, cur.part, cur.state, 0);
+         break;
+      case FIT_Y:
+         edje_edit_state_text_fit_x_set(ui.edje_o, cur.part, cur.state, 0);
+         edje_edit_state_text_fit_y_set(ui.edje_o, cur.part, cur.state, 1);
+         break;
+      case FIT_BOTH:
+         edje_edit_state_text_fit_x_set(ui.edje_o, cur.part, cur.state, 1);
+         edje_edit_state_text_fit_y_set(ui.edje_o, cur.part, cur.state, 1);
+         break;
+      case FIT_NONE: default:
+         edje_edit_state_text_fit_x_set(ui.edje_o, cur.part, cur.state, 0);
+         edje_edit_state_text_fit_y_set(ui.edje_o, cur.part, cur.state, 0);
+         break;
+   }
+   canvas_redraw();
+   text_frame_update();
+}
 
+static void
+_effect_combo_sel(void *data, Evas_Object *obj, void *event_info)
+{
+   if (!cur.part) return;
+   edje_edit_part_effect_set(ui.edje_o, cur.part,(int)(long)data);
+   canvas_redraw();
+   text_frame_update();
+}
+
+static void
+_fonts_button_clicked(void *data, Evas_Object *obj, void *event_info)
+{
+   fonts_browser_show(ui.win);
+}
+
+/***   Implementation   ***/
+Evas_Object*
+text_frame_create(Evas_Object *parent)
+{
+   Evas_Object *tb, *bt, *_o;
+
+   tb = elm_table_add(parent);
+   evas_object_show(tb);
+
+   NEW_ENTRY_TO_TABLE("font:", 0, 0, 1, _font_entry, EINA_TRUE)
+
+   bt = elm_button_add(parent);
+   elm_button_label_set(bt, "browse");
+   evas_object_size_hint_align_set(bt, 1.0, 0.5);
+   elm_table_pack(tb, bt, 2, 0, 1, 1);
+   evas_object_smart_callback_add(bt, "clicked", _fonts_button_clicked, NULL);
+   evas_object_show(bt);
+   
+   NEW_ENTRY_TO_TABLE("size:", 0, 1, 2, _size_entry, EINA_TRUE)
+   NEW_DOUBLE_ENTRY_TO_TABLE("align:", 0, 2, _alignx_entry, _aligny_entry, EINA_TRUE)
+   NEW_COMBO_TO_TABLE( _fit_combo, "fit:", 0, 3, 2, NULL, NULL)
+   elm_hoversel_item_add(_fit_combo, "none", NULL, ELM_ICON_NONE,
+                         _fit_combo_sel, (void*)FIT_NONE);
+   elm_hoversel_item_add(_fit_combo, "horizontal", NULL, ELM_ICON_NONE,
+                         _fit_combo_sel, (void*)FIT_X);
+   elm_hoversel_item_add(_fit_combo, "vertical", NULL, ELM_ICON_NONE,
+                         _fit_combo_sel, (void*)FIT_Y);
+   elm_hoversel_item_add(_fit_combo, "both", NULL, ELM_ICON_NONE,
+                         _fit_combo_sel, (void*)FIT_BOTH);
+   
+   NEW_COMBO_TO_TABLE( _effect_combo, "effect:", 0, 4, 2, NULL, NULL)
+   elm_hoversel_item_add(_effect_combo, "plain", NULL, ELM_ICON_NONE,
+                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_PLAIN);
+   elm_hoversel_item_add(_effect_combo, "outline", NULL, ELM_ICON_NONE,
+                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_OUTLINE);
+   elm_hoversel_item_add(_effect_combo, "outline (soft)", NULL, ELM_ICON_NONE,
+                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_SOFT_OUTLINE);
+   elm_hoversel_item_add(_effect_combo, "shadow", NULL, ELM_ICON_NONE,
+                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_SHADOW);
+   elm_hoversel_item_add(_effect_combo, "shadow (soft)", NULL, ELM_ICON_NONE,
+                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_SOFT_SHADOW);
+   elm_hoversel_item_add(_effect_combo, "outline + shadow", NULL, ELM_ICON_NONE,
+                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_OUTLINE_SHADOW);
+   elm_hoversel_item_add(_effect_combo, "outline + shadow (soft)", NULL, ELM_ICON_NONE,
+                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_OUTLINE_SOFT_SHADOW);
+   elm_hoversel_item_add(_effect_combo, "far shadow", NULL, ELM_ICON_NONE,
+                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_FAR_SHADOW);
+   elm_hoversel_item_add(_effect_combo, "far shadow (soft)", NULL, ELM_ICON_NONE,
+                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_FAR_SOFT_SHADOW);
+   elm_hoversel_item_add(_effect_combo, "glow", NULL, ELM_ICON_NONE,
+                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_GLOW);
+
+   NEW_ENTRY_TO_TABLE("elipsis:", 0, 5, 2, _elipsis_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("text:", 0, 6, 2, _text_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("text color:", 0, 7, 2, _color_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("shadow color:", 0, 8, 2, _color2_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("outline color:", 0, 9, 2, _color3_entry, EINA_TRUE)
+
+   return tb;
 }
 
 void
 text_frame_update(void)
 {
-   int eff_num = 0;
-   //int alpha;
-   int r, g, b;
-   Etk_Combobox_Item *item = NULL;
-   char *combo_data;
+   int eff = 0;
+   int r, g, b, a;
    const char *t;
-   const char *font;
+   Eina_Bool fx, fy;
 
-   if (!etk_string_length_get(Cur.state)) return;
-   if (!etk_string_length_get(Cur.part)) return;
-
-   printf("Update Text Frame: %s\n",Cur.state->string);
-
-   //Stop signal propagation
-   etk_signal_block("text-changed", ETK_OBJECT(UI_TextEntry),
-                    _text_Entry_text_changed_cb, NULL);
-   etk_signal_block("item-activated", ETK_OBJECT(UI_FontComboBox),
-                    ETK_CALLBACK(_text_FontComboBox_item_activated_cb), NULL);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_FontAlignHSpinner),
-                    ETK_CALLBACK(_text_FontAlignSpinner_value_changed_cb), NULL);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_FontAlignVSpinner),
-                    ETK_CALLBACK(_text_FontAlignSpinner_value_changed_cb), NULL);
-   etk_signal_block("toggled", ETK_OBJECT(UI_FontFitXCheck),
-                    ETK_CALLBACK(_text_FitXCheck_toggled_cb), NULL);
-   etk_signal_block("toggled", ETK_OBJECT(UI_FontFitYCheck),
-                    ETK_CALLBACK(_text_FitYCheck_toggled_cb), NULL);
-   etk_signal_block("value-changed", ETK_OBJECT(UI_FontElipsisSpinner),
-                    ETK_CALLBACK(_text_FontElipsisSpinner_value_changed_cb),
-                    NULL);
-
-   //Set Text Text in Cur.eps
-   t = edje_edit_state_text_get(edje_o,Cur.part->string,Cur.state->string);
-   printf("TEXT: %s\n",t);
-   etk_entry_text_set(ETK_ENTRY(UI_TextEntry), t);
+   if (!cur.part || !cur.state) return;
+   
+   //Set font
+   t = edje_edit_state_font_get(ui.edje_o, cur.part, cur.state);
+   elm_entry_entry_set(_font_entry, t);
    edje_edit_string_free(t);
 
-   //Set the font size spinner
-   etk_range_value_set(ETK_RANGE(UI_FontSizeSpinner), 
-      (float)edje_edit_state_text_size_get(edje_o, Cur.part->string, Cur.state->string));
+   //Set font size 
+   elm_entry_printf(_size_entry, "%d",
+               edje_edit_state_text_size_get(ui.edje_o, cur.part, cur.state));
 
-   //Set the font align spinners
-   etk_range_value_set(ETK_RANGE(UI_FontAlignHSpinner),
-                        edje_edit_state_text_align_x_get(edje_o,
-                                                         Cur.part->string,
-                                                         Cur.state->string));
-   etk_range_value_set(ETK_RANGE(UI_FontAlignVSpinner),
-                        edje_edit_state_text_align_y_get(edje_o,
-                                                         Cur.part->string,
-                                                         Cur.state->string));
+   //Set text
+   t = edje_edit_state_text_get(ui.edje_o, cur.part, cur.state);
+   if (t && strlen(t) > 0) //TODO t[0] != "/0" ???
+   {
+      elm_entry_entry_set(_text_entry, t);
+      edje_edit_string_free(t);
+   }
+   else elm_entry_entry_set(_text_entry, "unset");
+
+   //Set align
+   elm_entry_printf(_alignx_entry, "%.2f",
+            edje_edit_state_text_align_x_get(ui.edje_o, cur.part, cur.state));
+   elm_entry_printf(_aligny_entry, "%.2f",
+            edje_edit_state_text_align_y_get(ui.edje_o, cur.part, cur.state));
+
+   //Set fit
+   fx = edje_edit_state_text_fit_x_get(ui.edje_o, cur.part, cur.state);
+   fy = edje_edit_state_text_fit_y_get(ui.edje_o, cur.part, cur.state);
+
+   if (fx && fy) elm_hoversel_label_set(_fit_combo, "both");
+   else if (fx)  elm_hoversel_label_set(_fit_combo, "horizontal");
+   else if (fy)  elm_hoversel_label_set(_fit_combo, "vertical");
+   else          elm_hoversel_label_set(_fit_combo, "none");
 
    //Set Elipsis
-   etk_range_value_set(ETK_RANGE(UI_FontElipsisSpinner),
-                        edje_edit_state_text_elipsis_get(edje_o,
-                                                         Cur.part->string,
-                                                         Cur.state->string));
+   elm_entry_printf(_elipsis_entry, "%.3f",
+               edje_edit_state_text_elipsis_get(ui.edje_o, cur.part, cur.state));
 
-   //Set the font combobox
-   font = edje_edit_state_font_get(edje_o, Cur.part->string, Cur.state->string);
-   if (font)
-   {
-      //Loop for all the item in the Combobox
-      item = etk_combobox_first_item_get(ETK_COMBOBOX(UI_FontComboBox));
-      while (item)
-      {
-         combo_data = etk_combobox_item_field_get(item, 1);
-         printf("COMBODATA: %s\n",combo_data);
-         if (combo_data && (strcmp(combo_data, font) == 0))
-         {
-            //If we found the item set active and break
-            etk_combobox_active_item_set(ETK_COMBOBOX(UI_FontComboBox),item);
-            break;
-         }
-         item = etk_combobox_item_next_get(item);
-      }
-   }
-   else
-      etk_combobox_active_item_set(ETK_COMBOBOX(UI_FontComboBox),
-                  etk_combobox_first_item_get(ETK_COMBOBOX(UI_FontComboBox)));//TODO change all combobox like this one
+   //Set Effect
+   eff = edje_edit_part_effect_get(ui.edje_o, cur.part);
+   if (eff == EDJE_TEXT_EFFECT_OUTLINE)
+      elm_hoversel_label_set(_effect_combo, "outline");
+   else if (eff == EDJE_TEXT_EFFECT_SOFT_OUTLINE)
+      elm_hoversel_label_set(_effect_combo, "outline (soft)");
+   else if (eff == EDJE_TEXT_EFFECT_SHADOW)
+      elm_hoversel_label_set(_effect_combo, "shadow");
+   else if (eff == EDJE_TEXT_EFFECT_SOFT_SHADOW)
+      elm_hoversel_label_set(_effect_combo, "shadow (soft)");
+   else if (eff == EDJE_TEXT_EFFECT_OUTLINE_SHADOW)
+      elm_hoversel_label_set(_effect_combo, "outline + shadow");
+   else if (eff == EDJE_TEXT_EFFECT_OUTLINE_SOFT_SHADOW)
+      elm_hoversel_label_set(_effect_combo, "outline + shadow (soft)");
+   else if (eff == EDJE_TEXT_EFFECT_OUTLINE_SOFT_SHADOW)
+      elm_hoversel_label_set(_effect_combo, "outline + shadow (soft)");
+   else if (eff == EDJE_TEXT_EFFECT_FAR_SHADOW)
+      elm_hoversel_label_set(_effect_combo, "far shadow");
+   else if (eff == EDJE_TEXT_EFFECT_FAR_SOFT_SHADOW)
+      elm_hoversel_label_set(_effect_combo, "far shadow (soft)");
+   else if (eff == EDJE_TEXT_EFFECT_GLOW)
+      elm_hoversel_label_set(_effect_combo, "glow");
+   else elm_hoversel_label_set(_effect_combo, "plain");
 
-   edje_edit_string_free(font);
+   //Set Colors
+   edje_edit_state_color_get(ui.edje_o, cur.part, cur.state, &r, &g, &b, &a);
+   elm_entry_printf(_color_entry, "%d %d %d %d", r, g, b, a);
 
-   //Set Effect ComboBox
-   eff_num = edje_edit_part_effect_get(edje_o, Cur.part->string);
-   eff_num--;
-   if (eff_num < 0) eff_num = 0;
+   edje_edit_state_color2_get(ui.edje_o, cur.part, cur.state, &r, &g, &b, &a);
+   elm_entry_printf(_color2_entry, "%d %d %d %d", r, g, b, a);
 
-   etk_combobox_active_item_set(ETK_COMBOBOX(UI_EffectComboBox),
-      etk_combobox_nth_item_get(ETK_COMBOBOX(UI_EffectComboBox), eff_num));
-   
-   //Set Fit XY Checkbutton
-   etk_toggle_button_active_set(ETK_TOGGLE_BUTTON(UI_FontFitXCheck),
-      edje_edit_state_text_fit_x_get(edje_o, Cur.part->string, Cur.state->string));
-   etk_toggle_button_active_set(ETK_TOGGLE_BUTTON(UI_FontFitYCheck),
-      edje_edit_state_text_fit_y_get(edje_o, Cur.part->string, Cur.state->string));
-   
-   //Set Text color Rects
-   edje_edit_state_color_get(edje_o, Cur.part->string, Cur.state->string,&r,&g,&b,NULL);
-   evas_object_color_set(TextColorObject, r, g, b, 255);
-   edje_edit_state_color2_get(edje_o, Cur.part->string, Cur.state->string,&r,&g,&b,NULL);
-   evas_object_color_set(ShadowColorObject, r, g, b, 255);
-   edje_edit_state_color3_get(edje_o, Cur.part->string, Cur.state->string,&r,&g,&b,NULL);
-   evas_object_color_set(OutlineColorObject, r, g, b, 255);
-
-   //Renable  signal propagation
-   etk_signal_unblock("text-changed", ETK_OBJECT(UI_TextEntry),
-                      ETK_CALLBACK(_text_Entry_text_changed_cb), NULL);
-   etk_signal_unblock("item-activated", ETK_OBJECT(UI_FontComboBox),
-                      ETK_CALLBACK(_text_FontComboBox_item_activated_cb), NULL);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_FontAlignHSpinner),
-                      ETK_CALLBACK(_text_FontAlignSpinner_value_changed_cb), NULL);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_FontAlignVSpinner),
-                      ETK_CALLBACK(_text_FontAlignSpinner_value_changed_cb), NULL);
-   etk_signal_unblock("toggled", ETK_OBJECT(UI_FontFitXCheck),
-                      ETK_CALLBACK(_text_FitXCheck_toggled_cb), NULL);
-   etk_signal_unblock("toggled", ETK_OBJECT(UI_FontFitYCheck),
-                      ETK_CALLBACK(_text_FitYCheck_toggled_cb), NULL);
-   etk_signal_unblock("value-changed", ETK_OBJECT(UI_FontElipsisSpinner),
-                      ETK_CALLBACK(_text_FontElipsisSpinner_value_changed_cb),
-                      NULL);
-}
-
-
-/***   Callbacks   ***/
-Etk_Bool
-_text_FontComboBox_item_activated_cb(Etk_Combobox *combobox, Etk_Combobox_Item *item, void *data)
-{
-   printf("Changed Signal on FontComboBox EMITTED \n");
-
-   char *font;
-   if (!etk_string_length_get(Cur.part)) return ETK_TRUE;
-   if (!etk_string_length_get(Cur.state)) return ETK_TRUE;
-
-   font = etk_combobox_item_field_get(item, 1);
-
-   edje_edit_state_font_set(edje_o, Cur.part->string, Cur.state->string, font);
-
-   return ETK_TRUE;
-}
-
-Etk_Bool
-_text_EffectComboBox_changed_cb(Etk_Combobox *combobox, void *data)
-{
-   if (!etk_string_length_get(Cur.part)) return ETK_TRUE;
-
-   edje_edit_part_effect_set(edje_o, Cur.part->string,
-      (int)(long)etk_combobox_item_data_get(etk_combobox_active_item_get(combobox)));
-
-   canvas_redraw();
-
-   return ETK_TRUE;
-}
-
-Etk_Bool
-_text_FontSizeSpinner_value_changed_cb(Etk_Range *range, double value, void *data)
-{
-   printf("Value Changed Signal on FontSizeSpinner EMITTED (value: %d)\n",(int)etk_range_value_get(range));
-
-   edje_edit_state_text_size_set(edje_o, Cur.part->string, Cur.state->string,
-                                 (int)etk_range_value_get(range));
-
-   canvas_redraw();
-   return ETK_TRUE;
-}
-
-
-Etk_Bool
-_text_Entry_text_changed_cb(Etk_Object *object, void *data)
-{
-   printf("Text Changed Signal on TextEntry EMITTED (value %s)\n",etk_entry_text_get(ETK_ENTRY(object)));
-   edje_edit_state_text_set(edje_o, Cur.part->string, Cur.state->string,
-                            etk_entry_text_get(ETK_ENTRY(object)));
-
-   canvas_redraw();
-   return ETK_TRUE;
-}
-
-Etk_Bool
-_text_FontAlignSpinner_value_changed_cb(Etk_Range *range, double value, void *data)
-{
-   printf("Value Changed Signal on AlignSpinner (h or v, text or part) EMITTED (value: %.2f)\n",etk_range_value_get(range));
-
-   if (!etk_string_length_get(Cur.part)) return ETK_TRUE;
-   if (!etk_string_length_get(Cur.state)) return ETK_TRUE;
-   
-   if ((int)(long)data == TEXT_ALIGNH_SPINNER)
-      edje_edit_state_text_align_x_set(edje_o, Cur.part->string, Cur.state->string,
-                                       (double)etk_range_value_get(range));
-   if ((int)(long)data == TEXT_ALIGNV_SPINNER)
-      edje_edit_state_text_align_y_set(edje_o, Cur.part->string, Cur.state->string,
-                                       (double)etk_range_value_get(range));
-   if ((int)(long)data == STATE_ALIGNH_SPINNER)
-      edje_edit_state_align_x_set(edje_o, Cur.part->string, Cur.state->string,
-                                  (double)etk_range_value_get(range));
-   if ((int)(long)data == STATE_ALIGNV_SPINNER)
-      edje_edit_state_align_y_set(edje_o, Cur.part->string, Cur.state->string,
-                                  (double)etk_range_value_get(range));
-
-   return ETK_TRUE;
-}
-
-Etk_Bool
-_text_FontElipsisSpinner_value_changed_cb(Etk_Range *range, double value, void *data)
-{
-   //printf("Value Changed Signal on ElipsisSpinner EMITTED (value: %.2f)\n",etk_range_value_get(range));
-   edje_edit_state_text_elipsis_set(edje_o, Cur.part->string, Cur.state->string,
-                                    (double)etk_range_value_get(range));
-   return ETK_TRUE;
-}
-
-Etk_Bool
-_text_FitXCheck_toggled_cb(Etk_Toggle_Button *button, void *data)
-{
-   edje_edit_state_text_fit_x_set(edje_o, Cur.part->string, Cur.state->string,
-                                  etk_toggle_button_active_get(button));
-   return ETK_TRUE;
-}
-Etk_Bool
-_text_FitYCheck_toggled_cb(Etk_Toggle_Button *button, void *data)
-{
-   edje_edit_state_text_fit_y_set(edje_o, Cur.part->string, Cur.state->string,
-                                  etk_toggle_button_active_get(button));
-   return ETK_TRUE;
+   edje_edit_state_color3_get(ui.edje_o, cur.part, cur.state, &r, &g, &b, &a);
+   elm_entry_printf(_color3_entry, "%d %d %d %d", r, g, b, a);
 }

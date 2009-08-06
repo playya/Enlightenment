@@ -183,12 +183,12 @@ _visible_toggle_changed(void *data, Evas_Object *obj, void *event_info)
 Evas_Object*
 state_frame_create(Evas_Object *parent)
 {
-   Evas_Object *tb, *_o, *p;
+   Evas_Object *tb, *_o;
 
    tb = elm_table_add(parent);
    evas_object_show(tb);
 
-   NEW_ENTRY_TO_TABLE("name:", 0, 0, _name_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("name:", 0, 0, 2, _name_entry, EINA_TRUE)
    NEW_DOUBLE_ENTRY_TO_TABLE("aspect:", 0, 1, _aspect_min_entry, _aspect_max_entry, EINA_TRUE)
    NEW_COMBO_TO_TABLE(_aspect_combo,"preference:", 0, 2, 2, NULL, NULL);
    elm_hoversel_item_add(_aspect_combo, "None", NULL, ELM_ICON_NONE,
@@ -200,37 +200,26 @@ state_frame_create(Evas_Object *parent)
    elm_hoversel_item_add(_aspect_combo, "Both", NULL, ELM_ICON_NONE,
                          _aspect_combo_sel, (void*)EDJE_ASPECT_PREFER_BOTH);
    
-   NEW_ENTRY_TO_TABLE("min:", 0, 3, _size_min_entry, EINA_TRUE)
-   NEW_ENTRY_TO_TABLE("max:", 0, 4, _size_max_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("min:", 0, 3, 2, _size_min_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("max:", 0, 4, 2, _size_max_entry, EINA_TRUE)
    NEW_DOUBLE_ENTRY_TO_TABLE("align:", 0, 5, _align_x_entry, _align_y_entry, EINA_TRUE)
 
    //// NEW_TOGGLE_TO_TABLE            // TODO
    _o = elm_label_add(parent);
    elm_label_label_set(_o, "visible:  ");
-   evas_object_size_hint_weight_set(_o, 0.0, 0.0);
    evas_object_size_hint_align_set(_o, 1.0, 0.0);
    elm_table_pack(tb, _o, 0, 6, 1, 1);
    evas_object_show(_o);
-   
-   p = elm_frame_add(parent);
-   elm_frame_style_set(p, "pad_small");
-   evas_object_size_hint_weight_set(p, 1.0, 1.0);
-   evas_object_size_hint_align_set(p, 0.0, 0.0);
-   elm_table_pack(tb, p, 1, 6, 2, 1);
-   evas_object_show(p);
 
    _o = elm_toggle_add(parent);
    elm_toggle_states_labels_set(_o, "visible", "hidden");
-   
-   evas_object_size_hint_weight_set(_o, 1.0, 0.0);
-   evas_object_size_hint_align_set(_o, 0.0, 0.0);
-   elm_frame_content_set(p, _o);
+   elm_table_pack(tb, _o, 1, 6, 2, 1);
    _visible_toggle = _o;
    evas_object_show(_o);
    evas_object_smart_callback_add(_o, "changed", _visible_toggle_changed, NULL);
    ////
    
-   NEW_ENTRY_TO_TABLE("color class:", 0, 7, _color_class_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("color class:", 0, 7, 2, _color_class_entry, EINA_TRUE)
 
    return tb;
 }
@@ -299,8 +288,8 @@ state_frame_update(void)
 	 edje_edit_state_align_y_get(ui.edje_o, cur.part, cur.state));
 
    //Set visible checkbox
-   elm_toggle_state_set(_visible_toggle,
-		edje_edit_state_visible_get(ui.edje_o, cur.part, cur.state));
+   //~ elm_toggle_state_set(_visible_toggle,
+		//~ edje_edit_state_visible_get(ui.edje_o, cur.part, cur.state));
 
    //Set Color Class Entry
    cc = edje_edit_state_color_class_get(ui.edje_o, cur.part, cur.state);

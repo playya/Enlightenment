@@ -100,10 +100,10 @@ group_frame_create(Evas_Object *parent)
    tb = elm_table_add(parent);
    evas_object_show(tb);
 
-   NEW_ENTRY_TO_TABLE("name:", 0, 0, _name_entry, EINA_TRUE)
-   NEW_ENTRY_TO_TABLE("min:", 0, 1, _min_entry, EINA_TRUE)
-   NEW_ENTRY_TO_TABLE("max:", 0, 2, _max_entry, EINA_TRUE)
-   NEW_ENTRY_TO_TABLE("current:", 0, 3, _current_entry, EINA_FALSE)
+   NEW_ENTRY_TO_TABLE("name:", 0, 0, 1, _name_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("min:", 0, 1, 1, _min_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("max:", 0, 2, 1, _max_entry, EINA_TRUE)
+   NEW_ENTRY_TO_TABLE("current:", 0, 3, 1, _current_entry, EINA_FALSE)
 
    return tb;
 }

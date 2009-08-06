@@ -32,7 +32,7 @@
 #include "edje_editor_part.h"
 #include "edje_editor_state.h"
 #include "edje_editor_position.h"
-//~ #include "edje_editor_text.h"
+#include "edje_editor_text.h"
 //~ #include "edje_editor_rect.h"
 //~ #include "edje_editor_program.h"
 //~ #include "edje_editor_script.h"
@@ -41,6 +41,7 @@
 #include "edje_editor_consolle.h"
 #include "edje_editor_dialogs.h"
 #include "edje_editor_window.h"
+#include "edje_editor_fonts.h"
 //~ #include "edje_editor_gradient.h"
 //~ #include "edje_editor_fill.h"
 //~ #include "edje_editor_spectra.h"
@@ -62,8 +63,9 @@
 #define IFREE(ptr) { free(ptr); ptr = NULL; }
 
 #define MSG_FLOAT "<b>Can't understand size.</b><br>The number need to be a float:<br> (for ex.) '0.35'"
-#define MSG_INT "<b>Can't understand size.</b><br>The number need to be an integer :<br> (for ex.) '-12'"
+#define MSG_INT "<b>Can't understand size.</b><br>The number need to be an integer :<br> (for ex.) '12'"
 #define MSG_SIZE "<b>Can't understand sizes.</b><br>The format need to be:<br> (for ex.) '100x120'"
+#define MSG_COLOR "<b>Can't understand color.</b><br>The format need to be \"r g b a\":<br> (for ex.) '255 128 0 200'"
 
 //All the enum used are declared here
 enum various
@@ -85,9 +87,10 @@ enum various
    TOOLBAR_SPECTRUM,
    TOOLBAR_DATA,
    TOOLBAR_COLORS,
+   TOOLBAR_EXIT,
    FILECHOOSER_OPEN,
    //~ FILECHOOSER_IMAGE,
-   //~ FILECHOOSER_FONT,
+   FILECHOOSER_FONT,
    //~ FILECHOOSER_SAVE_EDC,
    //~ FILECHOOSER_SAVE_EDJ,
    //~ IMAGE_BROWSER_SHOW,
@@ -162,7 +165,11 @@ enum various
    DRAG_GRAD_2,
    EVENTS_NO,
    EVENTS_YES,
-   EVENTS_YES_REPEAT
+   EVENTS_YES_REPEAT,
+   FIT_NONE,
+   FIT_X,
+   FIT_Y,
+   FIT_BOTH
    //~ REL_COMBO_INTERFACE,
    //~ IMAGE_TWEEN_UP,
    //~ IMAGE_TWEEN_DOWN,

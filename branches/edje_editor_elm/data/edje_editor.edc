@@ -15,73 +15,87 @@
  *  along with Edje_editor.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define FRAME(NAME, W, H, IMAGE_NAME, IW, IH, PLACE_AFTER) \
-   part { \
-      name: NAME"_frame"; \
-      type: IMAGE; \
-      description { \
-         state: "default" 0.0; \
-         rel1 {relative: 1.0 1.0; offset: 0 0; to_y: PLACE_AFTER;} \
-         rel2 {relative: 1.0 1.0; offset: W 0; to_y: PLACE_AFTER;} \
+#define FONT_SIZE 10
+#define BIG_FONT_SIZE 13
+
+#define FRAME(NAME, W, H, IW, IH, PLACE_AFTER) \
+   part { name: NAME"_frame"; \
+      description { state: "default" 0.0; \
+         rel1 {relative: 1.0 1.0; offset: -W 0; to_y: PLACE_AFTER;} \
+         rel2 {relative: 1.0 1.0; offset: 0 -1; to_y: PLACE_AFTER;} \
          image {normal: "frame_bg.png"; border: 2 2 2 2;} \
       } \
-      description { \
-         state: "big" 0.0; \
-         rel1 {relative: 1.0 1.0; offset: -W 0; to_y: PLACE_AFTER;} \
+      description { state: "big" 0.0; \
+         rel1 {relative: 1.0 1.0; offset: -W 20; to_y: PLACE_AFTER;} \
          rel2 {relative: 1.0 1.0; offset: 0 H; to_y: PLACE_AFTER;} \
          image {normal: "frame_bg.png"; border: 2 2 2 2;} \
       } \
-      description { \
-         state: "small" 0.0; \
-         rel1 {relative: 1.0 1.0; offset: 0 0; to_y: PLACE_AFTER;} \
-         rel2 {relative: 1.0 1.0; offset: W 5+IH; to_y: PLACE_AFTER;} \
+      description { state: "small" 0.0; \
+         rel1 {relative: 1.0 1.0; offset: -W 20; to_y: PLACE_AFTER;} \
+         rel2 {relative: 1.0 1.0; offset: 0 20; to_y: PLACE_AFTER;} \
          image {normal: "frame_bg.png"; border: 2 2 2 2;} \
       } \
    } \
-   part { \
-      name: NAME"_frame_swallow"; \
+   part { name: NAME"_frame_swallow_clip"; \
+      description { state: "default" 0.0; \
+	 rel1 {relative: 0.0 0.0; offset: 3 3; to: NAME"_frame";} \
+	 rel2 {relative: 1.0 1.0; offset: -3 -3; to: NAME"_frame";} \
+      } \
+   } \
+   part { name: NAME"_frame_swallow"; \
       type: SWALLOW; \
       mouse_events: 1; \
-      description { \
-         state: "default" 0.0; \
+      clip_to: NAME"_frame_swallow_clip"; \
+      description { state: "default" 0.0; \
          color: 0 0 0 0; \
-         rel1 {relative: 0.0 0.0; offset: 5 5; to: NAME"_frame";} \
-         rel2 {relative: 1.0 1.0; offset: -5 -5; to: NAME"_frame";} \
+         rel1 {relative: 0.0 0.0; offset: 3 3; to: NAME"_frame";} \
+         rel2 {relative: 1.0 1.0; offset: -3 -3; to: NAME"_frame";} \
       } \
    } \
-   part { \
-      name: NAME"_frame_label_bg"; \
+   part { name: NAME"_frame_label_bg"; \
       type: IMAGE; \
       mouse_events: 1; \
-      description { \
-         state: "default" 0.0; \
-         rel1 {relative: 0.0 0.0; offset: -20 1; to: NAME"_frame";} \
-         rel2 {relative: 0.0 1.0; offset: -1 -2; to: NAME"_frame";} \
-         image {normal: "frame_bg_label.png"; border: 1 1 1 1;} \
+      description { state: "default" 0.0; \
+	 rel1 {relative: 0.0 0.0; to: NAME"_frame";} \
+	 rel2 {relative: 1.0 0.0; to: NAME"_frame";} \
+	 image {normal: "frame_bg_label.png"; border: 1 1 1 1;} \
+	 visible: 0; \
+      } \
+      description { state: "big" 0.0; \
+	 rel1 {relative: 0.0 0.0; offset: 0 -20; to: NAME"_frame";} \
+	 rel2 {relative: 1.0 0.0; to: NAME"_frame";} \
+	 image {normal: "frame_bg_label.png"; border: 1 1 1 1;} \
       } \
    } \
-   part { \
-      name: NAME"_frame_label_clip"; \
-      type: RECT; \
+   part { name: NAME"_frame_label"; \
+      type: TEXT; \
       mouse_events: 0; \
-      description { \
-         state: "default" 0.0; \
-         rel1 {relative: 0.0 0.0; offset: 0 0; to: NAME"_frame_label_bg";} \
-         rel2 {relative: 1.0 1.0; offset: 0 0; to: NAME"_frame_label_bg";} \
+      effect: FAR_SHADOW; \
+      description { state: "default" 0.0; \
+	 rel1 {to: NAME"_frame_label_bg";} \
+	 rel2 {to: NAME"_frame_label_bg";} \
+	 color2: 255 255 255 255; \
+	 color3: 55 55 55 55; \
+	 text { \
+	    text: NAME; \
+	    font: "Sans:style=Bold"; \
+	    size: BIG_FONT_SIZE; \
+	 } \
+	 visible: 0; \
       } \
-   } \
-   part { \
-      name: NAME"_frame_label_text"; \
-      type: IMAGE; \
-      mouse_events: 0; \
-      clip_to: NAME"_frame_label_clip"; \
-      description { \
-         state: "default" 0.0; \
-         rel1 {relative: 1.0 1.0; offset: -3-IW -IH; to: NAME"_frame_label_bg";} \
-         rel2 {relative: 1.0 1.0; offset: -3 0; to: NAME"_frame_label_bg";} \
-         image {normal: IMAGE_NAME;} \
+      description { state: "big" 0.0; \
+	 rel1 {to: NAME"_frame_label_bg";} \
+	 rel2 {to: NAME"_frame_label_bg";} \
+	 color2: 255 255 255 255; \
+	 color3: 55 55 55 55; \
+	 text { \
+	    text: NAME; \
+	    font: "Sans:style=Bold"; \
+	    size: BIG_FONT_SIZE; \
+	 } \
       } \
    }
+   
 
 #define FRAME_PROG(NAME) \
    program{ \
@@ -107,6 +121,8 @@
       action: STATE_SET "default" 0.0; \
       transition: SINUSOIDAL 0.5; \
       target: NAME"_frame"; \
+      target: NAME"_frame_label_bg"; \
+      target: NAME"_frame_label"; \
    } \
    program{ \
       name: NAME"_frame_show"; \
@@ -115,6 +131,8 @@
       action: STATE_SET "big" 0.0; \
       transition: SINUSOIDAL 0.5; \
       target: NAME"_frame"; \
+      target: NAME"_frame_label_bg"; \
+      target: NAME"_frame_label"; \
    } \
    program{ \
       name: NAME"_frame_show_small"; \
@@ -123,6 +141,8 @@
       action: STATE_SET "small" 0.0; \
       transition: SINUSOIDAL 0.5; \
       target: NAME"_frame"; \
+      target: NAME"_frame_label_bg"; \
+      target: NAME"_frame_label"; \
    }
 
 #define STATIC_IMAGE(NAME, FILE, W, H, EVENTS) \
@@ -138,11 +158,7 @@
                state: "default" 0.0; \
                aspect: 1.0 1.0; \
                aspect_preference: BOTH; \
-               image {normal: FILE;} \
-            } \
-         } \
-      } \
-   }
+               image {normal: FILE;} } } } }
 
 #define LINE(NAME, ALPHA, Y) \
          part { name: NAME; \
@@ -156,26 +172,7 @@
                   text: ""; \
                   font: "vera.ttf"; \
                   size: 10; \
-                  align: 0.0 0.5; \
-               } \
-            } \
-         } 
-
-         //~ part { name: "line2";
-            //~ type: TEXT;
-            //~ mouse_events: 0;
-            //~ description { state: "default" 0.0;
-               //~ color: 80 80 80 190;
-               //~ rel1 {relative: 0.0 0.6; offset: 5 0; to: "con_bg";}
-               //~ rel2 {relative: 1.0 0.8; to: "con_bg";}
-               //~ text{
-                  //~ text: "";
-                  //~ font: "vera.ttf";
-                  //~ size: 10;
-                  //~ align: 0.0 0.5;
-               //~ }
-            //~ }
-         //~ }
+                  align: 0.0 0.5; } } } 
 
 images {
    image: "backdrop.png" LOSSY 95;
@@ -190,17 +187,6 @@ images {
    image: "logo.png" LOSSY 95;
    image: "frame_bg.png" LOSSY 95;
    image: "frame_bg_label.png" LOSSY 95;
-   image: "lbl_group.png" LOSSY 95;
-   image: "lbl_part.png" LOSSY 95;
-   image: "lbl_desc.png" LOSSY 95;
-   image: "lbl_rect.png" LOSSY 95;
-   image: "lbl_text.png" LOSSY 95;
-   image: "lbl_image.png" LOSSY 95;
-   image: "lbl_pos.png" LOSSY 95;
-   image: "lbl_prog.png" LOSSY 95;
-   image: "lbl_script.png" LOSSY 95;
-   image: "lbl_grad.png" LOSSY 95;
-   image: "lbl_fill.png" LOSSY 95;
    image: "image.png" LOSSY 95;
    image: "rect.png" LOSSY 95;
    image: "text.png" LOSSY 95;
@@ -236,6 +222,7 @@ images {
    image: "add.png" LOSSY 95;
    image: "remove.png" LOSSY 95;
    image: "dia_warning.png" LOSSY 95;
+   image: "exit.png" LOSSY 95;
 }
 
 fonts {
@@ -283,6 +270,7 @@ collections {
    STATIC_IMAGE("ADD.PNG", "add.png", 10, 10, 0);
    STATIC_IMAGE("REMOVE.PNG", "remove.png", 10, 10, 0);
    STATIC_IMAGE("WARN.PNG", "dia_warning.png", 48, 48, 0);
+   STATIC_IMAGE("EXIT.PNG", "exit.png", 48, 48, 1);
    
    group{
       name: "BG3_I.PNG";
@@ -344,15 +332,15 @@ collections {
             }
          }
          /* toolbar swallow */
-         part { name: "toolbar";
+         part { name: "toolbar_swallow";
             type: SWALLOW;
             description { state: "default" 0.0;
                rel1 {relative: 0.0 0.0; offset: 150 0;}
-               rel2 {relative: 1.0 0.0; offset: 0 45;}
+               rel2 {relative: 1.0 0.0; offset: -7 45;}
             }
          }
          /* tree swallow */
-         part { name: "tree";
+         part { name: "tree_swallow";
             type: SWALLOW;
             description { state: "default" 0.0;
                rel1 {relative: 0.0 0.0; offset: 3 55;}
@@ -365,7 +353,7 @@ collections {
             mouse_events: 0;
             description { state: "default" 0.0;
                color: 255 255 0 0;
-               rel1 {relative: 1.0 1.0; offset: 0 -100; to: "tree";}
+               rel1 {relative: 1.0 1.0; offset: 0 -100; to: "tree_swallow";}
                rel2 {relative: 1.0 1.0; offset: 0 -5;}
             }
          }
@@ -391,17 +379,17 @@ collections {
             }
          }
          //EXAMPLE: FRAME (name, w, h, img_name, place_after)
-         FRAME("group", 200, 70, "lbl_group.png", 14, 50, "frames_starter")
-         FRAME("part", 200, 55, "lbl_part.png", 14, 35,"group_frame")
-         FRAME("state", 200, 133, "lbl_desc.png", 14, 42, "part_frame")
-         FRAME("rect", 120, 77, "lbl_rect.png", 14, 72, "state_frame")
-         FRAME("text", 250, 180, "lbl_text.png", 14, 36, "rect_frame")
-         FRAME("image", 250, 230, "lbl_image.png", 14, 46, "text_frame")
-         FRAME("gradient", 250, 135, "lbl_grad.png", 14, 67, "image_frame")
-         FRAME("fill", 250, 45, "lbl_fill.png", 14, 30, "gradient_frame")
-         FRAME("position", 200, 200, "lbl_pos.png", 14, 60, "fill_frame")
-         FRAME("program", 250, 250, "lbl_prog.png", 14, 60, "position_frame")
-         FRAME("script", 250, 250, "lbl_script.png", 14, 45, "program_frame")
+         FRAME("group", 200, 90, 14, 50, "frames_starter")
+         FRAME("part", 200, 75, 14, 35,"group_frame")
+         FRAME("state", 200, 153, 14, 42, "part_frame")
+         FRAME("rect", 120, 97, 14, 72, "state_frame")
+         FRAME("text", 200, 200, 14, 36, "rect_frame")
+         FRAME("image", 200, 250, 14, 46, "text_frame")
+         FRAME("gradient", 250, 155, 14, 67, "image_frame")
+         FRAME("fill", 200, 65, 14, 30, "gradient_frame")
+         FRAME("position", 200, 220, 14, 60, "fill_frame")
+         FRAME("program", 250, 270, 14, 60, "position_frame")
+         FRAME("script", 250, 270, 14, 45, "program_frame")
       }
       programs {
          program{
