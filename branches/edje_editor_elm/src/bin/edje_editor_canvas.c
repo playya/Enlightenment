@@ -31,16 +31,19 @@ _canvas_drag_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    //printf("ON DRAG\n");
    Evas_Coord parentx,parenty,parentw,parenth;
-   Evas_Coord x,y;
+   Evas_Coord x, y, w, h;
    Evas_Coord mouse_x, mouse_y;
 
    // MoveBox
    if ((int)(long)data == DRAG_MOVEBOX)
    {
       evas_pointer_output_xy_get(evas_object_evas_get(ui.win), &mouse_x, &mouse_y);
-      _canvas_move_fake(mouse_x - dx, mouse_y + 16 - dy);
+      x = mouse_x - dx;
+      y = mouse_y - dy;
+      if (x < 0) x = 0;
+      if (y < 0) y = 0;
+      _canvas_move_fake(x + 6, y + 16);
    }
-
    // Resize fake win
    if ((int)(long)data == DRAG_MINIARROW)
    {
@@ -49,7 +52,6 @@ _canvas_drag_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
       if (y < 0) y = 0;
       _canvas_resize_fake((int)x,(int)y);
    }
-
    // Move Rel1 Point
    if ((int)(long)data == DRAG_REL1)
    {
@@ -161,7 +163,7 @@ _canvas_drag_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
          }
       }
       //~ gradient_frame_update(); TODO
-      //~ fill_frame_update(); TODO
+      fill_frame_update();
    }
 
    canvas_redraw();
@@ -572,7 +574,7 @@ _canvas_resize_fake(int w, int h)
    if (h < 0) h = 100;
 
    evas_object_resize(EV_fakewin, w, h);
-   evas_object_resize(EV_movebox, w+8, 14);
+   evas_object_resize(EV_movebox, w+14, 14);
    edje_object_part_drag_value_set(EV_fakewin, "miniarrow",
                                    (double)w, (double)h);
 
@@ -584,7 +586,7 @@ _canvas_move_fake(int x, int y)
 {
    //printf("MOVEBOX: %d %d\n",x,y);
    evas_object_move(EV_fakewin, x, y);
-   evas_object_move(EV_movebox, x-4, y-16);
+   evas_object_move(EV_movebox, x-6, y-16);
 }
 
 
@@ -676,7 +678,7 @@ canvas_prepare(void)
 
    // Create MoveBox
    EV_movebox = evas_object_rectangle_add(evas);
-   evas_object_color_set(EV_movebox, 0, 0, 0, 0);
+   evas_object_color_set(EV_movebox, 255, 0, 0, 130 * DEBUG_MODE);
    evas_object_event_callback_add(EV_movebox, EVAS_CALLBACK_MOUSE_DOWN,
                                   _canvas_drag_start_cb, (void*)DRAG_MOVEBOX);
    evas_object_event_callback_add(EV_movebox, EVAS_CALLBACK_MOUSE_UP,
@@ -717,8 +719,8 @@ canvas_redraw(void)
          _canvas_draw_focus();
          return;
       }
-
-   }else
+   }
+   else
    {
       evas_object_hide(EV_fakewin);
       evas_object_hide(EV_movebox);

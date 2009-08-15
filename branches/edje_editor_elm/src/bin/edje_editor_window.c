@@ -64,6 +64,9 @@ window_main_create(void)
    elm_layout_content_set(ly, "position_frame_swallow", position_frame_create(ui.win));
    elm_layout_content_set(ly, "state_frame_swallow", state_frame_create(ui.win));
    elm_layout_content_set(ly, "text_frame_swallow", text_frame_create(ui.win));
+   elm_layout_content_set(ly, "rect_frame_swallow", rectangle_frame_create(ui.win));
+   elm_layout_content_set(ly, "image_frame_swallow", image_frame_create(ui.win));
+   elm_layout_content_set(ly, "fill_frame_swallow", fill_frame_create(ui.win));
 
 
    // Logo (keygrabber)
@@ -125,7 +128,7 @@ window_update_frames_visibility(void)
       switch(edje_edit_part_type_get(ui.edje_o, cur.part))
       {
 	 case EDJE_PART_TYPE_RECTANGLE:
-	    //~ rectangle_frame_update();
+	    rectangle_frame_update();
 	    edje_object_signal_emit(ui.edje_ui,"rect_frame_show","edje_editor");
 	    edje_object_signal_emit(ui.edje_ui,"fill_frame_hide","edje_editor");
 	    edje_object_signal_emit(ui.edje_ui,"image_frame_hide","edje_editor");
@@ -133,8 +136,8 @@ window_update_frames_visibility(void)
 	    edje_object_signal_emit(ui.edje_ui,"gradient_frame_hide","edje_editor");
 	    break;
 	 case EDJE_PART_TYPE_IMAGE:
-	    //~ image_frame_update();
-	    //~ fill_frame_update();
+	    image_frame_update();
+	    fill_frame_update();
 	    edje_object_signal_emit(ui.edje_ui,"image_frame_show","edje_editor");
 	    edje_object_signal_emit(ui.edje_ui,"fill_frame_show","edje_editor");
 	    edje_object_signal_emit(ui.edje_ui,"rect_frame_hide","edje_editor");

@@ -113,7 +113,6 @@ load_edje(const char *file)
    set_current_part(NULL);
    set_current_state(NULL);
    set_current_prog(NULL);
-   set_current_tween(NULL);
 
    //~ Parts_Hash = NULL;
 
@@ -167,7 +166,6 @@ change_to_group(const char *group)
    set_current_group(group);
    set_current_part(NULL);
    set_current_state(NULL);
-   set_current_tween(NULL);
    set_current_prog(NULL);
 
    tree_parts_create();
@@ -213,14 +211,6 @@ void set_current_prog(const char *prog)
    cur.prog = prog ? eina_stringshare_add(prog) : NULL;
 }
 
-void set_current_tween(const char *tween)
-{
-   printf("Set tween: %s to CURRENT\n", tween);
-   if (cur.tween) eina_stringshare_del(cur.tween);
-   cur.tween = tween ? eina_stringshare_add(tween) : NULL;
-}
-
-
 EAPI int
 elm_main(int argc, char **argv)
 {
@@ -240,7 +230,6 @@ elm_main(int argc, char **argv)
    cur.part = NULL;
    cur.state = NULL;
    cur.prog = NULL;
-   cur.tween = NULL;
    cur.fullscreen = 0;
    cur.open_temp_name = NULL;
    cur.open_file_name = NULL;

@@ -161,49 +161,24 @@ _to_combo_sel(void *data, Evas_Object *obj, void *event_info)
 Evas_Object*
 position_frame_create(Evas_Object *parent)
 {
-   Evas_Object *vbox, *fr, *tb, *_o;
-
-   vbox = elm_box_add(parent);
-   elm_box_horizontal_set(vbox, 0);
-   evas_object_size_hint_align_set(vbox, 0.0, 0.0);
-   evas_object_size_hint_weight_set(vbox, 1.0, 1.0);
-   evas_object_show(vbox);
-
-   fr = elm_frame_add(parent);
-   elm_frame_label_set(fr, "Top-Left point");
-   evas_object_size_hint_align_set(fr, 0.0, 0.0);
-   evas_object_size_hint_weight_set(fr, 1.0, 1.0);
-   evas_object_show(fr);
-   elm_box_pack_end(vbox, fr);
+   Evas_Object *tb, *_o;
 
    tb = elm_table_add(parent);
-   evas_object_size_hint_align_set(tb, 0.0, 0.0);
-   evas_object_size_hint_weight_set(tb, 1.0, 1.0);
-   elm_frame_content_set(fr,tb);
+   evas_object_show(tb);
 
-   NEW_DOUBLE_ENTRY_TO_TABLE("relative:", 0, 0, _rel1x_entry, _rel1y_entry, EINA_TRUE)
-   NEW_DOUBLE_ENTRY_TO_TABLE("offset:", 0, 1, _off1x_entry, _off1y_entry, EINA_TRUE)
-   NEW_COMBO_TO_TABLE(_to1x_combo, "to x", 0, 2, 2, part_populate_combo_with_parts, _to_combo_sel)
-   NEW_COMBO_TO_TABLE(_to1y_combo, "to y", 0, 3, 2, part_populate_combo_with_parts, _to_combo_sel)
-   
-   fr = elm_frame_add(parent);
-   elm_frame_label_set(fr, "Bottom-Right point");
-   evas_object_size_hint_align_set(fr, 0.0, 0.0);
-   evas_object_size_hint_weight_set(fr, 1.0, 1.0);
-   evas_object_show(fr);
-   elm_box_pack_end(vbox, fr);
+   NEW_TITLE_TO_TABLE("top-left point", 0, 0, 3)
+   NEW_DOUBLE_ENTRY_TO_TABLE("relative:", 0, 1, _rel1x_entry, _rel1y_entry, EINA_TRUE)
+   NEW_DOUBLE_ENTRY_TO_TABLE("offset:", 0, 2, _off1x_entry, _off1y_entry, EINA_TRUE)
+   NEW_COMBO_TO_TABLE(_to1x_combo, "to x", 0, 3, 2, part_populate_combo_with_parts, _to_combo_sel)
+   NEW_COMBO_TO_TABLE(_to1y_combo, "to y", 0, 4, 2, part_populate_combo_with_parts, _to_combo_sel)
 
-   tb = elm_table_add(parent);
-   evas_object_size_hint_align_set(tb, 0.0, 0.0);
-   evas_object_size_hint_weight_set(tb, 1.0, 1.0);
-   elm_frame_content_set(fr,tb);
+   NEW_TITLE_TO_TABLE("bottom-right point", 0, 5, 3)
+   NEW_DOUBLE_ENTRY_TO_TABLE("relative:", 0, 6, _rel2x_entry, _rel2y_entry, EINA_TRUE)
+   NEW_DOUBLE_ENTRY_TO_TABLE("offset:", 0, 7, _off2x_entry, _off2y_entry, EINA_TRUE)
+   NEW_COMBO_TO_TABLE(_to2x_combo, "to x", 0, 8, 2, part_populate_combo_with_parts, _to_combo_sel)
+   NEW_COMBO_TO_TABLE(_to2y_combo, "to y", 0, 9, 2, part_populate_combo_with_parts, _to_combo_sel)
 
-   NEW_DOUBLE_ENTRY_TO_TABLE("relative:", 0, 0, _rel2x_entry, _rel2y_entry, EINA_TRUE)
-   NEW_DOUBLE_ENTRY_TO_TABLE("offset:", 0, 1, _off2x_entry, _off2y_entry, EINA_TRUE)
-   NEW_COMBO_TO_TABLE(_to2x_combo, "to x", 0, 2, 2, part_populate_combo_with_parts, _to_combo_sel)
-   NEW_COMBO_TO_TABLE(_to2y_combo, "to y", 0, 3, 2, part_populate_combo_with_parts, _to_combo_sel)
-
-   return vbox;
+   return tb;
 }
 
 void

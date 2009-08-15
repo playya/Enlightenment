@@ -1,4 +1,4 @@
-/*  Copyright (C) 2006-2008 Davide Andreoli (see AUTHORS)
+/*  Copyright (C) 2006-2009 Davide Andreoli (see AUTHORS)
  *
  *  This file is part of Edje_editor.
  *  Edje_editor is free software: you can redistribute it and/or modify
@@ -19,11 +19,8 @@
 #define _EDJE_EDITOR_RECT_H_
 
 
-Evas_Object *RectColorObject;
-
-
-Etk_Widget* rectangle_frame_create (Evas *evas);
-void        rectangle_frame_update (void);
+Evas_Object* rectangle_frame_create (Evas_Object *parent);
+void         rectangle_frame_update (void);
 
 
 #endif

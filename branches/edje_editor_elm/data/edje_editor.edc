@@ -38,8 +38,9 @@
    } \
    part { name: NAME"_frame_swallow_clip"; \
       description { state: "default" 0.0; \
-	 rel1 {relative: 0.0 0.0; offset: 3 3; to: NAME"_frame";} \
-	 rel2 {relative: 1.0 1.0; offset: -3 -3; to: NAME"_frame";} \
+         fixed: 1 1; \
+         rel1 {relative: 0.0 0.0; offset: 3 3; to: NAME"_frame";} \
+         rel2 {relative: 1.0 1.0; offset: -3 -3; to: NAME"_frame";} \
       } \
    } \
    part { name: NAME"_frame_swallow"; \
@@ -47,24 +48,25 @@
       mouse_events: 1; \
       clip_to: NAME"_frame_swallow_clip"; \
       description { state: "default" 0.0; \
-         color: 0 0 0 0; \
-         rel1 {relative: 0.0 0.0; offset: 3 3; to: NAME"_frame";} \
-         rel2 {relative: 1.0 1.0; offset: -3 -3; to: NAME"_frame";} \
+      fixed: 1 1; \
+      color: 0 0 0 0; \
+      rel1 {relative: 0.0 0.0; offset: 3 3; to: NAME"_frame";} \
+      rel2 {relative: 1.0 1.0; offset: -3 -3; to: NAME"_frame";} \
       } \
    } \
    part { name: NAME"_frame_label_bg"; \
       type: IMAGE; \
       mouse_events: 1; \
       description { state: "default" 0.0; \
-	 rel1 {relative: 0.0 0.0; to: NAME"_frame";} \
-	 rel2 {relative: 1.0 0.0; to: NAME"_frame";} \
-	 image {normal: "frame_bg_label.png"; border: 1 1 1 1;} \
-	 visible: 0; \
+         rel1 {relative: 0.0 0.0; to: NAME"_frame";} \
+         rel2 {relative: 1.0 0.0; to: NAME"_frame";} \
+         image {normal: "frame_bg_label.png"; border: 1 1 1 1;} \
+         visible: 0; \
       } \
       description { state: "big" 0.0; \
-	 rel1 {relative: 0.0 0.0; offset: 0 -20; to: NAME"_frame";} \
-	 rel2 {relative: 1.0 0.0; to: NAME"_frame";} \
-	 image {normal: "frame_bg_label.png"; border: 1 1 1 1;} \
+         rel1 {relative: 0.0 0.0; offset: 0 -20; to: NAME"_frame";} \
+         rel2 {relative: 1.0 0.0; to: NAME"_frame";} \
+         image {normal: "frame_bg_label.png"; border: 1 1 1 1;} \
       } \
    } \
    part { name: NAME"_frame_label"; \
@@ -72,27 +74,27 @@
       mouse_events: 0; \
       effect: FAR_SHADOW; \
       description { state: "default" 0.0; \
-	 rel1 {to: NAME"_frame_label_bg";} \
-	 rel2 {to: NAME"_frame_label_bg";} \
-	 color2: 255 255 255 255; \
-	 color3: 55 55 55 55; \
-	 text { \
-	    text: NAME; \
-	    font: "Sans:style=Bold"; \
-	    size: BIG_FONT_SIZE; \
-	 } \
-	 visible: 0; \
+         rel1 {to: NAME"_frame_label_bg";} \
+         rel2 {to: NAME"_frame_label_bg";} \
+         color2: 255 255 255 255; \
+         color3: 55 55 55 55; \
+         text { \
+            text: NAME; \
+            font: "Sans:style=Bold"; \
+            size: BIG_FONT_SIZE; \
+         } \
+         visible: 0; \
       } \
       description { state: "big" 0.0; \
-	 rel1 {to: NAME"_frame_label_bg";} \
-	 rel2 {to: NAME"_frame_label_bg";} \
-	 color2: 255 255 255 255; \
-	 color3: 55 55 55 55; \
-	 text { \
-	    text: NAME; \
-	    font: "Sans:style=Bold"; \
-	    size: BIG_FONT_SIZE; \
-	 } \
+         rel1 {to: NAME"_frame_label_bg";} \
+         rel2 {to: NAME"_frame_label_bg";} \
+         color2: 255 255 255 255; \
+         color3: 55 55 55 55; \
+         text { \
+            text: NAME; \
+            font: "Sans:style=Bold"; \
+            size: BIG_FONT_SIZE; \
+         } \
       } \
    }
    
@@ -221,6 +223,8 @@ images {
    image: "doc_save_as.png" LOSSY 95;
    image: "add.png" LOSSY 95;
    image: "remove.png" LOSSY 95;
+   image: "go-down.png" LOSSY 95;
+   image: "go-up.png" LOSSY 95;
    image: "dia_warning.png" LOSSY 95;
    image: "exit.png" LOSSY 95;
 }
@@ -269,6 +273,8 @@ collections {
    STATIC_IMAGE("DOC_SAVE_AS.PNG", "doc_save_as.png", 10, 10, 0);
    STATIC_IMAGE("ADD.PNG", "add.png", 10, 10, 0);
    STATIC_IMAGE("REMOVE.PNG", "remove.png", 10, 10, 0);
+   STATIC_IMAGE("UP.PNG", "go-up.png", 10, 10, 0);
+   STATIC_IMAGE("DOWN.PNG", "go-down.png", 10, 10, 0);
    STATIC_IMAGE("WARN.PNG", "dia_warning.png", 48, 48, 0);
    STATIC_IMAGE("EXIT.PNG", "exit.png", 48, 48, 1);
    
@@ -382,12 +388,12 @@ collections {
          FRAME("group", 200, 90, 14, 50, "frames_starter")
          FRAME("part", 200, 75, 14, 35,"group_frame")
          FRAME("state", 200, 153, 14, 42, "part_frame")
-         FRAME("rect", 120, 97, 14, 72, "state_frame")
+         FRAME("rect", 200, 47, 14, 72, "state_frame")
          FRAME("text", 200, 200, 14, 36, "rect_frame")
-         FRAME("image", 200, 250, 14, 46, "text_frame")
+         FRAME("image", 200, 110, 14, 46, "text_frame")
          FRAME("gradient", 250, 155, 14, 67, "image_frame")
-         FRAME("fill", 200, 65, 14, 30, "gradient_frame")
-         FRAME("position", 200, 220, 14, 60, "fill_frame")
+         FRAME("fill", 200, 125, 14, 30, "gradient_frame")
+         FRAME("position", 200, 180, 14, 60, "fill_frame")
          FRAME("program", 250, 270, 14, 60, "position_frame")
          FRAME("script", 250, 270, 14, 45, "program_frame")
       }
@@ -697,8 +703,6 @@ collections {
                rel2 {relative: 0 0; offset: 7 7;}
             }
             dragable {
-               //confine: "miniarrow";
-               //events:  ;
                x: 1 1 1;
                y: 1 1 1;
             }

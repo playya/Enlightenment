@@ -60,37 +60,26 @@ _dialog_filechooser_done(void *data, Evas_Object *obj, void *event_info)
          //~ case FILECHOOSER_SAVE_EDC:
               //~ dialog_alert_show("Not yet implemented.");
          //~ break;
-         //~ case FILECHOOSER_IMAGE:
-            //~ snprintf(cmd, 4096, "%s/%s", 
-               //~ etk_filechooser_widget_current_folder_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)),
-               //~ etk_filechooser_widget_selected_file_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
-            //~ if (!edje_edit_image_add(edje_o, cmd))
-            //~ {
-               //~ dialog_alert_show("ERROR: Can't import image file.");
-               //~ break;
-            //~ }
-            //~ image_browser_populate();
-//~ 
-            //~ Etk_Range *range;
-            //~ double upper;
-            //~ range = etk_scrolled_view_vscrollbar_get(
-                    //~ etk_iconbox_scrolled_view_get(ETK_ICONBOX(UI_ImageBrowserIconbox)));
-            //~ etk_range_range_get(range, NULL, &upper);
-            //~ etk_range_value_set(range, upper);
-//~ 
-            //~ Etk_Iconbox_Icon *icon;
-            //~ icon = etk_iconbox_icon_get_by_label(ETK_ICONBOX(UI_ImageBrowserIconbox),
-                                 //~ etk_filechooser_widget_selected_file_get(
-                                 //~ ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
-            //~ etk_iconbox_icon_select(icon);
-//~ 
-            //~ break;
-	 case FILECHOOSER_FONT:
-	    if (!ecore_str_has_suffix(selected, ".ttf") ||
-	        (!edje_edit_font_add(ui.edje_o, selected)))
-	       dialog_alert_show("ERROR: Can't import font file.");
-	    evas_object_del(data);
-	    fonts_browser_show(ui.win);
+         case FILECHOOSER_IMAGE:
+            if (!edje_edit_image_add(ui.edje_o, selected))
+            {
+               dialog_alert_show("ERROR: Can't import image file.");
+               break;
+            }
+            if (cur.part && cur.state)
+               edje_edit_state_image_set(ui.edje_o, cur.part, cur.state,
+                                         ecore_file_file_get(selected));
+            // close the dialog
+            evas_object_del(data);
+            image_browser_show(EINA_TRUE);
+            //TODO show the imported image
+            break;
+      case FILECHOOSER_FONT:
+         if (!ecore_str_has_suffix(selected, ".ttf") ||
+            (!edje_edit_font_add(ui.edje_o, selected)))
+           dialog_alert_show("ERROR: Can't import font file.");
+         evas_object_del(data);
+         fonts_browser_show(ui.win);
          break;
    }
 }
@@ -113,7 +102,7 @@ dialog_filechooser_show(int FileChooserType)
    evas_object_show(fs);
 
    evas_object_smart_callback_add(fs, "done", _dialog_filechooser_done, inwin);
-   evas_object_data_set(fs, "FileChooserType", FileChooserType);
+   evas_object_data_set(fs, "FileChooserType", (void*)(long)FileChooserType);
 
 
    //~ FileChooserOperation = FileChooserType;

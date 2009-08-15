@@ -33,6 +33,12 @@ edje_editor_text.c \
 edje_editor_text.h \
 edje_editor_fonts.c \
 edje_editor_fonts.h \
+edje_editor_rect.c \
+edje_editor_rect.h \
+edje_editor_images.c \
+edje_editor_images.h \
+edje_editor_fill.c \
+edje_editor_fill.h \
 main.c \
 main.h
 

@@ -26,14 +26,14 @@
 //~ #include <Ecore_Data.h>
 //~ #include <Ecore_File.h>
 //~ #include <Ecore_Evas.h>
-//~ #include "edje_editor_images.h"
+#include "edje_editor_images.h"
 #include "edje_editor_tree.h"
 #include "edje_editor_group.h"
 #include "edje_editor_part.h"
 #include "edje_editor_state.h"
 #include "edje_editor_position.h"
 #include "edje_editor_text.h"
-//~ #include "edje_editor_rect.h"
+#include "edje_editor_rect.h"
 //~ #include "edje_editor_program.h"
 //~ #include "edje_editor_script.h"
 #include "edje_editor_toolbar.h"
@@ -43,7 +43,7 @@
 #include "edje_editor_window.h"
 #include "edje_editor_fonts.h"
 //~ #include "edje_editor_gradient.h"
-//~ #include "edje_editor_fill.h"
+#include "edje_editor_fill.h"
 //~ #include "edje_editor_spectra.h"
 //~ #include "edje_editor_spectra_widget.h"
 //~ #include "edje_editor_tree_model_spectra.h"
@@ -51,16 +51,8 @@
 //~ #include "edje_editor_colors.h"
 
 /* DEFINES */
-#define USE_GL_ENGINE 0
-#define DEBUG_MODE 0
+#define DEBUG_MODE 1       // 0 or 1
 
-//~ #if DEBUG_MODE
-   //~ #define TREE_WIDTH 365
-//~ #else
-   //~ #define TREE_WIDTH 265
-//~ #endif
-
-#define IFREE(ptr) { free(ptr); ptr = NULL; }
 
 #define MSG_FLOAT "<b>Can't understand size.</b><br>The number need to be a float:<br> (for ex.) '0.35'"
 #define MSG_INT "<b>Can't understand size.</b><br>The number need to be an integer :<br> (for ex.) '12'"
@@ -72,8 +64,6 @@ enum various
 {
    TOOLBAR_NEW,
    TOOLBAR_OPEN,
-   TOOLBAR_ADD,
-   TOOLBAR_REMOVE,
    TOOLBAR_OPTIONS,
    TOOLBAR_DEBUG,
    TOOLBAR_SAVE,
@@ -89,7 +79,7 @@ enum various
    TOOLBAR_COLORS,
    TOOLBAR_EXIT,
    FILECHOOSER_OPEN,
-   //~ FILECHOOSER_IMAGE,
+   FILECHOOSER_IMAGE,
    FILECHOOSER_FONT,
    //~ FILECHOOSER_SAVE_EDC,
    //~ FILECHOOSER_SAVE_EDJ,
@@ -115,15 +105,15 @@ enum various
    //~ COLOR_OBJECT_CC1,
    //~ COLOR_OBJECT_CC2,
    //~ COLOR_OBJECT_CC3,
-   //~ NEW_IMAGE,
-   //~ NEW_GRADIENT,
-   //~ NEW_RECT,
-   //~ NEW_TEXT,
-   //~ NEW_SWAL,
-   //~ NEW_GROUPSWAL,
-   //~ NEW_PROG,
-   //~ NEW_DESC,
-   //~ NEW_GROUP,
+   NEW_IMAGE,
+   NEW_GRADIENT,
+   NEW_RECT,
+   NEW_TEXT,
+   NEW_SWAL,
+   NEW_GROUPSWAL,
+   NEW_PROG,
+   NEW_DESC,
+   NEW_GROUP,
    //~ REMOVE_DESCRIPTION,
    //~ REMOVE_PART,
    //~ REMOVE_GROUP,
@@ -189,7 +179,6 @@ struct CurrentState
    const char *part;            //The current selected part name (stringshared)
    const char *state;           //The current selected state name (stringshared)
    const char *prog;            //The current selected prog name (stringshared)
-   const char *tween;           //The current selected tween name in the image frame (stringshared)
    //~ Etk_String *spectra;     //The current selected spectra in the spectra editor
 
    const char *open_file_name;  // The original name of the opened file (stringshared)
@@ -269,7 +258,8 @@ Eina_Bool ecore_str_equal(const char *s1, const char *s2);
 #define EDJE_ACTION_TYPE_DRAG_VAL_STEP 5
 #define EDJE_ACTION_TYPE_DRAG_VAL_PAGE 6
 #define EDJE_ACTION_TYPE_SCRIPT        7
-#define EDJE_ACTION_TYPE_LAST          8
+#define EDJE_ACTION_TYPE_FOCUS_SET     8
+#define EDJE_ACTION_TYPE_LAST          9
 
 #define EDJE_TWEEN_MODE_NONE       0
 #define EDJE_TWEEN_MODE_LINEAR     1

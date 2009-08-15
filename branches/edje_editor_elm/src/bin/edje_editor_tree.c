@@ -19,6 +19,8 @@
 #include "main.h"
 
 /***   Parts Tree 'model'   ***/
+static Elm_Genlist_Item* _tree_part_add(const char *name);
+
 Elm_Genlist_Item_Class parts_class;
 Elm_Genlist_Item_Class states_class;
 Elm_Genlist_Item_Class progs_class;
@@ -107,7 +109,6 @@ _tree_model_part_sel(void *data, Evas_Object *obj, void *event_info)
    set_current_part(part);
    set_current_state("default 0.0");
    set_current_prog(NULL);
-   set_current_tween(NULL);
 
 
    window_update_frames_visibility();
@@ -130,7 +131,6 @@ _tree_model_state_sel(void *data, Evas_Object *obj, void *event_info)
    set_current_part(parent);
    set_current_state(state);
    set_current_prog(NULL);
-   set_current_tween(NULL);
    
    edje_edit_part_selected_state_set(ui.edje_o, cur.part, cur.state);  
 
@@ -236,11 +236,120 @@ _tree_emitter_populate(Evas_Object *o)
    edje_edit_string_list_free(progs);
 }
 
+
+#define GENERATE_UNIQUE_PART_NAME(PREFIX) \
+   snprintf(name, sizeof(name), PREFIX); \
+   i = 2; \
+   while (edje_edit_part_exist(ui.edje_o, name)) \
+      snprintf(name, sizeof(name), PREFIX" %d", i++);
+
+static void
+_add_combo_sel(void *data, Evas_Object *obj, void *event_info)
+{
+   char name[1024];
+   int i = 2;
+   Elm_Genlist_Item *item = NULL;
+   Eina_List *l;
+
+   switch ((int)(long)data)
+   {
+      case NEW_RECT:
+         GENERATE_UNIQUE_PART_NAME("New rectangle")
+         if (!edje_edit_part_add(ui.edje_o, name, EDJE_PART_TYPE_RECTANGLE))
+         {
+            dialog_alert_show("<b>Error</b><br>Can't create rectangle.");
+            break;
+         }
+         item = _tree_part_add(name);
+         break;
+
+      case NEW_IMAGE:
+         GENERATE_UNIQUE_PART_NAME("New image")
+         if (!edje_edit_part_add(ui.edje_o, name, EDJE_PART_TYPE_IMAGE))
+         {
+            dialog_alert_show("<b>Error</b><br>Can't create image.");
+            break;
+         }
+         item = _tree_part_add(name);
+
+         // autoselect the first image in the edje file
+         l = edje_edit_images_list_get(ui.edje_o);
+         if (l && l->data)
+           edje_edit_state_image_set(ui.edje_o, name, "default 0.00", l->data);
+         break;
+
+      case NEW_GRADIENT:
+         GENERATE_UNIQUE_PART_NAME("New gradient");
+         if (!edje_edit_part_add(ui.edje_o, name, EDJE_PART_TYPE_GRADIENT))
+         {
+            dialog_alert_show("<b>Error</b><br>Can't create gradient.");
+            break;
+         }
+         edje_edit_state_gradient_type_set(ui.edje_o, name, "default 0.00", "linear");
+         item = _tree_part_add(name);
+         break;
+
+      case NEW_TEXT:
+         GENERATE_UNIQUE_PART_NAME("New text");         
+         if (!edje_edit_part_add(ui.edje_o, name, EDJE_PART_TYPE_TEXT))
+         {
+            dialog_alert_show("<b>Error</b><br>Can't create text part.");
+            break;
+         }
+         item = _tree_part_add(name);
+
+         edje_edit_state_font_set(ui.edje_o, name, "default 0.00", "Sans");
+         edje_edit_state_text_size_set(ui.edje_o, name, "default 0.00", 16);
+         edje_edit_state_text_set(ui.edje_o, name, "default 0.00", "Hallo World !! :)");
+         edje_edit_part_effect_set(ui.edje_o, name, EDJE_TEXT_EFFECT_GLOW);
+         break;
+
+      case NEW_SWAL:
+         GENERATE_UNIQUE_PART_NAME("New swallow");
+         if (!edje_edit_part_add(ui.edje_o, name, EDJE_PART_TYPE_SWALLOW))
+         {
+            dialog_alert_show("<b>Error</b><br>Can't create swallow.");
+            break;
+         }
+         item = _tree_part_add(name);
+         break;
+
+      case NEW_GROUPSWAL:
+         GENERATE_UNIQUE_PART_NAME("New group swallow");
+         if (!edje_edit_part_add(ui.edje_o, name, EDJE_PART_TYPE_GROUP))
+         {
+            dialog_alert_show("<b>Error</b><br>Can't create group swallow.");
+            break;
+         }
+         item = _tree_part_add(name);
+         break;
+   }
+   
+   // select the new item
+   if (item)
+   {
+      elm_genlist_item_selected_set(item, EINA_TRUE);
+      elm_genlist_item_show(item); // TODO this should not scroll if the item is visible yet
+   }
+}
+
+static Elm_Genlist_Item*
+_tree_part_add(const char *name)
+{
+   return elm_genlist_item_append(ui.parts_tree, &parts_class,
+                           eina_stringshare_add(name), /* item data */ //NOTE free() by _tree_model_del()
+                           NULL/* parent */,
+                           ELM_GENLIST_ITEM_SUBITEMS,
+                           _tree_model_part_sel /* func */,
+                           NULL/* func data */);
+}
+
 void 
 tree_parts_create(void)
 {
-   Evas_Object *bt, *tree, *table, *label;
+   Evas_Object *bt, *tree, *table, *label, *ic, *o;
    Eina_List *parts, *progs, *l;
+   Elm_Hoversel_Item *it;
    char *name;
    
    printf("populate parts\n");
@@ -271,6 +380,30 @@ tree_parts_create(void)
    elm_table_pack(table, label, 1, 1, 1, 1);
    evas_object_show(label);
    
+   // 'Add' Hoversel
+   ic = elm_icon_add(ui.win);
+   elm_icon_file_set(ic, EdjeFile, "ADD.PNG");
+   o = elm_hoversel_add(ui.win);
+   elm_hoversel_icon_set(o, ic);
+   elm_hoversel_label_set(o, "Add");
+   elm_hoversel_hover_parent_set(o, ui.win);
+   elm_table_pack(table, o, 2, 0, 1, 2);
+   it = elm_hoversel_item_add(o, "rectangle", NULL, ELM_ICON_NONE, _add_combo_sel, (void*)NEW_RECT);
+   elm_hoversel_item_icon_set(it, EdjeFile, "RECT.PNG", ELM_ICON_FILE);
+   it = elm_hoversel_item_add(o, "image", NULL, ELM_ICON_NONE, _add_combo_sel, (void*)NEW_IMAGE);
+   elm_hoversel_item_icon_set(it, EdjeFile, "IMAGE.PNG", ELM_ICON_FILE);
+   it = elm_hoversel_item_add(o, "gradient", NULL, ELM_ICON_NONE, _add_combo_sel, (void*)NEW_GRADIENT);
+   elm_hoversel_item_icon_set(it, EdjeFile, "GRAD_LINEAR.PNG", ELM_ICON_FILE);
+   it = elm_hoversel_item_add(o, "text", NULL, ELM_ICON_NONE, _add_combo_sel, (void*)NEW_TEXT);
+   elm_hoversel_item_icon_set(it, EdjeFile, "TEXT.PNG", ELM_ICON_FILE);
+   it = elm_hoversel_item_add(o, "swallow", NULL, ELM_ICON_NONE, _add_combo_sel, (void*)NEW_SWAL);
+   elm_hoversel_item_icon_set(it, EdjeFile, "SWAL.PNG", ELM_ICON_FILE);
+   it = elm_hoversel_item_add(o, "group swallow", NULL, ELM_ICON_NONE, _add_combo_sel, (void*)NEW_GROUPSWAL);
+   elm_hoversel_item_icon_set(it, EdjeFile, "GROUP.PNG", ELM_ICON_FILE);
+   evas_object_show(o);
+   
+   
+   // Tree
    parts_class.item_style     = "default";
    parts_class.func.label_get = _tree_model_label_get;
    parts_class.func.icon_get  = _tree_model_part_icon_get;
@@ -292,19 +425,17 @@ tree_parts_create(void)
    tree = elm_genlist_add(ui.win);
    evas_object_size_hint_align_set(tree, -1.0, -1.0);
    evas_object_size_hint_weight_set(tree, 1.0, 1.0);
-   elm_table_pack(table, tree, 0, 2, 2, 1);
+   elm_table_pack(table, tree, 0, 2, 3, 1);
    evas_object_show(tree);
    ui.parts_tree = tree;
 
    
    //Signal emitter
-   Evas_Object *o;
-
    o = elm_hoversel_add(ui.win);
    elm_hoversel_hover_parent_set(o, ui.win);
    elm_hoversel_label_set(o, "Signal Emitter");
    evas_object_size_hint_weight_set(o, 1.0, 0.0);
-   elm_table_pack(table, o, 0, 3, 2, 1);
+   elm_table_pack(table, o, 0, 3, 3, 1);
    evas_object_show(o);
    
    _tree_emitter_populate(o);
@@ -316,13 +447,7 @@ tree_parts_create(void)
    EINA_LIST_FOREACH(parts, l, name)
    {
       printf("  PART: %s\n", name);
-      elm_genlist_item_append(tree, &parts_class,
-                           eina_stringshare_add(name), /* item data */ //NOTE free() by _tree_model_del()
-                           NULL/* parent */,
-                           ELM_GENLIST_ITEM_SUBITEMS,
-                           _tree_model_part_sel /* func */,
-                           NULL/* func data */);
-   
+      _tree_part_add(name);
    }
    edje_edit_string_list_free(parts);
    

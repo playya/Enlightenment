@@ -22,7 +22,7 @@ static Evas_Object *_min_entry;
 static Evas_Object *_max_entry;
 static Evas_Object *_current_entry;
 
-
+/***   Callbacks   ***/
 static void
 _entry_apply(Evas_Object *o)
 {

@@ -18,26 +18,11 @@
 #ifndef _EDJE_EDITOR_WINDOW_H_
 #define _EDJE_EDITOR_WINDOW_H_
 
-//~ /* etk_embed objects */
-//~ Etk_Widget *UI_PartsTreeEmbed;
-//~ Etk_Widget *UI_GroupEmbed;
-//~ Etk_Widget *UI_PartEmbed;
-//~ Etk_Widget *UI_DescriptionEmbed;
-//~ Etk_Widget *UI_RectEmbed;
-//~ Etk_Widget *UI_TextEmbed;
-//~ Etk_Widget *UI_PositionEmbed;
-//~ Etk_Widget *UI_ProgramEmbed;
-//~ Etk_Widget *UI_ScriptEmbed;
-//~ Etk_Widget *UI_ImageEmbed;
-//~ Etk_Widget *UI_GradientEmbed;
-//~ Etk_Widget *UI_FillEmbed;
-//~ Etk_Widget *UI_ToolbarEmbed;
 
 /*** Public */
 void window_main_create(void);
 void window_update_frames_visibility(void);
 //~ Etk_Widget* window_color_button_create (char* label_text, int color_button_enum,int w,int h, Evas *evas);
-//~ void        window_embed_position_set  (void *position_data, int *x, int *y);
 
 
 /*** Private */
@@ -125,5 +110,33 @@ void _window_logo_key_press(void *data, Evas *e, Evas_Object *obj, void *event_i
    } \
    if (SEL_CB) \
       evas_object_smart_callback_add(_o, "selected", SEL_CB, _o);
+
+#define NEW_SLIDER_TO_TABLE(TITLE, X, Y, W, SLIDER, CB) \
+   _o = elm_label_add(parent); \
+   elm_label_label_set(_o, TITLE"  "); \
+   elm_table_pack(tb, _o, X, Y, 1, 1); \
+   evas_object_size_hint_weight_set(_o, 0.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 1.0, 0.5); \
+   evas_object_show(_o); \
+   \
+   _o = elm_slider_add(parent); \
+   elm_slider_min_max_set(_o, 0.0, 255.0); \
+   elm_slider_indicator_format_set(_o, "%3.0f"); \
+   elm_slider_value_set(_o, 255); \
+   elm_slider_span_size_set(_o, 120); \
+   elm_table_pack(tb, _o, X+1, Y, W, 1); \
+   evas_object_size_hint_weight_set(_o, 1.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 0.0, 0.5); \
+   evas_object_show(_o); \
+   SLIDER = _o; \
+   evas_object_smart_callback_add(_o, "changed", CB, NULL);
+
+#define NEW_TITLE_TO_TABLE(TITLE, X, Y, W) \
+   _o = elm_label_add(parent); \
+   elm_label_label_set(_o, "<b>"TITLE"</b>"); \
+   elm_table_pack(tb, _o, X, Y, W, 1); \
+   evas_object_show(_o);
+
+
 
 #endif

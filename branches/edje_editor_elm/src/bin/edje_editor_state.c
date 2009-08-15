@@ -55,50 +55,50 @@ _entry_apply(Evas_Object *o)
 
       if (ecore_str_equal(cur.state, "default 0.0"))
       {
-	 dialog_alert_show("You can't rename default 0.0");
-	 state_frame_update();
-	 return;
+         dialog_alert_show("You can't rename default 0.0");
+         state_frame_update();
+         return;
       }
 
       if (edje_edit_state_name_set(ui.edje_o, cur.part, cur.state, txt))
       {
-	 /* update tree  TODO */
-	 //~ Etk_Tree_Row *row;
-	 //~ row = etk_tree_selected_row_get(ETK_TREE(UI_PartsTree));
-	 //~ etk_tree_row_fields_set(row,TRUE,
+         /* update tree  TODO */
+         //~ Etk_Tree_Row *row;
+         //~ row = etk_tree_selected_row_get(ETK_TREE(UI_PartsTree));
+         //~ etk_tree_row_fields_set(row,TRUE,
                                     //~ COL_NAME, EdjeFile, "DESC.PNG", name,
                                     //~ NULL);
-	 set_current_state(txt);
+         set_current_state(txt);
       }
       else
-	 dialog_alert_show("<b>Wrong name format</b><br>Name must be in the form:<br>\"default 0.00\"");
+        dialog_alert_show("<b>Wrong name format</b><br>Name must be in the form:<br>\"default 0.00\"");
    }
 
    // Apply Aspect 
    else if (o == _aspect_min_entry)
    {
       if (sscanf(txt,"%lf", &f) == 1)
-	 edje_edit_state_aspect_min_set(ui.edje_o, cur.part, cur.state, f);
+        edje_edit_state_aspect_min_set(ui.edje_o, cur.part, cur.state, f);
       else
-	 dialog_alert_show(MSG_FLOAT);
+        dialog_alert_show(MSG_FLOAT);
    }
    else if (o == _aspect_max_entry)
    {
       if (sscanf(txt,"%lf", &f) == 1)
-	 edje_edit_state_aspect_max_set(ui.edje_o, cur.part, cur.state, f);
+        edje_edit_state_aspect_max_set(ui.edje_o, cur.part, cur.state, f);
       else
-	 dialog_alert_show(MSG_FLOAT);
+        dialog_alert_show(MSG_FLOAT);
    }
 
    // Apply SizeMin
    else if (o == _size_min_entry)
    {
       if (ecore_str_equal(txt, "unset"))
-	 w = h = 0;
+        w = h = 0;
       else if (sscanf(txt,"%dx%d", &w, &h) != 2)
       {
-	 dialog_alert_show(MSG_SIZE);
-	 return;
+         dialog_alert_show(MSG_SIZE);
+         return;
       }
       edje_edit_state_min_w_set(ui.edje_o, cur.part, cur.state, w);
       edje_edit_state_min_h_set(ui.edje_o, cur.part, cur.state, h);
@@ -108,11 +108,11 @@ _entry_apply(Evas_Object *o)
    else if (o == _size_max_entry )
    {
       if (ecore_str_equal(txt, "unset"))
-	 w = h = -1;
+        w = h = -1;
       else if (sscanf(txt,"%dx%d", &w, &h) != 2)
       {
-	 dialog_alert_show(MSG_SIZE);
-	 return;
+         dialog_alert_show(MSG_SIZE);
+         return;
       }
       edje_edit_state_max_w_set(ui.edje_o, cur.part, cur.state, w);
       edje_edit_state_max_h_set(ui.edje_o, cur.part, cur.state, h);
@@ -122,25 +122,25 @@ _entry_apply(Evas_Object *o)
    else if (o == _align_x_entry)
    {
       if (sscanf(txt,"%lf", &f) == 1)
-	 edje_edit_state_align_x_set(ui.edje_o, cur.part, cur.state, f);
+        edje_edit_state_align_x_set(ui.edje_o, cur.part, cur.state, f);
       else
-	 dialog_alert_show(MSG_FLOAT);
+        dialog_alert_show(MSG_FLOAT);
    }
    else if (o == _align_y_entry)
    {
       if (sscanf(txt,"%lf", &f) == 1)
-	 edje_edit_state_align_y_set(ui.edje_o, cur.part, cur.state, f);
+        edje_edit_state_align_y_set(ui.edje_o, cur.part, cur.state, f);
       else
-	 dialog_alert_show(MSG_FLOAT);
+        dialog_alert_show(MSG_FLOAT);
    }
 
    // Apply ColorClass
    else if (o == _color_class_entry)
    {
       if (ecore_str_equal(txt, "unset") || strlen(txt) < 1)
-	 edje_edit_state_color_class_set(ui.edje_o, cur.part, cur.state, NULL);
+        edje_edit_state_color_class_set(ui.edje_o, cur.part, cur.state, NULL);
       else
-	 edje_edit_state_color_class_set(ui.edje_o, cur.part, cur.state, txt);
+        edje_edit_state_color_class_set(ui.edje_o, cur.part, cur.state, txt);
    }
    
    canvas_redraw();
@@ -166,7 +166,7 @@ static void
 _aspect_combo_sel(void *data, Evas_Object *obj, void *event_info)
 {
    edje_edit_state_aspect_pref_set(ui.edje_o, cur.part, cur.state,
-				   (int)(long)data);
+                                   (int)(long)data);
    state_frame_update();
 }
 
@@ -175,7 +175,7 @@ _visible_toggle_changed(void *data, Evas_Object *obj, void *event_info)
 {
    if (!cur.part || !cur.state) return;
    edje_edit_state_visible_set(ui.edje_o, cur.part, cur.state,
-			       elm_toggle_state_get(_visible_toggle));
+                               elm_toggle_state_get(_visible_toggle));
    canvas_redraw();
 }
 
@@ -243,25 +243,25 @@ state_frame_update(void)
 
    //Set aspect min & max
    elm_entry_printf(_aspect_min_entry, "%.1f",
-		    edje_edit_state_aspect_min_get(ui.edje_o, cur.part, cur.state));
+                edje_edit_state_aspect_min_get(ui.edje_o, cur.part, cur.state));
    elm_entry_printf(_aspect_max_entry, "%.1f",
-		    edje_edit_state_aspect_max_get(ui.edje_o, cur.part, cur.state));
+                edje_edit_state_aspect_max_get(ui.edje_o, cur.part, cur.state));
    
    //Set aspect preference
    switch (edje_edit_state_aspect_pref_get(ui.edje_o, cur.part, cur.state))
    {
       case EDJE_ASPECT_PREFER_HORIZONTAL:
-	 elm_hoversel_label_set(_aspect_combo, "horizontal");
-	 break;
+         elm_hoversel_label_set(_aspect_combo, "horizontal");
+         break;
       case EDJE_ASPECT_PREFER_VERTICAL:
-	 elm_hoversel_label_set(_aspect_combo, "vertical");
-	 break;
+         elm_hoversel_label_set(_aspect_combo, "vertical");
+         break;
       case EDJE_ASPECT_PREFER_BOTH:
-	 elm_hoversel_label_set(_aspect_combo, "both");
-	 break;
+         elm_hoversel_label_set(_aspect_combo, "both");
+         break;
       case EDJE_ASPECT_PREFER_NONE: default:
-	 elm_hoversel_label_set(_aspect_combo, "none");
-	 break;
+         elm_hoversel_label_set(_aspect_combo, "none");
+         break;
    }
 
    //Set SizeMin
@@ -283,17 +283,16 @@ state_frame_update(void)
 
    //Set align & valign
    elm_entry_printf(_align_x_entry, "%.3f",
-	 edje_edit_state_align_x_get(ui.edje_o, cur.part, cur.state));
+                   edje_edit_state_align_x_get(ui.edje_o, cur.part, cur.state));
    elm_entry_printf(_align_y_entry, "%.3f",
-	 edje_edit_state_align_y_get(ui.edje_o, cur.part, cur.state));
+                   edje_edit_state_align_y_get(ui.edje_o, cur.part, cur.state));
 
    //Set visible checkbox
-   //~ elm_toggle_state_set(_visible_toggle,
-		//~ edje_edit_state_visible_get(ui.edje_o, cur.part, cur.state));
+   elm_toggle_state_set(_visible_toggle,
+                   edje_edit_state_visible_get(ui.edje_o, cur.part, cur.state));
 
    //Set Color Class Entry
    cc = edje_edit_state_color_class_get(ui.edje_o, cur.part, cur.state);
    elm_entry_entry_set(_color_class_entry, cc ? cc : "unset");
    edje_edit_string_free(cc);
-   
 }

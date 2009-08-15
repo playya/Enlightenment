@@ -83,10 +83,11 @@ _toolbar_cb(void *data, Evas_Object *obj, void *event_info)
 #define TOOLBAR_ITEM(LABEL, IMAGE, DATA) \
    bt = elm_button_add(parent); \
    elm_button_label_set(bt, LABEL); \
+   evas_object_size_hint_align_set(bt, 0.0, 0.0); \
    ic = elm_icon_add(parent); \
    elm_icon_file_set(ic, EdjeFile, IMAGE); \
    elm_button_icon_set(bt, ic); \
-   elm_button_style_set(bt, "toolbar_horizontal"); \
+   elm_button_style_set(bt, "toolbar"); \
    elm_box_pack_end(box, bt); \
    evas_object_show(bt); \
    evas_object_smart_callback_add(bt, "clicked", _toolbar_cb, DATA);
@@ -103,16 +104,16 @@ toolbar_create(Evas_Object *parent)
 
 
    TOOLBAR_ITEM("New", "DOC_NEW.PNG", (void*)TOOLBAR_NEW)
-   TOOLBAR_ITEM("Open", "", (void*)TOOLBAR_OPEN)
+   TOOLBAR_ITEM("Open", "DOC_OPEN.PNG", (void*)TOOLBAR_OPEN)
    TOOLBAR_ITEM("Save", "DOC_SAVE.PNG", (void*)TOOLBAR_SAVE)
-   TOOLBAR_ITEM("d", "DOC_SAVE_AS.PNG", (void*)TOOLBAR_SAVE_EDJ)
+   TOOLBAR_ITEM("Save as", "DOC_SAVE_AS.PNG", (void*)TOOLBAR_SAVE_EDJ)
    /*TOOLBAR_ITEM("Export edc", "DOC_SAVE_AS.PNG", TOOLBAR_SAVE_EDC)*/
    
    
    
    TOOLBAR_ITEM("Exit", "EXIT.PNG", (void*)TOOLBAR_EXIT)
    // these apply to the last item created (Exit) an put it at the end
-   evas_object_size_hint_align_set(bt, 1.0, 0.5);
+   evas_object_size_hint_align_set(bt, 1.0, 0.0);
    evas_object_size_hint_weight_set(bt, 1.0, 1.0);
 
    return box;
@@ -504,173 +505,11 @@ toolbar_play_button_toggle(int set)
 //~ 
    //~ switch ((int)(long)data)
    //~ {
-      //~ case NEW_RECT:
-         //~ if (!etk_string_length_get(Cur.group))
-         //~ {
-            //~ dialog_alert_show("You must first select a group.");
-            //~ break;
-         //~ }
-         //~ //generate a unique new name
-         //~ snprintf(name, sizeof(name), "New rectangle");
-         //~ i = 2;
-         //~ while (edje_edit_part_exist(edje_o, name))
-            //~ snprintf(name, sizeof(name), "New rectangle %d", i++);
-         //~ 
-         //~ if (!edje_edit_part_add(edje_o, name, EDJE_PART_TYPE_RECTANGLE))
-         //~ {
-            //~ dialog_alert_show("Can't create part.");
-            //~ break;
-         //~ }
-//~ 
-         //~ row = tree_part_add(name, NULL);
-         //~ etk_tree_row_select(row);
-         //~ etk_tree_row_unfold(row);
-         //~ position_comboboxes_populate();
-         //~ program_source_combo_populate();
-         //~ break;
-//~ 
-      //~ case NEW_IMAGE:
-         //~ if (!etk_string_length_get(Cur.group))
-         //~ {
-            //~ dialog_alert_show("You must first select a group.");
-            //~ break;
-         //~ }
-         //~ //generate a unique new name
-         //~ snprintf(name, sizeof(name), "New image");
-         //~ i = 2;
-         //~ while (edje_edit_part_exist(edje_o, name))
-            //~ snprintf(name, sizeof(name), "New image %d", i++);
-//~ 
-         //~ if (!edje_edit_part_add(edje_o, name, EDJE_PART_TYPE_IMAGE))
-         //~ {
-            //~ dialog_alert_show("Can't create part.");
-            //~ break;
-         //~ }
-         //~ row = tree_part_add(name, NULL);
-//~ 
-         //~ Eina_List *images;
-         //~ images = edje_edit_images_list_get(edje_o);
-         //~ if (images)
-         //~ {
-            //~ if (images->data)
-               //~ edje_edit_state_image_set(edje_o, name,
-                                         //~ "default 0.00", images->data);
-         //~ }
-//~ 
-         //~ etk_tree_row_select(row);
-         //~ etk_tree_row_unfold(row);
-         //~ position_comboboxes_populate();
-         //~ program_source_combo_populate();
-         //~ break;
-      //~ case NEW_GRADIENT:
-         //~ if (!etk_string_length_get(Cur.group))
-         //~ {
-            //~ dialog_alert_show("You must first select a group.");
-            //~ break;
-         //~ }
-         //~ //generate a unique new name
-         //~ snprintf(name, sizeof(name), "New gradient");
-         //~ i = 2;
-         //~ while (edje_edit_part_exist(edje_o, name))
-            //~ snprintf(name, sizeof(name), "New gradient %d", i++);
-//~ 
-         //~ if (!edje_edit_part_add(edje_o, name, EDJE_PART_TYPE_GRADIENT))
-         //~ {
-            //~ dialog_alert_show("Can't create gradient.");
-            //~ break;
-         //~ }
-         //~ edje_edit_state_gradient_type_set(edje_o, name, "default 0.00", "linear");
-         //~ row = tree_part_add(name, NULL);
-//~ 
-         //~ etk_tree_row_select(row);
-         //~ etk_tree_row_unfold(row);
-         //~ position_comboboxes_populate();
-         //~ program_source_combo_populate();
-         //~ break;
-      //~ case NEW_TEXT:
-         //~ if (!etk_string_length_get(Cur.group))
-         //~ {
-            //~ dialog_alert_show("You must first select a group.");
-            //~ break;
-         //~ }
-         //~ //generate a unique new name
-         //~ snprintf(name, sizeof(name), "New text");
-         //~ i = 2;
-         //~ while (edje_edit_part_exist(edje_o, name))
-            //~ snprintf(name, sizeof(name), "New text %d", i++);
-//~ 
-         //~ if (!edje_edit_part_add(edje_o, name, EDJE_PART_TYPE_TEXT))
-         //~ {
-            //~ dialog_alert_show("Can't create part.");
-            //~ break;
-         //~ }
-         //~ row = tree_part_add(name, NULL);
-//~ 
-         //~ char *font;
-         //~ item = etk_combobox_first_item_get(ETK_COMBOBOX(UI_FontComboBox));
-         //~ if (item)
-         //~ {
-            //~ font = etk_combobox_item_field_get(item, 1);
-            //~ if (font)
-               //~ edje_edit_state_font_set(edje_o, name, "default 0.00", font);
-         //~ }
-         //~ edje_edit_state_text_size_set(edje_o, name, "default 0.00", 16);
-         //~ edje_edit_state_text_set(edje_o, name, "default 0.00",
-                                  //~ "Something to say !");
-         //~ edje_edit_part_effect_set(edje_o, name, EDJE_TEXT_EFFECT_GLOW);
-//~ 
-         //~ etk_tree_row_select(row);
-         //~ etk_tree_row_unfold(row);
-         //~ position_comboboxes_populate();
-         //~ program_source_combo_populate();
-         //~ break;
+        
+        
       //~ case NEW_SWAL:
-         //~ if (!etk_string_length_get(Cur.group))
-         //~ {
-            //~ dialog_alert_show("You must first select a group.");
-            //~ break;
-         //~ }
-         //~ //generate a unique new name
-         //~ snprintf(name, sizeof(name), "New swallow");
-         //~ i = 2;
-         //~ while (edje_edit_part_exist(edje_o, name))
-            //~ snprintf(name, sizeof(name), "New swallow %d", i++);
-//~ 
-         //~ if (!edje_edit_part_add(edje_o, name, EDJE_PART_TYPE_SWALLOW))
-         //~ {
-            //~ dialog_alert_show("Can't create part.");
-            //~ break;
-         //~ }
-         //~ row = tree_part_add(name, NULL);
-         //~ etk_tree_row_select(row);
-         //~ etk_tree_row_unfold(row);
-         //~ position_comboboxes_populate();
-         //~ program_source_combo_populate();
-         //~ break;
-      //~ case NEW_GROUPSWAL:
-         //~ if (!etk_string_length_get(Cur.group))
-         //~ {
-            //~ dialog_alert_show("You must first select a group.");
-            //~ break;
-         //~ }
-         //~ //generate a unique new name
-         //~ snprintf(name, sizeof(name), "New group swallow");
-         //~ i = 2;
-         //~ while (edje_edit_part_exist(edje_o, name))
-            //~ snprintf(name, sizeof(name), "New group swallow %d", i++);
-//~ 
-         //~ if (!edje_edit_part_add(edje_o, name, EDJE_PART_TYPE_GROUP))
-         //~ {
-            //~ dialog_alert_show("Can't create part.");
-            //~ break;
-         //~ }
-         //~ row = tree_part_add(name, NULL);
-         //~ etk_tree_row_select(row);
-         //~ etk_tree_row_unfold(row);
-         //~ position_comboboxes_populate();
-         //~ program_source_combo_populate();
-//~ 
-         //~ break;
+         
+
       //~ case NEW_DESC:
          //~ if (!etk_string_length_get(Cur.part))
          //~ {

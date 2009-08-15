@@ -15,38 +15,81 @@
  *  along with Edje_editor.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Etk.h>
-#include <Edje.h>
-#include <Edje_Edit.h>
 #include "main.h"
 
+static Evas_Object *_color_entry;
 
-Etk_Widget*
-rectangle_frame_create(Evas *evas)
+
+/***   Callbacks   ***/
+static void
+_entry_apply(Evas_Object *o)
 {
-   return window_color_button_create("Color", COLOR_OBJECT_RECT, 100, 30, evas);
+   char *txt;
+   int r, g, b, a;
+
+   /* TODO FIX THIS IN ELM */
+   /* I get a <br> at the end of the line */
+   /* Need to fix elm for this, maybe a single_line entry must take care of this*/
+   const char *to_fix;
+   to_fix = elm_entry_entry_get(o);
+   txt = strdup(to_fix);
+   if (ecore_str_has_suffix(txt, "<br>"))
+      txt[strlen(txt) - 4] = '\0';
+   //~ printf("Apply entry [%s]\n", txt);
+
+   if (!txt || !cur.group || !cur.part || !cur.state)
+     return;
+
+   // apply color
+   if (o == _color_entry)
+   {
+      if (sscanf(txt,"%d %d %d %d", &r, &g, &b, &a) != 4)
+      {
+         dialog_alert_show(MSG_COLOR);
+         return;
+      }
+      edje_edit_state_color_set(ui.edje_o, cur.part, cur.state, r, g, b, a);
+   }
+
+   rectangle_frame_update();
+}
+
+static void
+_entry_key_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   Evas_Event_Key_Down *ev = event_info;
+   
+   //~ printf("KEY DOWN %s\n", ev->key);
+   if (ecore_str_equal(ev->key, "Return"))
+   {
+      _entry_apply(obj);
+   }
+   else if(ecore_str_equal(ev->key, "Escape"))
+   {
+      group_frame_update();
+   }
+}
+
+/***   Implementation   ***/
+Evas_Object*
+rectangle_frame_create(Evas_Object *parent)
+{
+   Evas_Object *tb, *_o;
+
+   tb = elm_table_add(parent);
+   evas_object_show(tb);
+
+   NEW_ENTRY_TO_TABLE("color:", 0, 0, 1, _color_entry, EINA_TRUE)
+
+   return tb;
 }
 
 void
 rectangle_frame_update(void)
 {
-   Etk_Color color;
-
-   if (etk_string_length_get(Cur.state))
-   {
-      edje_edit_state_color_get(edje_o, Cur.part->string, Cur.state->string,
-                                &color.r, &color.g, &color.b, &color.a);
-
-      etk_signal_block("color-changed", ETK_OBJECT(UI_ColorPicker),
-                       ETK_CALLBACK(_dialog_colorpicker_change_cb), NULL);
-
-      //Set ColorPicker
-      etk_colorpicker_current_color_set (ETK_COLORPICKER(UI_ColorPicker), color);
-      //Set Color rect
-      evas_color_argb_premul(color.a,&color.r,&color.g,&color.b);
-      evas_object_color_set(RectColorObject,color.r,color.g,color.b,color.a);
-
-      etk_signal_unblock("color-changed", ETK_OBJECT(UI_ColorPicker),
-                         ETK_CALLBACK(_dialog_colorpicker_change_cb), NULL);
-   }
+   int r, g, b, a;
+   if (!cur.part || !cur.state) return;
+   
+   edje_edit_state_color_get(ui.edje_o, cur.part, cur.state, &r, &g, &b, &a);
+   elm_entry_printf(_color_entry, "%d %d %d %d", r, g, b, a);
 }
