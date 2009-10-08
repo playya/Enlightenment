@@ -1,0 +1,21 @@
+Source: eterm
+Section: x11
+Priority: optional
+Maintainer: Sytse Wielinga <s.b.wielinga@student.utwente.nl>
+Standards-Version: 3.6.1.0
+Build-Depends: libimlib2-dev, libast2-dev (>=0.6), libpcre3-dev, libttf-dev, debhelper (>> 4.0)
+
+Package: eterm
+Architecture: any
+Depends: ncurses-term, ${shlibs:Depends}
+Provides: x-terminal-emulator, eterm-backgrounds
+Conflicts: eterm-backgrounds, eterm-ml
+Replaces: eterm-ml, eterm-backgrounds
+Description: Enlightened Terminal Emulator
+ A terminal emulator in the spirit of xterm or rxvt, eterm uses an
+ Enlightenment style config file, as well as themes.  The Imlib graphics
+ engine is used to render images.  This version supports background images,
+ pixmapped scrollbars, pseudo-transparency, POSIX threads, and unicode
+ support.
+ .
+ This is a CVS version.
