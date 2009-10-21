@@ -38,6 +38,66 @@ ecore_str_equal(const char *s1, const char *s2)
 }
 
 int
+save_edje(const char *file)
+{
+   const char *compiler = NULL;
+  
+   // TODO: port warning dialog
+   compiler = edje_edit_compiler_get(ui.edje_o);
+   if (strcmp(compiler, "edje_edit"))
+   {
+      //~ dialog = etk_message_dialog_new(ETK_MESSAGE_DIALOG_WARNING,
+                                    //~ ETK_MESSAGE_DIALOG_OK_CANCEL,
+               //~ "<b>Warning</b><br>"
+               //~ "This file has been compiled from EDC sources.<br>"
+               //~ "Saving the file means that the original source file will<br>"
+               //~ "be replaced by a new generated EDC.<br><br>"
+               //~ "This will cause the lost of the following features:<br>"
+               //~ " - All the MACRO (#define) will be lost.<br>"
+               //~ " - All the comments in the original sources will be lost.<br>"
+               //~ " - All the sources file will be merged in a single EDC.<br><br>"
+               //~ "Are you sure you want to save the file?"
+               //~ );
+      //~ etk_signal_connect("response", ETK_OBJECT(dialog),
+                      //~ ETK_CALLBACK(_window_confirm_save), NULL);
+      //~ etk_widget_show_all(dialog);
+      //~ break;
+   }
+   edje_edit_string_free(compiler);
+ 
+   //~ _window_confirm_save(NULL, ETK_RESPONSE_OK, NULL);
+
+   int save_success = edje_edit_save(ui.edje_o);
+   
+   if (save_success)
+   {
+      if (file)
+      {
+         if (!ecore_file_cp(cur.open_temp_name, file))
+         {
+            save_success = 0;
+         }
+         //TODO: overwrite cur.open_file_name with file
+      }
+      else
+      {
+         if (!ecore_file_cp(cur.open_temp_name, cur.open_file_name))
+         {
+            save_success = 0;
+         }
+      }
+
+   }
+   if (!save_success)
+   {
+      dialog_alert_show("<b>ERROR</b>:<br>Can't save to Edje file.");
+      return 0;
+   }
+  
+  return 1;
+}
+
+int
 load_edje(const char *file)
 {
    unsigned char new_file = 0;

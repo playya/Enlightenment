@@ -41,22 +41,27 @@ _dialog_filechooser_done(void *data, Evas_Object *obj, void *event_info)
          if (load_edje(selected))
             evas_object_del(data);
          break;
-      //~ case FILECHOOSER_SAVE_EDJ:
-            //~ printf("SAVE EDJ\n");
-            //~ snprintf(cmd,4096,"%s/%s",
-               //~ etk_filechooser_widget_current_folder_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)),
-               //~ etk_filechooser_widget_selected_file_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
-            //~ edje_edit_save(edje_o);
-            //~ if(!ecore_file_cp(Cur.edj_temp_name->string, cmd))
-            //~ {
-               //~ dialog_alert_show("<b>ERROR:<\b><br>Can't write file");
-            //~ }
-            //~ else
-            //~ {
-               //~ Cur.edj_file_name = etk_string_set(Cur.edj_file_name, cmd);
-               //~ ecore_evas_title_set(UI_ecore_MainWin, cmd);
-            //~ }
-         //~ break;
+      case FILECHOOSER_SAVE_EDJ:
+         if (selected)
+         {
+            printf("SAVE EDJ: %s\n", selected);
+            //snprintf(cmd,4096,"%s/%s",
+            //~ etk_filechooser_widget_current_folder_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)),
+            //~ etk_filechooser_widget_selected_file_get(ETK_FILECHOOSER_WIDGET(UI_FileChooser)));
+            save_edje (selected);
+               //~ if(!ecore_file_cp(Cur.edj_temp_name->string, cmd))
+               //~ {
+                  //~ dialog_alert_show("<b>ERROR:<\b><br>Can't write file");
+               //~ }
+               //~ else
+               //~ {
+                  //~ Cur.edj_file_name = etk_string_set(Cur.edj_file_name, cmd);
+                  //~ ecore_evas_title_set(UI_ecore_MainWin, cmd);
+               //~ }
+            // close the dialog
+            evas_object_del(data);
+         }
+         break;
          //~ case FILECHOOSER_SAVE_EDC:
               //~ dialog_alert_show("Not yet implemented.");
          //~ break;
@@ -104,9 +109,8 @@ dialog_filechooser_show(int FileChooserType)
    evas_object_smart_callback_add(fs, "done", _dialog_filechooser_done, inwin);
    evas_object_data_set(fs, "FileChooserType", (void*)(long)FileChooserType);
 
-
-   //~ FileChooserOperation = FileChooserType;
-   //~ switch(FileChooserOperation){
+   switch(FileChooserType)
+   {
       //~ case FILECHOOSER_OPEN:
          //~ etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose an EDJ or EDC file to open");
          //~ etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_FALSE);
@@ -122,19 +126,20 @@ dialog_filechooser_show(int FileChooserType)
          //~ etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_FALSE);
          //~ etk_widget_hide(UI_FilechooserSaveButton);
       //~ break;
-      //~ case FILECHOOSER_SAVE_EDJ:
+      case FILECHOOSER_SAVE_EDJ:
+         elm_fileselector_is_save_set(fs, EINA_TRUE);
          //~ etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose the new edje name");
          //~ etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_TRUE);
          //~ etk_widget_hide(UI_FilechooserLoadButton);
-      //~ break;
+      break;
       //~ case FILECHOOSER_SAVE_EDC:
          //~ etk_window_title_set(ETK_WINDOW(UI_FileChooserDialog), "Choose the new edc name");
          //~ etk_filechooser_widget_is_save_set(ETK_FILECHOOSER_WIDGET(UI_FileChooser),ETK_TRUE);
          //~ etk_widget_hide(UI_FilechooserLoadButton);
       //~ break;
-      //~ default:
-      //~ break;
-   //~ }
+      default:
+         break;
+   }
 }
 
 

@@ -23,7 +23,7 @@
 void
 _toolbar_cb(void *data, Evas_Object *obj, void *event_info)
 {
-   const char *compiler;
+   
    printf("Toolbar click\n");
    
    switch ((int)(long)data)
@@ -35,47 +35,29 @@ _toolbar_cb(void *data, Evas_Object *obj, void *event_info)
       case TOOLBAR_OPEN:
          dialog_filechooser_show(FILECHOOSER_OPEN);
          break;
-      //~ case TOOLBAR_SAVE:
-         //~ if (!cur.open_file_name)
-         //~ {
-            //~ dialog_filechooser_show(FILECHOOSER_SAVE_EDJ); //TODO
-            //~ break;
-         //~ }
-//~ 
-         //~ compiler = edje_edit_compiler_get(ui.edje_o);
-         //~ if (strcmp(compiler, "edje_edit"))
-         //~ {
-            //~ dialog = etk_message_dialog_new(ETK_MESSAGE_DIALOG_WARNING,
-                                          //~ ETK_MESSAGE_DIALOG_OK_CANCEL,
-                     //~ "<b>Warning</b><br>"
-                     //~ "This file has been compiled from EDC sources.<br>"
-                     //~ "Saving the file means that the original source file will<br>"
-                     //~ "be replaced by a new generated EDC.<br><br>"
-                     //~ "This will cause the lost of the following features:<br>"
-                     //~ " - All the MACRO (#define) will be lost.<br>"
-                     //~ " - All the comments in the original sources will be lost.<br>"
-                     //~ " - All the sources file will be merged in a single EDC.<br><br>"
-                     //~ "Are you sure you want to save the file?"
-                     //~ );
-            //~ etk_signal_connect("response", ETK_OBJECT(dialog),
-                            //~ ETK_CALLBACK(_window_confirm_save), NULL);
-            //~ etk_widget_show_all(dialog);
-            //~ break;
-         //~ }
-         //~ edje_edit_string_free(compiler);
-
-         //~ _window_confirm_save(NULL, ETK_RESPONSE_OK, NULL);
-         //~ break;
+      case TOOLBAR_SAVE:
+         if (!cur.open_file_name)
+         {
+           // TODO: enable this if OLBAR_SAVE_EDJ is working again
+           //dialog_filechooser_show(FILECHOOSER_SAVE_EDJ);
+         }
+         else
+         {
+           save_edje (NULL);
+         }
+         break;
       case TOOLBAR_SAVE_EDC:
          dialog_alert_show("Not yet reimplemented ;)");
          break;
-      //~ case TOOLBAR_SAVE_EDJ:
-         //~ dialog_filechooser_show(FILECHOOSER_SAVE_EDJ);
-         //~ break;
+      case TOOLBAR_SAVE_EDJ:
+         dialog_alert_show("Not yet reimplemented ;)");
+         //dialog_filechooser_show(FILECHOOSER_SAVE_EDJ);
+         break;
       case TOOLBAR_EXIT:
-	 elm_exit();
-	 break;
-      default: break;
+	       elm_exit();
+	       break;
+      default:
+         break;
    }
 
 }

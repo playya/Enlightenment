@@ -82,7 +82,7 @@ enum various
    FILECHOOSER_IMAGE,
    FILECHOOSER_FONT,
    //~ FILECHOOSER_SAVE_EDC,
-   //~ FILECHOOSER_SAVE_EDJ,
+   FILECHOOSER_SAVE_EDJ,
    //~ IMAGE_BROWSER_SHOW,
    //~ IMAGE_BROWSER_CLOSE,
    //~ TOOLBAR_FONT_BROWSER,
@@ -217,6 +217,7 @@ void set_current_tween(const char *tween);
 
 
 int  load_edje        (const char *file);
+int  save_edje        (const char *file);
 //~ void reload_edje      (void);
 
 
