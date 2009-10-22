@@ -20,6 +20,7 @@
 
 /***   Parts Tree 'model'   ***/
 static Elm_Genlist_Item* _tree_part_add(const char *name);
+static Elm_Genlist_Item* _tree_program_add(const char *name);
 
 Elm_Genlist_Item_Class parts_class;
 Elm_Genlist_Item_Class states_class;
@@ -243,6 +244,12 @@ _tree_emitter_populate(Evas_Object *o)
    while (edje_edit_part_exist(ui.edje_o, name)) \
       snprintf(name, sizeof(name), PREFIX" %d", i++);
 
+#define GENERATE_UNIQUE_PROGRAM_NAME(PREFIX) \
+   snprintf(name, sizeof(name), PREFIX); \
+   i = 2; \
+   while (edje_edit_program_exist(ui.edje_o, name)) \
+      snprintf(name, sizeof(name), PREFIX" %d", i++);
+
 static void
 _add_combo_sel(void *data, Evas_Object *obj, void *event_info)
 {
@@ -323,6 +330,15 @@ _add_combo_sel(void *data, Evas_Object *obj, void *event_info)
          }
          item = _tree_part_add(name);
          break;
+      case NEW_PROG:
+         GENERATE_UNIQUE_PROGRAM_NAME("New program");
+         if (!edje_edit_program_add(ui.edje_o, name))
+         {
+            dialog_alert_show("<b>Error</b><br>Can't create program.");
+            break;
+         }
+         item = _tree_program_add(name);
+         break;
    }
    
    // select the new item
@@ -341,6 +357,17 @@ _tree_part_add(const char *name)
                            NULL/* parent */,
                            ELM_GENLIST_ITEM_SUBITEMS,
                            _tree_model_part_sel /* func */,
+                           NULL/* func data */);
+}
+
+static Elm_Genlist_Item*
+_tree_program_add(const char *name)
+{
+   return elm_genlist_item_append(ui.parts_tree, &progs_class,
+                           eina_stringshare_add(name), /* item data */ //NOTE free() by _tree_model_del()
+                           NULL/* parent */,
+                           ELM_GENLIST_ITEM_NONE,
+                           _tree_model_prog_sel /* func */,
                            NULL/* func data */);
 }
 
@@ -400,8 +427,9 @@ tree_parts_create(void)
    elm_hoversel_item_icon_set(it, EdjeFile, "SWAL.PNG", ELM_ICON_FILE);
    it = elm_hoversel_item_add(o, "group swallow", NULL, ELM_ICON_NONE, _add_combo_sel, (void*)NEW_GROUPSWAL);
    elm_hoversel_item_icon_set(it, EdjeFile, "GROUP.PNG", ELM_ICON_FILE);
+   it = elm_hoversel_item_add(o, "program", NULL, ELM_ICON_NONE, _add_combo_sel, (void*)NEW_PROG);
+   elm_hoversel_item_icon_set(it, EdjeFile, "PROG.PNG", ELM_ICON_FILE);
    evas_object_show(o);
-   
    
    // Tree
    parts_class.item_style     = "default";
