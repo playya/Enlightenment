@@ -64,6 +64,7 @@ window_main_create(void)
    elm_layout_content_set(ly, "position_frame_swallow", position_frame_create(ui.win));
    elm_layout_content_set(ly, "state_frame_swallow", state_frame_create(ui.win));
    elm_layout_content_set(ly, "text_frame_swallow", text_frame_create(ui.win));
+   elm_layout_content_set(ly, "program_frame_swallow", program_frame_create(ui.win));
    elm_layout_content_set(ly, "rect_frame_swallow", rectangle_frame_create(ui.win));
    elm_layout_content_set(ly, "image_frame_swallow", image_frame_create(ui.win));
    elm_layout_content_set(ly, "fill_frame_swallow", fill_frame_create(ui.win));
@@ -176,9 +177,16 @@ window_update_frames_visibility(void)
       edje_object_signal_emit(ui.edje_ui,"gradient_frame_hide","edje_editor");
    }
    
+   if (cur.prog)
+   {
+      edje_object_signal_emit(ui.edje_ui,"program_frame_show","edje_editor");
+   }
+   else
+   {
+      edje_object_signal_emit(ui.edje_ui,"program_frame_hide","edje_editor");
+   }
 
    //TODO
-   //~ edje_object_signal_emit(ui.edje_ui,"program_frame_hide","edje_editor");
    //~ edje_object_signal_emit(ui.edje_ui,"script_frame_hide","edje_editor");
    
 }

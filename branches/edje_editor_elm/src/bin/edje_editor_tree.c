@@ -111,7 +111,6 @@ _tree_model_part_sel(void *data, Evas_Object *obj, void *event_info)
    set_current_state("default 0.0");
    set_current_prog(NULL);
 
-
    window_update_frames_visibility();
    
    part_frame_update();
@@ -139,14 +138,26 @@ _tree_model_state_sel(void *data, Evas_Object *obj, void *event_info)
    position_frame_update();
    //~ position_comboboxes_update();
 
-   
    canvas_redraw();
 }
 
 static void
 _tree_model_prog_sel(void *data, Evas_Object *obj, void *event_info)
 {
-   printf("SEL PROG\n");
+   const char *prog = elm_genlist_item_data_get(event_info);
+  
+   printf("SEL PROG: %s\n", prog);
+  
+   set_current_part(NULL);
+   set_current_state(NULL);
+   set_current_prog(prog);
+
+   window_update_frames_visibility();
+   
+   part_frame_update();
+   state_frame_update();
+   position_frame_update();
+   canvas_redraw();
 }
 
 static void

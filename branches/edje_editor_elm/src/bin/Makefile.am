@@ -31,6 +31,8 @@ edje_editor_state.c \
 edje_editor_state.h \
 edje_editor_text.c \
 edje_editor_text.h \
+edje_editor_program.c \
+edje_editor_program.h \
 edje_editor_fonts.c \
 edje_editor_fonts.h \
 edje_editor_rect.c \
