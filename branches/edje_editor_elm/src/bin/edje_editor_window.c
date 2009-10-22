@@ -39,7 +39,7 @@ window_main_create(void)
    ui.win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
    elm_win_title_set(ui.win, "Edje Editor");
    evas_object_smart_callback_add(ui.win, "delete-request", _window_delete_cb, NULL);
-   evas_object_resize(ui.win, 950, 500);
+   evas_object_resize(ui.win, 900, 800);
 
    // Elementary Layout
    ly = elm_layout_add(ui.win);

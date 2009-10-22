@@ -23,7 +23,8 @@
 void
 _toolbar_cb(void *data, Evas_Object *obj, void *event_info)
 {
-   
+   char *edje_file = NULL;
+  
    printf("Toolbar click\n");
    
    switch ((int)(long)data)
@@ -36,22 +37,34 @@ _toolbar_cb(void *data, Evas_Object *obj, void *event_info)
          dialog_filechooser_show(FILECHOOSER_OPEN);
          break;
       case TOOLBAR_SAVE:
-         if (!cur.open_file_name)
+         edje_object_file_get (ui.edje_o, &edje_file, NULL);
+          
+         // only save if a group is loaded, 
+         // if not ignore as nothing could have been changed
+         if (edje_file)
          {
-           // TODO: enable this if OLBAR_SAVE_EDJ is working again
-           //dialog_filechooser_show(FILECHOOSER_SAVE_EDJ);
-         }
-         else
-         {
-           save_edje (NULL);
+            if (!cur.open_file_name)
+            {
+               dialog_filechooser_show(FILECHOOSER_SAVE_EDJ);
+            }
+            else
+            {
+               save_edje (NULL);
+            }
          }
          break;
       case TOOLBAR_SAVE_EDC:
          dialog_alert_show("Not yet reimplemented ;)");
          break;
       case TOOLBAR_SAVE_EDJ:
-         dialog_alert_show("Not yet reimplemented ;)");
-         //dialog_filechooser_show(FILECHOOSER_SAVE_EDJ);
+         edje_object_file_get (ui.edje_o, &edje_file, NULL);
+          
+         // only save if a group is loaded, 
+         // if not ignore as nothing could have been changed
+         if (edje_file)
+         {
+            dialog_filechooser_show(FILECHOOSER_SAVE_EDJ);
+         }
          break;
       case TOOLBAR_EXIT:
 	       elm_exit();
