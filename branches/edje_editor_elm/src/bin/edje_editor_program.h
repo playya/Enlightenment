@@ -20,5 +20,6 @@
 
 Evas_Object *program_frame_create        (Evas_Object *parent);
 void         program_frame_update        (void);
+void         program_source_combo_populate(void);
 
 #endif

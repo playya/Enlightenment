@@ -31,7 +31,7 @@ _canvas_drag_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    //printf("ON DRAG\n");
    Evas_Coord parentx,parenty,parentw,parenth;
-   Evas_Coord x, y, w, h;
+   Evas_Coord x, y;
    Evas_Coord mouse_x, mouse_y;
 
    // MoveBox

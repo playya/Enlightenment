@@ -410,7 +410,7 @@ part_type_image_get2(const char *part)
 }
 
 char *
-part_type_image_get_OLD(const char *part)
+part_type_image_get(const char *part)
 {
    /* Get the name of the group in edje_editor.edj that
     * correspond to the given EDJE_PART_TYPE.

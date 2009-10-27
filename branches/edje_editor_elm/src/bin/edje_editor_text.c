@@ -194,7 +194,9 @@ text_frame_create(Evas_Object *parent)
    evas_object_show(bt);
    
    NEW_ENTRY_TO_TABLE("size:", 0, 1, 2, _size_entry, EINA_TRUE)
+    
    NEW_DOUBLE_ENTRY_TO_TABLE("align:", 0, 2, _alignx_entry, _aligny_entry, EINA_TRUE)
+    
    NEW_COMBO_TO_TABLE( _fit_combo, "fit:", 0, 3, 2, NULL, NULL)
    elm_hoversel_item_add(_fit_combo, "none", NULL, ELM_ICON_NONE,
                          _fit_combo_sel, (void*)FIT_NONE);

@@ -22,8 +22,8 @@ static Evas_Object *_name_entry;
 static Evas_Object *_size_entry;
 static Evas_Object *_alignx_entry;
 static Evas_Object *_aligny_entry;
-static Evas_Object *_fit_combo;
-static Evas_Object *_effect_combo;
+static Evas_Object *_source_combo;
+static Evas_Object *_signal_combo;
 static Evas_Object *_color_entry;
 static Evas_Object *_color2_entry;
 static Evas_Object *_color3_entry;
@@ -135,38 +135,25 @@ _entry_key_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void
-_fit_combo_sel(void *data, Evas_Object *obj, void *event_info)
+_source_combo_sel(void *data, Evas_Object *obj, void *event_info)
 {
-   switch ((int)(long)data)
-   {
-      case FIT_X:
-         edje_edit_state_text_fit_x_set(ui.edje_o, cur.part, cur.state, 1);
-         edje_edit_state_text_fit_y_set(ui.edje_o, cur.part, cur.state, 0);
-         break;
-      case FIT_Y:
-         edje_edit_state_text_fit_x_set(ui.edje_o, cur.part, cur.state, 0);
-         edje_edit_state_text_fit_y_set(ui.edje_o, cur.part, cur.state, 1);
-         break;
-      case FIT_BOTH:
-         edje_edit_state_text_fit_x_set(ui.edje_o, cur.part, cur.state, 1);
-         edje_edit_state_text_fit_y_set(ui.edje_o, cur.part, cur.state, 1);
-         break;
-      case FIT_NONE: default:
-         edje_edit_state_text_fit_x_set(ui.edje_o, cur.part, cur.state, 0);
-         edje_edit_state_text_fit_y_set(ui.edje_o, cur.part, cur.state, 0);
-         break;
-   }
+   const char *source = (const char*) data;
+
+   edje_edit_program_source_set (ui.edje_o, cur.prog, source);
+  
    canvas_redraw();
-   text_frame_update();
+   program_frame_update();
 }
 
 static void
-_effect_combo_sel(void *data, Evas_Object *obj, void *event_info)
+_signal_combo_sel(void *data, Evas_Object *obj, void *event_info)
 {
-   if (!cur.part) return;
-   edje_edit_part_effect_set(ui.edje_o, cur.part,(int)(long)data);
+   const char *signal = (const char*) data;
+
+   edje_edit_program_signal_set (ui.edje_o, cur.prog, signal);
+  
    canvas_redraw();
-   text_frame_update();
+   program_frame_update();
 }
 
 static void
@@ -181,6 +168,7 @@ Evas_Object*
 program_frame_create(Evas_Object *parent)
 {
    Evas_Object *tb, *bt, *_o;
+   Elm_Hoversel_Item *it;
 
    tb = elm_table_add(parent);
    evas_object_show(tb);
@@ -194,39 +182,60 @@ program_frame_create(Evas_Object *parent)
    evas_object_smart_callback_add(bt, "clicked", _run_button_clicked, NULL);
    evas_object_show(bt);
    
-   NEW_ENTRY_TO_TABLE("size:", 0, 1, 2, _size_entry, EINA_TRUE)
-   NEW_DOUBLE_ENTRY_TO_TABLE("align:", 0, 2, _alignx_entry, _aligny_entry, EINA_TRUE)
-   NEW_COMBO_TO_TABLE( _fit_combo, "fit:", 0, 3, 2, NULL, NULL)
-   elm_hoversel_item_add(_fit_combo, "none", NULL, ELM_ICON_NONE,
-                         _fit_combo_sel, (void*)FIT_NONE);
-   elm_hoversel_item_add(_fit_combo, "horizontal", NULL, ELM_ICON_NONE,
-                         _fit_combo_sel, (void*)FIT_X);
-   elm_hoversel_item_add(_fit_combo, "vertical", NULL, ELM_ICON_NONE,
-                         _fit_combo_sel, (void*)FIT_Y);
-   elm_hoversel_item_add(_fit_combo, "both", NULL, ELM_ICON_NONE,
-                         _fit_combo_sel, (void*)FIT_BOTH);
+   // create source
+   NEW_COMBO_TO_TABLE( _source_combo, "source:", 0, 3, 2, NULL, NULL)
    
-   NEW_COMBO_TO_TABLE( _effect_combo, "effect:", 0, 4, 2, NULL, NULL)
-   elm_hoversel_item_add(_effect_combo, "plain", NULL, ELM_ICON_NONE,
-                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_PLAIN);
-   elm_hoversel_item_add(_effect_combo, "outline", NULL, ELM_ICON_NONE,
-                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_OUTLINE);
-   elm_hoversel_item_add(_effect_combo, "outline (soft)", NULL, ELM_ICON_NONE,
-                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_SOFT_OUTLINE);
-   elm_hoversel_item_add(_effect_combo, "shadow", NULL, ELM_ICON_NONE,
-                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_SHADOW);
-   elm_hoversel_item_add(_effect_combo, "shadow (soft)", NULL, ELM_ICON_NONE,
-                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_SOFT_SHADOW);
-   elm_hoversel_item_add(_effect_combo, "outline + shadow", NULL, ELM_ICON_NONE,
-                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_OUTLINE_SHADOW);
-   elm_hoversel_item_add(_effect_combo, "outline + shadow (soft)", NULL, ELM_ICON_NONE,
-                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_OUTLINE_SOFT_SHADOW);
-   elm_hoversel_item_add(_effect_combo, "far shadow", NULL, ELM_ICON_NONE,
-                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_FAR_SHADOW);
-   elm_hoversel_item_add(_effect_combo, "far shadow (soft)", NULL, ELM_ICON_NONE,
-                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_FAR_SOFT_SHADOW);
-   elm_hoversel_item_add(_effect_combo, "glow", NULL, ELM_ICON_NONE,
-                         _effect_combo_sel, (void*)EDJE_TEXT_EFFECT_GLOW);
+   // create signal
+   NEW_COMBO_TO_TABLE( _signal_combo, "signal:", 0, 4, 2, NULL, NULL)
+    
+   it = elm_hoversel_item_add(_signal_combo, "program,start", NULL, ELM_ICON_NONE,
+                              _signal_combo_sel, "program,start");
+   elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
+
+   it = elm_hoversel_item_add(_signal_combo, "program,stop", NULL, ELM_ICON_NONE,
+                              _signal_combo_sel, "program,stop");
+   elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
+  
+   it = elm_hoversel_item_add(_signal_combo, "load", NULL, ELM_ICON_NONE,
+                              _signal_combo_sel, "load");
+   elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
+  
+   it = elm_hoversel_item_add(_signal_combo, "show", NULL, ELM_ICON_NONE,
+                              _signal_combo_sel, "show");
+   elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
+  
+   it = elm_hoversel_item_add(_signal_combo, "hide", NULL, ELM_ICON_NONE,
+                              _signal_combo_sel, "hide");
+   elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
+  
+   it = elm_hoversel_item_add(_signal_combo, "resize", NULL, ELM_ICON_NONE,
+                              _signal_combo_sel, "resize");
+   elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
+  
+   it = elm_hoversel_item_add(_signal_combo, "mouse,in", NULL, ELM_ICON_NONE,
+                              _signal_combo_sel, "mouse,in");
+   elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
+  
+   it = elm_hoversel_item_add(_signal_combo, "mouse,out", NULL, ELM_ICON_NONE,
+                              _signal_combo_sel, "mouse,out");
+   elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
+   
+   it = elm_hoversel_item_add(_signal_combo, "mouse,move", NULL, ELM_ICON_NONE,
+                              _signal_combo_sel, "mouse,move");
+   elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
+  
+   it = elm_hoversel_item_add(_signal_combo, "mouse,down,1", NULL, ELM_ICON_NONE,
+                              _signal_combo_sel, "mouse,down,1");
+   elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
+  
+   it = elm_hoversel_item_add(_signal_combo, "mouse,up,1", NULL, ELM_ICON_NONE,
+                              _signal_combo_sel, "mouse,up,1");
+   elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
+  
+   it = elm_hoversel_item_add(_signal_combo, "mouse,clicked,1", NULL, ELM_ICON_NONE,
+                              _signal_combo_sel, "mouse,clicked,1");
+   elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
+
 
    NEW_ENTRY_TO_TABLE("elipsis:", 0, 5, 2, _elipsis_entry, EINA_TRUE)
    NEW_ENTRY_TO_TABLE("text:", 0, 6, 2, _text_entry, EINA_TRUE)
@@ -240,24 +249,40 @@ program_frame_create(Evas_Object *parent)
 void
 program_frame_update(void)
 {
-   int eff = 0;
-   int r, g, b, a;
-   const char *t;
-   Eina_Bool fx, fy;
+   const char *s;
 
-   if (!cur.part || !cur.state) return;
+   if (!cur.prog) return;
    
-   //Set font
-   t = edje_edit_state_font_get(ui.edje_o, cur.part, cur.state);
-   elm_entry_entry_set(_name_entry, t);
-   edje_edit_string_free(t);
+   //Set name
+   elm_entry_entry_set(_name_entry, cur.prog);
 
-   //Set font size 
-   elm_entry_printf(_size_entry, "%d",
-               edje_edit_state_text_size_get(ui.edje_o, cur.part, cur.state));
+   // Set source
+   s = edje_edit_program_source_get (ui.edje_o, cur.prog);
+   if (!s)
+   {
+      elm_hoversel_label_set(_source_combo, "none"); // TODO: minimal width
+   }
+   else
+   {
+      elm_hoversel_label_set(_source_combo, s); // TODO: minimal width
+   }
+   edje_edit_string_free(s);
+  
+   //Update Signal
+   s = edje_edit_program_signal_get(ui.edje_o, cur.prog);
+   if (!s)
+   {
+      elm_hoversel_label_set(_signal_combo, "none"); // TODO: minimal width
+   }
+   else
+   {
+      elm_hoversel_label_set(_signal_combo, s); // TODO: minimal width
+   }
+   edje_edit_string_free(s);
+  
 
    //Set text
-   t = edje_edit_state_text_get(ui.edje_o, cur.part, cur.state);
+   /*t = edje_edit_state_text_get(ui.edje_o, cur.part, cur.state);
    if (t && strlen(t) > 0) //TODO t[0] != "/0" ???
    {
       elm_entry_entry_set(_text_entry, t);
@@ -269,23 +294,23 @@ program_frame_update(void)
    elm_entry_printf(_alignx_entry, "%.2f",
             edje_edit_state_text_align_x_get(ui.edje_o, cur.part, cur.state));
    elm_entry_printf(_aligny_entry, "%.2f",
-            edje_edit_state_text_align_y_get(ui.edje_o, cur.part, cur.state));
+            edje_edit_state_text_align_y_get(ui.edje_o, cur.part, cur.state));*/
 
-   //Set fit
-   fx = edje_edit_state_text_fit_x_get(ui.edje_o, cur.part, cur.state);
+   //Set source
+   /*fx = edje_edit_state_text_fit_x_get(ui.edje_o, cur.part, cur.state);
    fy = edje_edit_state_text_fit_y_get(ui.edje_o, cur.part, cur.state);
 
-   if (fx && fy) elm_hoversel_label_set(_fit_combo, "both");
-   else if (fx)  elm_hoversel_label_set(_fit_combo, "horizontal");
-   else if (fy)  elm_hoversel_label_set(_fit_combo, "vertical");
-   else          elm_hoversel_label_set(_fit_combo, "none");
+   if (fx && fy) elm_hoversel_label_set(_source_combo, "both");
+   else if (fx)  elm_hoversel_label_set(_source_combo, "horizontal");
+   else if (fy)  elm_hoversel_label_set(_source_combo, "vertical");
+   else          elm_hoversel_label_set(_source_combo, "none");
 
    //Set Elipsis
    elm_entry_printf(_elipsis_entry, "%.3f",
-               edje_edit_state_text_elipsis_get(ui.edje_o, cur.part, cur.state));
+               edje_edit_state_text_elipsis_get(ui.edje_o, cur.part, cur.state));*/
 
    //Set Effect
-   eff = edje_edit_part_effect_get(ui.edje_o, cur.part);
+   /*eff = edje_edit_part_effect_get(ui.edje_o, cur.part);
    if (eff == EDJE_TEXT_EFFECT_OUTLINE)
       elm_hoversel_label_set(_effect_combo, "outline");
    else if (eff == EDJE_TEXT_EFFECT_SOFT_OUTLINE)
@@ -306,15 +331,50 @@ program_frame_update(void)
       elm_hoversel_label_set(_effect_combo, "far shadow (soft)");
    else if (eff == EDJE_TEXT_EFFECT_GLOW)
       elm_hoversel_label_set(_effect_combo, "glow");
-   else elm_hoversel_label_set(_effect_combo, "plain");
+   else elm_hoversel_label_set(_effect_combo, "plain");*/
 
    //Set Colors
-   edje_edit_state_color_get(ui.edje_o, cur.part, cur.state, &r, &g, &b, &a);
+   /*edje_edit_state_color_get(ui.edje_o, cur.part, cur.state, &r, &g, &b, &a);
    elm_entry_printf(_color_entry, "%d %d %d %d", r, g, b, a);
 
    edje_edit_state_color2_get(ui.edje_o, cur.part, cur.state, &r, &g, &b, &a);
    elm_entry_printf(_color2_entry, "%d %d %d %d", r, g, b, a);
 
    edje_edit_state_color3_get(ui.edje_o, cur.part, cur.state, &r, &g, &b, &a);
-   elm_entry_printf(_color3_entry, "%d %d %d %d", r, g, b, a);
+   elm_entry_printf(_color3_entry, "%d %d %d %d", r, g, b, a);*/
 }
+
+void
+program_source_combo_populate(void)
+{
+   Eina_List *l;
+   Elm_Hoversel_Item *it;
+   char *image_name;
+   printf("Populate Program Source ComboEntry\n");
+  
+   // delete label and items before adding new
+   elm_hoversel_label_set(_source_combo, "");
+   l = elm_hoversel_items_get (_source_combo);
+   while (l)
+   {
+      Elm_Hoversel_Item *it = (Elm_Hoversel_Item*) l->data;
+     
+      elm_hoversel_item_del (it);
+     
+      l = l->next;
+   }
+
+   l = edje_edit_parts_list_get(ui.edje_o);
+   while (l)
+   {
+      image_name = part_type_image_get((char*)l->data);
+      it = elm_hoversel_item_add(_source_combo, (char*)l->data, NULL, ELM_ICON_NONE,
+                                 _source_combo_sel, l->data);
+      elm_hoversel_item_icon_set(it, EdjeFile, image_name, ELM_ICON_FILE);
+      free(image_name);
+
+      l = l->next;
+   }
+   edje_edit_string_list_free(l);
+}
+

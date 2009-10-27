@@ -15,7 +15,7 @@
  *  along with Edje_editor.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "main.h"
-
+#include "edje_editor_program.h"
 
 void
 elm_entry_printf(Evas_Object *obj, const char *format, ...)
@@ -232,8 +232,8 @@ change_to_group(const char *group)
 
    tree_parts_create();
    //~ position_comboboxes_populate();
-   //~ program_source_combo_populate();
-   //~ program_signal_combo_populate();
+   program_source_combo_populate();
+   //program_signal_combo_populate();
 
    group_frame_update();
    part_frame_update();

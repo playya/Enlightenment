@@ -59,6 +59,25 @@ void _window_logo_key_press(void *data, Evas *e, Evas_Object *obj, void *event_i
    ENTRY = _o; \
    evas_object_event_callback_add(_o, EVAS_CALLBACK_KEY_DOWN, _entry_key_down, NULL);
    
+// TODO: not good working, maybe elementary widget needs to be fixed!
+/*#define NEW_SPINNER_TO_TABLE(TITLE, X, Y, W, SPINNER, FORMAT) \
+   _o = elm_label_add(parent); \
+   elm_label_label_set(_o, TITLE"  "); \
+   elm_table_pack(tb, _o, X, Y, 1, 1); \
+   evas_object_size_hint_weight_set(_o, 0.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 1.0, 0.5); \
+   evas_object_show(_o); \
+    \
+   _o = elm_spinner_add(parent); \
+   elm_spinner_value_set(_o, 0); \
+   elm_spinner_min_max_set (_o, 1, 14); \
+   elm_table_pack(tb, _o, X+1, Y, W, 1); \
+   evas_object_size_hint_weight_set(_o, 1.0, 0.0); \
+   evas_object_size_hint_align_set(_o, 0.0, 0.5); \
+   evas_object_show(_o); \
+   SPINNER = _o; \
+   evas_object_event_callback_add(_o, EVAS_CALLBACK_KEY_DOWN, _spinner_key_down, NULL);*/
+
 #define NEW_DOUBLE_ENTRY_TO_TABLE(TITLE, X, Y, ENTRY1, ENTRY2, EDITABLE) \
    _o = elm_label_add(parent); \
    elm_label_label_set(_o, TITLE"  "); \

@@ -40,7 +40,7 @@
 
 Evas_Object *part_frame_create   (Evas_Object *parent);
 void         part_frame_update   (void);
-//~ char*        part_type_image_get (const char *part);
+char*        part_type_image_get (const char *part);
 const char  *part_type_image_get2(const char *part);
 void         part_populate_combo_with_parts(void *data, Evas_Object *obj, void *event_info); //TODO find a better name :P
 

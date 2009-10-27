@@ -179,6 +179,7 @@ window_update_frames_visibility(void)
    
    if (cur.prog)
    {
+      program_frame_update();
       edje_object_signal_emit(ui.edje_ui,"program_frame_show","edje_editor");
    }
    else

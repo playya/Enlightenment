@@ -34,7 +34,7 @@
 #include "edje_editor_position.h"
 #include "edje_editor_text.h"
 #include "edje_editor_rect.h"
-//~ #include "edje_editor_program.h"
+#include "edje_editor_program.h"
 //~ #include "edje_editor_script.h"
 #include "edje_editor_toolbar.h"
 #include "edje_editor_canvas.h"
