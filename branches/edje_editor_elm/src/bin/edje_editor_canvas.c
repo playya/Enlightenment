@@ -724,6 +724,7 @@ canvas_redraw(void)
    {
       evas_object_hide(EV_fakewin);
       evas_object_hide(EV_movebox);
+      evas_object_hide(ui.edje_o);
    }
    evas_object_hide(EV_rel1X_parent_handler);
    evas_object_hide(EV_rel1Y_parent_handler);

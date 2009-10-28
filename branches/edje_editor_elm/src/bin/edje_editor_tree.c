@@ -212,6 +212,7 @@ static void
 _tree_btn_click_cb(void *data, Evas_Object *obj, void *event_info)
 {
    printf("Click\n");
+
    tree_groups_create();
 }
 
@@ -563,7 +564,14 @@ tree_groups_create(void)
    elm_pager_content_pop(ui.tree_pager);
    elm_pager_content_push(ui.tree_pager, box);
    
-
+   // hide all stuff in group selection mode
+   set_current_group(NULL);
+   set_current_part(NULL);
+   set_current_state(NULL);
+   set_current_prog(NULL); 
+   window_update_frames_visibility();
+   canvas_redraw ();
+  
    //Select the first group and load it
    //~ etk_combobox_entry_active_item_set(ETK_COMBOBOX_ENTRY(UI_GroupsComboBox),
       //~ etk_combobox_entry_first_item_get(ETK_COMBOBOX_ENTRY(UI_GroupsComboBox)));

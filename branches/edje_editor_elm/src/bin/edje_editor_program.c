@@ -17,26 +17,20 @@
 
 #include "main.h"
 
-static Evas_Object *_text_entry;
 static Evas_Object *_name_entry;
-static Evas_Object *_size_entry;
-static Evas_Object *_alignx_entry;
-static Evas_Object *_aligny_entry;
+static Evas_Object *_delay_entry;
+static Evas_Object *_delayrandom_entry;
 static Evas_Object *_source_combo;
 static Evas_Object *_signal_combo;
-static Evas_Object *_color_entry;
-static Evas_Object *_color2_entry;
-static Evas_Object *_color3_entry;
-static Evas_Object *_elipsis_entry;
 
 /***   Callbacks   ***/
 static void
 _entry_apply(Evas_Object *o)
 {
    char *txt;
-   int i, r, g, b, a;
-   double f;
-
+   int i;
+   char val_buf[128];
+   
    /* TODO FIX THIS IN ELM */
    /* I get a <br> at the end of the line */
    /* Need to fix elm for this, probably a single_line entry must take care of this*/
@@ -44,78 +38,48 @@ _entry_apply(Evas_Object *o)
    to_fix = elm_entry_entry_get(o);
    txt = strdup(to_fix);
    if (ecore_str_has_suffix(txt, "<br>"))
+   {
       txt[strlen(txt) - 4] = '\0';
+   }
    printf("Apply entry [%s]\n", txt);
 
-   if (!txt || !cur.part || !cur.state) return;
+   if (!txt || !cur.prog) return;
    
-   /* Apply Text */
-   if (o == _text_entry)
-   {
-      if (ecore_str_equal(txt, "unset"))
-        edje_edit_state_text_set(ui.edje_o, cur.part, cur.state, "");
-      else
-        edje_edit_state_text_set(ui.edje_o, cur.part, cur.state, txt);
-   }
-   /* Apply Font */
+   /* Apply Name */
    else if (o  == _name_entry)
-      edje_edit_state_font_set(ui.edje_o, cur.part, cur.state, txt);
-   /* Apply Font Size */
-   else if (o == _size_entry)
    {
-      if (sscanf(txt, "%d", &i) != 1)
+      // TODO: error handling of return
+      edje_edit_program_name_set(ui.edje_o, cur.prog, txt);
+      set_current_prog(txt);
+      // TODO: should also change the label in the parts selection on the left
+      //       currently a group change is needed to update the label
+   }
+   /* Apply Delay */
+   else if (o == _delay_entry)
+   {
+      if (sscanf(val_buf, "%f", elm_entry_entry_get(o)) != 1)
+      {
         dialog_alert_show(MSG_INT);
+      }
       else
-        edje_edit_state_text_size_set(ui.edje_o, cur.part, cur.state, i);
+      {
+        // TODO: error handling of return
+        edje_edit_program_in_from_set (ui.edje_o, cur.prog, 0.0);
+      }
+     
+   /*snprintf (val_buf, sizeof (val_buf), "%.4f", edje_edit_program_in_from_get(ui.edje_o, cur.prog));
+   elm_entry_entry_set(_delay_entry, val_buf);
+   snprintf (val_buf, sizeof (val_buf), "%.4f", edje_edit_program_in_range_get(ui.edje_o, cur.prog));
+   elm_entry_entry_set(_delayrandom_entry, val_buf);*/
    }
-   /* Apply AlignX */
-   else if (o == _alignx_entry)
-   {
-      if (sscanf(txt, "%lf", &f) != 1)
-        dialog_alert_show(MSG_FLOAT);
-      else
-        edje_edit_state_text_align_x_set(ui.edje_o, cur.part, cur.state, f);
+  
+   if (txt)
+   { 
+      free (txt);
    }
-   /* Apply AlignY */
-   else if (o == _aligny_entry)
-   {
-      if (sscanf(txt, "%lf", &f) != 1)
-        dialog_alert_show(MSG_FLOAT);
-      else
-        edje_edit_state_text_align_y_set(ui.edje_o, cur.part, cur.state, f);
-   }
-   /* Apply Colors*/
-   else if (o == _color_entry)
-   {
-      if (sscanf(txt, "%d %d %d %d", &r, &g, &b, &a) != 4)
-        dialog_alert_show(MSG_COLOR);
-      else
-        edje_edit_state_color_set(ui.edje_o, cur.part, cur.state, r, g, b, a);
-   }
-   else if (o == _color2_entry)
-   {
-      if (sscanf(txt, "%d %d %d %d", &r, &g, &b, &a) != 4)
-        dialog_alert_show(MSG_COLOR);
-      else
-        edje_edit_state_color2_set(ui.edje_o, cur.part, cur.state, r, g, b, a);
-   }
-   else if (o == _color3_entry)
-   {
-      if (sscanf(txt, "%d %d %d %d", &r, &g, &b, &a) != 4)
-        dialog_alert_show(MSG_COLOR);
-      else
-        edje_edit_state_color3_set(ui.edje_o, cur.part, cur.state, r, g, b, a);
-   }
-   /* Apply Elipsis*/
-   else if (o == _elipsis_entry)
-   {
-      if (sscanf(txt, "%lf", &f) != 1)
-        dialog_alert_show(MSG_FLOAT);
-      else
-        edje_edit_state_text_elipsis_set(ui.edje_o, cur.part, cur.state, f);
-   }
+
    canvas_redraw();
-   text_frame_update();
+   program_frame_update();
 }
 
 static void
@@ -236,12 +200,7 @@ program_frame_create(Evas_Object *parent)
                               _signal_combo_sel, "mouse,clicked,1");
    elm_hoversel_item_icon_set(it, EdjeFile, "DESC.PNG", ELM_ICON_FILE);
 
-
-   NEW_ENTRY_TO_TABLE("elipsis:", 0, 5, 2, _elipsis_entry, EINA_TRUE)
-   NEW_ENTRY_TO_TABLE("text:", 0, 6, 2, _text_entry, EINA_TRUE)
-   NEW_ENTRY_TO_TABLE("text color:", 0, 7, 2, _color_entry, EINA_TRUE)
-   NEW_ENTRY_TO_TABLE("shadow color:", 0, 8, 2, _color2_entry, EINA_TRUE)
-   NEW_ENTRY_TO_TABLE("outline color:", 0, 9, 2, _color3_entry, EINA_TRUE)
+   NEW_DOUBLE_ENTRY_TO_TABLE("delay:", 0, 5, _delay_entry, _delayrandom_entry, EINA_TRUE)
 
    return tb;
 }
@@ -250,6 +209,7 @@ void
 program_frame_update(void)
 {
    const char *s;
+   char val_buf[128];
 
    if (!cur.prog) return;
    
@@ -280,68 +240,12 @@ program_frame_update(void)
    }
    edje_edit_string_free(s);
   
+   //Update Delay
+   snprintf (val_buf, sizeof (val_buf), "%.4f", edje_edit_program_in_from_get(ui.edje_o, cur.prog));
+   elm_entry_entry_set(_delay_entry, val_buf);
+   snprintf (val_buf, sizeof (val_buf), "%.4f", edje_edit_program_in_range_get(ui.edje_o, cur.prog));
+   elm_entry_entry_set(_delayrandom_entry, val_buf);
 
-   //Set text
-   /*t = edje_edit_state_text_get(ui.edje_o, cur.part, cur.state);
-   if (t && strlen(t) > 0) //TODO t[0] != "/0" ???
-   {
-      elm_entry_entry_set(_text_entry, t);
-      edje_edit_string_free(t);
-   }
-   else elm_entry_entry_set(_text_entry, "unset");
-
-   //Set align
-   elm_entry_printf(_alignx_entry, "%.2f",
-            edje_edit_state_text_align_x_get(ui.edje_o, cur.part, cur.state));
-   elm_entry_printf(_aligny_entry, "%.2f",
-            edje_edit_state_text_align_y_get(ui.edje_o, cur.part, cur.state));*/
-
-   //Set source
-   /*fx = edje_edit_state_text_fit_x_get(ui.edje_o, cur.part, cur.state);
-   fy = edje_edit_state_text_fit_y_get(ui.edje_o, cur.part, cur.state);
-
-   if (fx && fy) elm_hoversel_label_set(_source_combo, "both");
-   else if (fx)  elm_hoversel_label_set(_source_combo, "horizontal");
-   else if (fy)  elm_hoversel_label_set(_source_combo, "vertical");
-   else          elm_hoversel_label_set(_source_combo, "none");
-
-   //Set Elipsis
-   elm_entry_printf(_elipsis_entry, "%.3f",
-               edje_edit_state_text_elipsis_get(ui.edje_o, cur.part, cur.state));*/
-
-   //Set Effect
-   /*eff = edje_edit_part_effect_get(ui.edje_o, cur.part);
-   if (eff == EDJE_TEXT_EFFECT_OUTLINE)
-      elm_hoversel_label_set(_effect_combo, "outline");
-   else if (eff == EDJE_TEXT_EFFECT_SOFT_OUTLINE)
-      elm_hoversel_label_set(_effect_combo, "outline (soft)");
-   else if (eff == EDJE_TEXT_EFFECT_SHADOW)
-      elm_hoversel_label_set(_effect_combo, "shadow");
-   else if (eff == EDJE_TEXT_EFFECT_SOFT_SHADOW)
-      elm_hoversel_label_set(_effect_combo, "shadow (soft)");
-   else if (eff == EDJE_TEXT_EFFECT_OUTLINE_SHADOW)
-      elm_hoversel_label_set(_effect_combo, "outline + shadow");
-   else if (eff == EDJE_TEXT_EFFECT_OUTLINE_SOFT_SHADOW)
-      elm_hoversel_label_set(_effect_combo, "outline + shadow (soft)");
-   else if (eff == EDJE_TEXT_EFFECT_OUTLINE_SOFT_SHADOW)
-      elm_hoversel_label_set(_effect_combo, "outline + shadow (soft)");
-   else if (eff == EDJE_TEXT_EFFECT_FAR_SHADOW)
-      elm_hoversel_label_set(_effect_combo, "far shadow");
-   else if (eff == EDJE_TEXT_EFFECT_FAR_SOFT_SHADOW)
-      elm_hoversel_label_set(_effect_combo, "far shadow (soft)");
-   else if (eff == EDJE_TEXT_EFFECT_GLOW)
-      elm_hoversel_label_set(_effect_combo, "glow");
-   else elm_hoversel_label_set(_effect_combo, "plain");*/
-
-   //Set Colors
-   /*edje_edit_state_color_get(ui.edje_o, cur.part, cur.state, &r, &g, &b, &a);
-   elm_entry_printf(_color_entry, "%d %d %d %d", r, g, b, a);
-
-   edje_edit_state_color2_get(ui.edje_o, cur.part, cur.state, &r, &g, &b, &a);
-   elm_entry_printf(_color2_entry, "%d %d %d %d", r, g, b, a);
-
-   edje_edit_state_color3_get(ui.edje_o, cur.part, cur.state, &r, &g, &b, &a);
-   elm_entry_printf(_color3_entry, "%d %d %d %d", r, g, b, a);*/
 }
 
 void
