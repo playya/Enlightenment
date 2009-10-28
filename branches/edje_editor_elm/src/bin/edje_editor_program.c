@@ -236,26 +236,12 @@ program_frame_update(void)
 
    // Set source
    s = edje_edit_program_source_get (ui.edje_o, cur.prog);
-   if (!s)
-   {
-      elm_hoversel_label_set(_source_combo, "none"); // TODO: minimal width
-   }
-   else
-   {
-      elm_hoversel_label_set(_source_combo, s); // TODO: minimal width
-   }
+   elm_hoversel_label_set(_source_combo, s ? s : "none");
    edje_edit_string_free(s);
   
    // Update Signal
    s = edje_edit_program_signal_get(ui.edje_o, cur.prog);
-   if (!s)
-   {
-      elm_hoversel_label_set(_signal_combo, "none"); // TODO: minimal width
-   }
-   else
-   {
-      elm_hoversel_label_set(_signal_combo, s); // TODO: minimal width
-   }
+   elm_hoversel_label_set(_signal_combo, s ? s : "none");
    edje_edit_string_free(s);
   
    // Update Delay
@@ -280,6 +266,7 @@ program_source_combo_populate(void)
    elm_hoversel_clear (_source_combo);
 
    l = edje_edit_parts_list_get(ui.edje_o);
+   // TODO: use EINA_LIST_FOREACH()
    while (l)
    {
       image_name = part_type_image_get((char*)l->data);

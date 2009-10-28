@@ -49,6 +49,7 @@
 //~ #include "edje_editor_tree_model_spectra.h"
 //~ #include "edje_editor_data.h"
 //~ #include "edje_editor_colors.h"
+#include "edje_editor_widgets.h"
 
 /* DEFINES */
 #define DEBUG_MODE 1       // 0 or 1

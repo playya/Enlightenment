@@ -42,7 +42,8 @@ edje_editor_images.h \
 edje_editor_fill.c \
 edje_editor_fill.h \
 main.c \
-main.h
+main.h \
+edje_editor_widgets.h
 
 
 edje_editor_LDADD = @ELEMENTARY_LIBS@
