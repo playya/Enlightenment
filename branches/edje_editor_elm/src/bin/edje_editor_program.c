@@ -19,17 +19,18 @@
 
 static Evas_Object *_name_entry;
 static Evas_Object *_delay_entry;
+static Evas_Object *_after_entry;
 static Evas_Object *_delayrandom_entry;
 static Evas_Object *_source_combo;
 static Evas_Object *_signal_combo;
+static Evas_Object *_action_combo;
 
 /***   Callbacks   ***/
 static void
 _entry_apply(Evas_Object *o)
 {
    char *txt;
-   int i;
-   char val_buf[128];
+   float f;
    
    /* TODO FIX THIS IN ELM */
    /* I get a <br> at the end of the line */
@@ -57,9 +58,9 @@ _entry_apply(Evas_Object *o)
    /* Apply Delay */
    else if (o == _delay_entry)
    {
-      if (sscanf(val_buf, "%f", elm_entry_entry_get(o)) != 1)
+      if (sscanf(elm_entry_entry_get(o), "%f", &f) != 1)
       {
-        dialog_alert_show(MSG_INT);
+        dialog_alert_show(MSG_FLOAT);
       }
       else
       {
@@ -115,6 +116,17 @@ _signal_combo_sel(void *data, Evas_Object *obj, void *event_info)
    const char *signal = (const char*) data;
 
    edje_edit_program_signal_set (ui.edje_o, cur.prog, signal);
+  
+   canvas_redraw();
+   program_frame_update();
+}
+
+static void
+_action_combo_sel(void *data, Evas_Object *obj, void *event_info)
+{
+   const char *signal = (const char*) data;
+
+   //edje_edit_program_signal_set (ui.edje_o, cur.prog, signal);
   
    canvas_redraw();
    program_frame_update();
@@ -202,6 +214,12 @@ program_frame_create(Evas_Object *parent)
 
    NEW_DOUBLE_ENTRY_TO_TABLE("delay:", 0, 5, _delay_entry, _delayrandom_entry, EINA_TRUE)
 
+   //NEW_ENTRY_TO_TABLE("after(s):", 0, 0, 1, _after_entry, EINA_TRUE)
+   // TODO: I don't like how After(s) is done in old edje_editor. It should be a real list...
+    
+   // create Action
+   //NEW_COMBO_TO_TABLE( _action_combo, "action:", 0, 6, 2, NULL, NULL)
+    
    return tb;
 }
 
@@ -213,7 +231,7 @@ program_frame_update(void)
 
    if (!cur.prog) return;
    
-   //Set name
+   // Set name
    elm_entry_entry_set(_name_entry, cur.prog);
 
    // Set source
@@ -228,7 +246,7 @@ program_frame_update(void)
    }
    edje_edit_string_free(s);
   
-   //Update Signal
+   // Update Signal
    s = edje_edit_program_signal_get(ui.edje_o, cur.prog);
    if (!s)
    {
@@ -240,11 +258,12 @@ program_frame_update(void)
    }
    edje_edit_string_free(s);
   
-   //Update Delay
+   // Update Delay
    snprintf (val_buf, sizeof (val_buf), "%.4f", edje_edit_program_in_from_get(ui.edje_o, cur.prog));
    elm_entry_entry_set(_delay_entry, val_buf);
    snprintf (val_buf, sizeof (val_buf), "%.4f", edje_edit_program_in_range_get(ui.edje_o, cur.prog));
    elm_entry_entry_set(_delayrandom_entry, val_buf);
+
 
 }
 
@@ -258,15 +277,7 @@ program_source_combo_populate(void)
   
    // delete label and items before adding new
    elm_hoversel_label_set(_source_combo, "");
-   l = elm_hoversel_items_get (_source_combo);
-   while (l)
-   {
-      Elm_Hoversel_Item *it = (Elm_Hoversel_Item*) l->data;
-     
-      elm_hoversel_item_del (it);
-     
-      l = l->next;
-   }
+   elm_hoversel_clear (_source_combo);
 
    l = edje_edit_parts_list_get(ui.edje_o);
    while (l)

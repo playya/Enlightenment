@@ -23,7 +23,7 @@
 void
 _toolbar_cb(void *data, Evas_Object *obj, void *event_info)
 {
-   char *edje_file = NULL;
+   const char *edje_file = NULL;
   
    printf("Toolbar click\n");
    
@@ -117,7 +117,7 @@ toolbar_create(Evas_Object *parent)
 Evas_Object*
 toolbar_create_old()
 {
-   Evas_Object *tb, *icon;
+   Evas_Object *tb;
 
    // Toolbar
    tb = elm_toolbar_add(ui.win);
