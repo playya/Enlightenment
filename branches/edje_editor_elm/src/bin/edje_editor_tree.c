@@ -26,6 +26,24 @@ Elm_Genlist_Item_Class parts_class;
 Elm_Genlist_Item_Class states_class;
 Elm_Genlist_Item_Class progs_class;
 
+#define GENERATE_UNIQUE_PART_NAME(PREFIX) \
+   snprintf(name, sizeof(name), PREFIX); \
+   i = 2; \
+   while (edje_edit_part_exist(ui.edje_o, name)) \
+      snprintf(name, sizeof(name), PREFIX" %d", i++);
+
+#define GENERATE_UNIQUE_PROGRAM_NAME(PREFIX) \
+   snprintf(name, sizeof(name), PREFIX); \
+   i = 2; \
+   while (edje_edit_program_exist(ui.edje_o, name)) \
+      snprintf(name, sizeof(name), PREFIX" %d", i++);
+
+#define GENERATE_UNIQUE_GROUP_NAME(PREFIX) \
+   snprintf(name, sizeof(name), PREFIX); \
+   i = 2; \
+   while (edje_edit_group_exist(ui.edje_o, name)) \
+      snprintf(name, sizeof(name), PREFIX" %d", i++);
+
 static char*
 _tree_model_label_get(const void *data, Evas_Object *obj, const char *source)
 {
@@ -207,11 +225,25 @@ _tree_model_contract_req(void *data, Evas_Object *obj, void *event_info)
    elm_genlist_item_expanded_set(it, 0);
 }
 
+static void
+_group_add_click_cb(void *data, Evas_Object *obj, void *event_info)
+{
+   char name[1024];
+   int i = 2;
+  
+   printf("Click group add\n");
+
+   GENERATE_UNIQUE_GROUP_NAME("New Group")
+   edje_edit_group_add (ui.edje_o, name);
+  
+   tree_groups_create();
+}
+
 /***   Parts Tree   ***/
 static void
 _tree_btn_click_cb(void *data, Evas_Object *obj, void *event_info)
 {
-   printf("Click\n");
+   printf("Click part add\n");
 
    tree_groups_create();
 }
@@ -248,19 +280,6 @@ _tree_emitter_populate(Evas_Object *o)
      }
    edje_edit_string_list_free(progs);
 }
-
-
-#define GENERATE_UNIQUE_PART_NAME(PREFIX) \
-   snprintf(name, sizeof(name), PREFIX); \
-   i = 2; \
-   while (edje_edit_part_exist(ui.edje_o, name)) \
-      snprintf(name, sizeof(name), PREFIX" %d", i++);
-
-#define GENERATE_UNIQUE_PROGRAM_NAME(PREFIX) \
-   snprintf(name, sizeof(name), PREFIX); \
-   i = 2; \
-   while (edje_edit_program_exist(ui.edje_o, name)) \
-      snprintf(name, sizeof(name), PREFIX" %d", i++);
 
 static void
 _add_combo_sel(void *data, Evas_Object *obj, void *event_info)
@@ -529,30 +548,54 @@ tree_groups_create(void)
 {
    Eina_List *groups, *l;
    char *name;
-   Evas_Object *box, *lb, *list;
-
-   box = elm_box_add(ui.win);
-   evas_object_size_hint_align_set(box, 1.0, 1.0);
-   evas_object_show(box);
+   Evas_Object *lb, *list, *bt, *table;
+   unsigned int i = 0;
+  
+   table = elm_table_add(ui.win);
+   elm_table_homogenous_set(table, 0);
    
    // label
    lb = elm_label_add(ui.win);
    elm_label_label_set(lb, "<b>Select a group</b>");
-   elm_box_pack_end(box, lb);
+   evas_object_size_hint_align_set(lb, 1.0, 0.0);
+   evas_object_size_hint_weight_set(lb, 1.0, 0.0); // This should expand the label
+   elm_table_pack(table, lb, 1, 0, 1, 1);
    evas_object_show(lb);
+  
+   // 'Change Group' Button
+   bt = elm_button_add(ui.win);
+   elm_button_label_set(bt, "Add Group");
+   evas_object_smart_callback_add(bt, "clicked", _group_add_click_cb, NULL);
+   evas_object_size_hint_align_set(bt, 1.0, 0.0);
+   evas_object_size_hint_weight_set(bt, 1.0, 0.0); // TODO this doesn't work as expected
+   elm_table_pack(table, bt, 2, 0, 1, 1);
+   evas_object_show(bt);
    
    // list
    list = elm_list_add(ui.win);
    evas_object_size_hint_align_set(list, -1.0, -1.0);
    evas_object_size_hint_weight_set(list, 1.0, 1.0);
-   elm_box_pack_end(box, list);
+  elm_table_pack(table, list, 0, 1, 3, 1);
 
 
    // Populate the list
    Elm_List_Item *item;
    groups = edje_file_collection_list(cur.open_temp_name);
+  
    EINA_LIST_FOREACH(groups, l, name)
+   {
+      if (i == 0) // do for first group
+      {
+         if (!edje_object_file_set(ui.edje_o, cur.open_temp_name, name))
+         {
+            dialog_alert_show("Error loading first default group");
+           return;
+         }
+      }
       item = elm_list_item_append(list, name, NULL, NULL, _tree_group_sel_cb, NULL);
+     
+      ++i;
+   }
    edje_file_collection_list_free(groups);
    
    // Run the list
@@ -562,7 +605,7 @@ tree_groups_create(void)
    
    // Push the list in the tree pager (aka: show it)
    elm_pager_content_pop(ui.tree_pager);
-   elm_pager_content_push(ui.tree_pager, box);
+   elm_pager_content_push(ui.tree_pager, table);
    
    // hide all stuff in group selection mode
    set_current_group(NULL);
