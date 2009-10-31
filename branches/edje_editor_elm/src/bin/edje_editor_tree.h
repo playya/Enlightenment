@@ -36,7 +36,7 @@
 //~ Etk_Widget *UI_GroupsComboBox;
 
 
-void           tree_groups_create       (void);
+void           tree_groups_create       (Eina_Bool push_pop);
 void           tree_parts_create        (void);
 //~ Etk_Tree_Row* tree_part_add          (const char *part_name, Etk_Tree_Row *after);
 //~ Etk_Tree_Row* tree_state_add         (const char *part_name, const char *state_name);

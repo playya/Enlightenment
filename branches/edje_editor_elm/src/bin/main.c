@@ -178,7 +178,7 @@ load_edje(const char *file)
 
    //~ Parts_Hash = NULL;
 
-   tree_groups_create();
+   tree_groups_create(TRUE);
    //~ text_font_combo_populate();
    //~ gradient_spectra_combo_populate();
 

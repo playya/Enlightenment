@@ -234,9 +234,9 @@ _group_add_click_cb(void *data, Evas_Object *obj, void *event_info)
    printf("Click group add\n");
 
    GENERATE_UNIQUE_GROUP_NAME("New Group")
-   edje_edit_group_add (ui.edje_o, name);
+   edje_edit_group_add(ui.edje_o, name);
   
-   tree_groups_create();
+   tree_groups_create(FALSE);
 }
 
 /***   Parts Tree   ***/
@@ -245,7 +245,7 @@ _tree_btn_click_cb(void *data, Evas_Object *obj, void *event_info)
 {
    printf("Click part add\n");
 
-   tree_groups_create();
+   tree_groups_create(TRUE);
 }
 
 static void
@@ -543,8 +543,12 @@ void _tree_group_sel_cb(void *data, Evas_Object *obj, void *event_info)
    change_to_group(elm_list_item_label_get(item));
 }
 
+/*!
+ * push_pop TRUE push and pop the same element (don't change stacking)
+ * push_pop FALSE select (and enter) the last element in the list
+ */
 void
-tree_groups_create(void)
+tree_groups_create(Eina_Bool push_pop)
 {
    Eina_List *groups, *l;
    char *name;
@@ -575,7 +579,7 @@ tree_groups_create(void)
    list = elm_list_add(ui.win);
    evas_object_size_hint_align_set(list, -1.0, -1.0);
    evas_object_size_hint_weight_set(list, 1.0, 1.0);
-  elm_table_pack(table, list, 0, 1, 3, 1);
+   elm_table_pack(table, list, 0, 1, 3, 1);
 
 
    // Populate the list
@@ -591,22 +595,31 @@ tree_groups_create(void)
             dialog_alert_show("Error loading first default group");
            return;
          }
+        printf ("name: %s\n", name);
       }
       item = elm_list_item_append(list, name, NULL, NULL, _tree_group_sel_cb, NULL);
-     
+     elm_list_item_show (item);
       ++i;
    }
    edje_file_collection_list_free(groups);
-   
+     
    // Run the list
    elm_list_go(list);
    evas_object_show(list);
    
    
    // Push the list in the tree pager (aka: show it)
-   elm_pager_content_pop(ui.tree_pager);
-   elm_pager_content_push(ui.tree_pager, table);
-   
+   if (push_pop)
+   {  
+      elm_pager_content_pop(ui.tree_pager);
+      elm_pager_content_push(ui.tree_pager, table);
+   }
+   else
+   {
+      // enter selected item
+      elm_list_item_selected_set (item, TRUE); 
+   }
+  
    // hide all stuff in group selection mode
    set_current_group(NULL);
    set_current_part(NULL);
