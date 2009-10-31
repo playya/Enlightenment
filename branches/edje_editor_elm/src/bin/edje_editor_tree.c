@@ -598,7 +598,7 @@ tree_groups_create(Eina_Bool push_pop)
         printf ("name: %s\n", name);
       }
       item = elm_list_item_append(list, name, NULL, NULL, _tree_group_sel_cb, NULL);
-     elm_list_item_show (item);
+
       ++i;
    }
    edje_file_collection_list_free(groups);
@@ -613,21 +613,21 @@ tree_groups_create(Eina_Bool push_pop)
    {  
       elm_pager_content_pop(ui.tree_pager);
       elm_pager_content_push(ui.tree_pager, table);
+      set_current_group(NULL); // in group mode don't show the group
    }
    else
    {
       // enter selected item
-      elm_list_item_selected_set (item, TRUE); 
+      change_to_group(elm_list_item_label_get(item));
    }
   
-   // hide all stuff in group selection mode
-   set_current_group(NULL);
+   // hide rest stuff in group selection mode
    set_current_part(NULL);
    set_current_state(NULL);
    set_current_prog(NULL); 
    window_update_frames_visibility();
-   canvas_redraw ();
-  
+   canvas_redraw(); 
+
    //Select the first group and load it
    //~ etk_combobox_entry_active_item_set(ETK_COMBOBOX_ENTRY(UI_GroupsComboBox),
       //~ etk_combobox_entry_first_item_get(ETK_COMBOBOX_ENTRY(UI_GroupsComboBox)));
