@@ -31,6 +31,7 @@ PKG_CHECK_MODULES(ECORE, [
     ecore-evas >= 0.9.9
     ecore-file >= 0.9.9
     ecore-ipc >= 0.9.9
+    ecore-data >= 0.9.9
   ]
 )
 
@@ -78,7 +79,7 @@ else
 fi
 AM_CONDITIONAL(HAVE_XINE, test $xine = "xine")
 
-requirements="evas ecore-evas ecore-file ecore-ipc edje"
+requirements="evas ecore-evas ecore-file ecore-ipc ecore-data edje"
 AC_SUBST(requirements)
 
 #####################################################################
