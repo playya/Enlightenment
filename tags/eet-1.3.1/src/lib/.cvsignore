@@ -1,0 +1,10 @@
+eet
+eet-config
+libeet.so.0.0.0
+.deps
+.libs
+Makefile
+Makefile.in
+*.lo
+libeet.la
+*.gcno
