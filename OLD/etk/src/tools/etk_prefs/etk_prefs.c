@@ -21,7 +21,6 @@
 #include <string.h>
 #include <limits.h>
 #include <Ecore_File.h>
-#include <Ecore_Data.h>
 #include <Etk.h>
 #include "config.h"
 // initialize some functions etc

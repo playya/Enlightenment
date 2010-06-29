@@ -30,7 +30,6 @@
 #include <time.h>
 
 #include <Ecore.h>
-#include <Ecore_Data.h>
 #include <Ecore_File.h>
 
 #include "etk_box.h"

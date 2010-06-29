@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <Ecore_Data.h>
 #include <Ecore_File.h>
 
 #include "etk_drag.h"
