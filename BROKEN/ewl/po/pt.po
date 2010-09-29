@@ -1,13 +1,13 @@
 # Portuguese translation for ewl
 # This file is distributed under the same license as the enlightenment package.
 # Sérgio Marques <smarquespt@gmail.com>, 2010
-#
+# Adaptado ao acordo ortográfico de 1990
 msgid ""
 msgstr ""
 "Project-Id-Version: ewl\n"
 "Report-Msgid-Bugs-To: http://trac.enlightenment.org/e/\n"
-"POT-Creation-Date: 2010-08-11 03:00-0700\n"
-"PO-Revision-Date: 2010-08-11 19:21-0000\n"
+"POT-Creation-Date: 2010-08-12 07:00-0700\n"
+"PO-Revision-Date: 2010-09-29 01:52-0000\n"
 "Last-Translator: Sérgio Marques <smarquespt@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -111,19 +111,19 @@ msgstr "Encontrar"
 
 #: ../src/lib/ewl_stock.c:39
 msgid "STOCK|Find and replace"
-msgstr "encontrar e substituir"
+msgstr "Encontrar e substituir"
 
 #: ../src/lib/ewl_stock.c:40
 msgid "STOCK|Flip horizontal"
-msgstr "Inverter na horizontal"
+msgstr "Inverter horizontalmente"
 
 #: ../src/lib/ewl_stock.c:41
 msgid "STOCK|Flip vertical"
-msgstr "Inverter na vertical"
+msgstr "Inverter verticalmente"
 
 #: ../src/lib/ewl_stock.c:42
 msgid "STOCK|Fullscreen"
-msgstr "Ecrã Completo"
+msgstr "Ecrã completo"
 
 #: ../src/lib/ewl_stock.c:43
 msgid "STOCK|Help"
@@ -131,7 +131,7 @@ msgstr "Ajuda"
 
 #: ../src/lib/ewl_stock.c:44
 msgid "STOCK|Home"
-msgstr "Pasta Pessoal"
+msgstr "Pasta pessoal"
 
 #: ../src/lib/ewl_stock.c:45
 msgid "STOCK|Indent"
@@ -163,11 +163,11 @@ msgstr "FF"
 
 #: ../src/lib/ewl_stock.c:52
 msgid "STOCK|Next"
-msgstr "seguinte"
+msgstr "Seguinte"
 
 #: ../src/lib/ewl_stock.c:53
 msgid "STOCK|Pause"
-msgstr "pausa"
+msgstr "Pausa"
 
 #: ../src/lib/ewl_stock.c:54
 msgid "STOCK|Play"
@@ -207,7 +207,7 @@ msgstr "Colar"
 
 #: ../src/lib/ewl_stock.c:63
 msgid "STOCK|Preferences"
-msgstr "preferências"
+msgstr "Preferências"
 
 #: ../src/lib/ewl_stock.c:64
 msgid "STOCK|Print"
@@ -223,7 +223,7 @@ msgstr "Propriedades"
 
 #: ../src/lib/ewl_stock.c:67
 msgid "STOCK|Quit"
-msgstr "sair"
+msgstr "Sair"
 
 #: ../src/lib/ewl_stock.c:68
 msgid "STOCK|Redo"
@@ -231,7 +231,7 @@ msgstr "Refazer"
 
 #: ../src/lib/ewl_stock.c:69
 msgid "STOCK|Refresh"
-msgstr "Actualizar"
+msgstr "Atualizar"
 
 #: ../src/lib/ewl_stock.c:70
 msgid "STOCK|Remove"
@@ -255,7 +255,7 @@ msgstr "Gravar como"
 
 #: ../src/lib/ewl_stock.c:75
 msgid "STOCK|Select all"
-msgstr "seleccionar tudo"
+msgstr "Selecionar tudo"
 
 #: ../src/lib/ewl_stock.c:76
 msgid "STOCK|Sort ascending"
@@ -263,7 +263,7 @@ msgstr "Ordenação ascendente"
 
 #: ../src/lib/ewl_stock.c:77
 msgid "STOCK|Sort descending"
-msgstr "Ordenarção descendente"
+msgstr "Ordenação descendente"
 
 #: ../src/lib/ewl_stock.c:78
 msgid "STOCK|Spell check"
@@ -303,11 +303,11 @@ msgstr "Reduzir"
 
 #: ../src/lib/ewl_colordialog.c:57
 msgid "Ewl Colordialog"
-msgstr "Cor do diálogo ewl"
+msgstr "Cor do diálogo Ewl"
 
 #: ../src/lib/ewl_colorpicker.c:192
 msgid "COLOR|Current:"
-msgstr "Actual:"
+msgstr "Atual:"
 
 #: ../src/lib/ewl_colorpicker.c:210
 msgid "COLOR|Previous:"
