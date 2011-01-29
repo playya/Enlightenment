@@ -1,0 +1,9 @@
+Makefile.in
+Makefile
+*.la
+*.lo
+*.gcno
+.libs
+.deps
+eina_suite
+eina_bench

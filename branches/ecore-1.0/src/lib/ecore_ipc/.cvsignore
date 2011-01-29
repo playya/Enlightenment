@@ -1,0 +1,7 @@
+.deps
+.libs
+Ecore_Ipc.h
+Makefile
+Makefile.in
+ecore_ipc.lo
+libecore_ipc.la

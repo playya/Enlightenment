@@ -1,0 +1,70 @@
+MAINTAINERCLEANFILES = Makefile.in
+
+SUBDIRS =
+
+if BUILD_LOADER_EDB
+if !EVAS_STATIC_BUILD_EDB
+SUBDIRS += edb
+endif
+endif
+
+if BUILD_LOADER_EET
+if !EVAS_STATIC_BUILD_EET
+SUBDIRS += eet
+endif
+endif
+
+if BUILD_LOADER_GIF
+if !EVAS_STATIC_BUILD_GIF
+SUBDIRS += gif
+endif
+endif
+
+if BUILD_LOADER_JPEG
+if !EVAS_STATIC_BUILD_JPEG
+SUBDIRS += jpeg
+endif
+endif
+
+if BUILD_LOADER_PMAPS
+if !EVAS_STATIC_BUILD_PMAPS
+SUBDIRS += pmaps
+endif
+endif
+
+if BUILD_LOADER_PNG
+if !EVAS_STATIC_BUILD_PNG
+SUBDIRS += png
+endif
+endif
+
+if BUILD_LOADER_SVG
+if !EVAS_STATIC_BUILD_SVG
+SUBDIRS += svg
+endif
+endif
+
+if BUILD_LOADER_TIFF
+if !EVAS_STATIC_BUILD_TIFF
+SUBDIRS += tiff
+endif
+endif
+
+if BUILD_LOADER_XPM
+if !EVAS_STATIC_BUILD_XPM
+SUBDIRS += xpm
+endif
+endif
+
+if BUILD_LOADER_BMP
+if !EVAS_STATIC_BUILD_BMP
+SUBDIRS += bmp
+endif
+endif
+
+if BUILD_LOADER_TGA
+if !EVAS_STATIC_BUILD_TGA
+SUBDIRS += tga
+endif
+endif
+
