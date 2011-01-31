@@ -2,3 +2,7 @@
 
         1.0.0 release
         
+2011-01-29  Rui Miguel Silva Seabra
+
+        * make https not fail (that's curl's responsibility, really).
+
