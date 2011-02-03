@@ -13,4 +13,8 @@
 2011-01-31  Sebastian Dransfeld
 
         * Fix memleak, free cache icons after retrival
-        
+
+2011-02-03  Sebastian Dransfeld
+
+        * Fix leak in efreet_mime_type_icon_get()
+
