@@ -576,6 +576,9 @@ efreet_cache_icon_free(Efreet_Cache_Icon *icon)
     free(icon);
 }
 
+/*
+ * Needs EAPI because of helper binaries
+ */
 EAPI void
 efreet_cache_icon_fallback_free(Efreet_Cache_Fallback_Icon *icon)
 {
