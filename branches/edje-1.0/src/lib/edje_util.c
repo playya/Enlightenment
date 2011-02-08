@@ -4515,8 +4515,14 @@ _edje_recursive_get_helper(Edje *ed, char **path, Edje_Real_Part **orp)
    const char *alias = NULL;
    char *idx = NULL;
 
+   if (!path[0])
+     return NULL;
+
    if (ed->collection && ed->collection->alias)
-     alias = eina_hash_find(ed->collection->alias, path[0]);
+     {
+        alias = eina_hash_find(ed->collection->alias, path[0]);
+        if (alias) alias = strdupa(alias);
+     }
 
    if (!alias)
      alias = path[0];
