@@ -358,17 +358,16 @@ evas_object_text_text_set(Evas_Object *obj, const char *_text)
    evas_bidi_shape_string(text, &o->cur.intl_props, len);
 #endif
    if (o->cur.text) eina_ustringshare_del(o->cur.text);
-   if (o->cur.utf8_text) eina_stringshare_del(o->cur.utf8_text);
 
    if ((text) && (*text)) 
      {
         o->cur.text = eina_ustringshare_add(text);
-        o->cur.utf8_text = eina_stringshare_add(_text);
+        eina_stringshare_replace(&o->cur.utf8_text, _text);
      }
    else 
      {
         o->cur.text = NULL;
-        o->cur.utf8_text = NULL;
+        eina_stringshare_replace(&o->cur.utf8_text, NULL);
      }
 
    o->prev.text = NULL;

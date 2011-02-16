@@ -6,3 +6,7 @@
 
         * Fix lurking free bug in key grabs.
         
+2011-02-16  Tom Hacohen (TAsn)
+
+        * Backported a patch for text object segfault.
+
