@@ -1,7 +1,7 @@
 2011-01-29  Carsten Haitzler (The Rasterman)
 
         1.0.0 release
-        
+
 2011-01-29  Rui Miguel Silva Seabra
 
         * make https not fail (that's curl's responsibility, really).
@@ -11,3 +11,8 @@
         * Fix: ecore-evas CAN send "render done" messages even if not
         waiting for sync counter when using gl engine. new semi-sync
         mode to account for that.
+
+2011-02-20 Vincent Torri
+
+	* Ecore_Win32: improve resize of windows and fix key up event for
+	the 'space' key.
