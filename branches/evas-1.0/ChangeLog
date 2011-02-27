@@ -1,16 +1,19 @@
 2011-01-29  Carsten Haitzler (The Rasterman)
 
-        1.0.0 release
+	1.0.0 release
 
 2011-01-31  ChunEon Park
 
-        * Fix lurking free bug in key grabs.
+	* Fix lurking free bug in key grabs.
 
 2011-02-16  Tom Hacohen (TAsn)
 
-        * Backported a patch for text object segfault.
+	* Backported a patch for text object segfault.
 
 2011-02-16  Tom Hacohen (TAsn)
 
-        * Backported a patch for Evas_Encoding robustness
+	* Backported a patch for Evas_Encoding robustness
 
+2011-02-27  Vincent Torri
+
+	* Fixed static linking of the bmp and tga loaders
