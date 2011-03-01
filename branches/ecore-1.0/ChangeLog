@@ -17,3 +17,8 @@
 	* Ecore_Win32: improve resize of windows and fix key up event for
 	the 'space' key.
 	* Ecore_WinCE: do not erase a window background
+
+2011-03-01 Guillaume Friloux
+
+	* Fix detection of complete file write in ecore_file inotify.
+
