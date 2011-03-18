@@ -29,6 +29,7 @@ README \
 $(pkgconfig_DATA) \
 autogen.sh \
 eeze.pc.in \
+eeze.spec.in \
 m4/efl_doxygen.m4
 
 .PHONY: doc
