@@ -1,4 +1,9 @@
 2011-01-29  Carsten Haitzler (The Rasterman)
 
         1.0.0 release
-        
+
+2011-03-18  Jiyoun Park
+
+        * Fix wrong call to free when using mempool for Evas_Object.
+
+
