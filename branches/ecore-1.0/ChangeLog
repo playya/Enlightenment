@@ -25,3 +25,8 @@
 2011-03-19 Mike Blumenkrantz
 
         * Fix crash in ecore_con_ssl related to attempted connections on a dead socket
+
+2011-03-23  Elixirious
+
+	* Fix: ecore_con_url_ftp_upload upload the file until the end.
+
