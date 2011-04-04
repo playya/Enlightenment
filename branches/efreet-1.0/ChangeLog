@@ -22,3 +22,7 @@
 
         * Fix doc for efreet_utils.{h,c},efreet_mime.c
         * Add comment for all internal EAPI functions
+
+2011-04-04 Tom Hacohen (TAsn)
+
+	* Fixed uri encoding when opening files.
