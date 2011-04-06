@@ -17,3 +17,7 @@
 2011-02-27  Vincent Torri
 
 	* Fixed static linking of the bmp and tga loaders
+
+2011-04-06  Cedric Bail
+
+	* Backport all clip fix (should improve map and textblock usage).
