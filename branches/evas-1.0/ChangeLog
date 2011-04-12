@@ -21,3 +21,9 @@
 2011-04-06  Cedric Bail
 
 	* Backport all clip fix (should improve map and textblock usage).
+
+2011-04-12  Tom Hacohen (TAsn)
+
+	* Backported a fix for evas_object_textblock_text_markup_prepend using
+	  the wrong cursor.
+
