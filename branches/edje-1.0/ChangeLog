@@ -18,3 +18,7 @@
 
 	* fix signal comming from box/table item to include their
 	index or name correctly.
+
+2011-05-11  Tom Hacohen
+
+	* text: fix ellipsis causing text to not draw in some cases.
