@@ -27,3 +27,7 @@
 	* Backported a fix for evas_object_textblock_text_markup_prepend using
 	  the wrong cursor.
 
+2011-05-12 Brian Wang
+
+	* Textblock: fix segfault with evas_textblock_cursor_content_get
+
