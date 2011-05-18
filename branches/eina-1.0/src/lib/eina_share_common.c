@@ -96,6 +96,7 @@
 static const char EINA_MAGIC_SHARE_STR[] = "Eina Share";
 static const char EINA_MAGIC_SHARE_HEAD_STR[] = "Eina Share Head";
 
+static int _eina_share_common_count = 0;
 
 #define EINA_MAGIC_CHECK_SHARE_COMMON_HEAD(d, unlock, ...)      \
    do {                                                          \
@@ -616,9 +617,12 @@ eina_share_common_init(Eina_Share **_share,
                        const char *node_magic_STR)
 {
    Eina_Share *share;
+
+   if (_eina_share_common_count++ != 0)
+     return EINA_TRUE;
+
    share = *_share = calloc(sizeof(Eina_Share), 1);
-   if (!share)
-      return EINA_FALSE;
+   if (!share) goto on_error;
 
    if (_eina_share_common_log_dom < 0) /*Only register if not already */
       _eina_share_common_log_dom = eina_log_domain_register(
@@ -628,7 +632,7 @@ eina_share_common_init(Eina_Share **_share,
    if (_eina_share_common_log_dom < 0)
      {
         EINA_LOG_ERR("Could not register log domain: eina_share_common");
-        return EINA_FALSE;
+        goto on_error;
      }
 
    share->share = calloc(1, sizeof(Eina_Share_Common));
@@ -640,7 +644,7 @@ eina_share_common_init(Eina_Share **_share,
              _eina_share_common_log_dom = -1;
           }
 
-        return EINA_FALSE;
+        goto on_error;
      }
 
    share->node_magic = node_magic;
@@ -653,6 +657,10 @@ eina_share_common_init(Eina_Share **_share,
 
    _eina_share_common_population_init(share);
    return EINA_TRUE;
+
+ on_error:
+   _eina_share_common_count--;
+   return EINA_FALSE;
 }
 
 /**
@@ -671,6 +679,9 @@ eina_share_common_shutdown(Eina_Share **_share)
 {
    unsigned int i;
    Eina_Share *share = *_share;
+
+   if (--_eina_share_common_count != 0)
+     return EINA_TRUE;
 
    SHARE_COMMON_LOCK_BIG();
 
