@@ -2,6 +2,7 @@
 
         1.0.0 release
 
+
 2011-03-09  Cedric Bail
 
 	* Fix stat failure when file size in bytes or the number of blocks
@@ -14,7 +15,3 @@
 2011-04-27  Vincent Torri
 
         * Fix static build of the buddy mempool
-
-2011-05-18  Cedric Bail
-
-        * Fix eina_share_common_init to be called only once.
