@@ -2281,7 +2281,7 @@ evas_gl_common_context_flush(Evas_GL_Context *gc)
 }
 
 static void
-scissor_rot(Evas_Engine_GL_Context *gc __UNUSED__,
+scissor_rot(Evas_GL_Context *gc __UNUSED__,
             int rot, int gw, int gh, int cx, int cy, int cw, int ch)
 {
    switch (rot)
