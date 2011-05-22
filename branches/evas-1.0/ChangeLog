@@ -80,6 +80,10 @@
         inode number, size, and on linux, the nanonsecond resolution
         timestamp as well.
 
+2011-03-22  Gustavo Sverzut Barbieri (k-s)
+
+	* Fix build of GL and static modules.
+
 2011-04-06  Cedric Bail
 
 	* Backport all clip fix (should improve map and textblock usage).
