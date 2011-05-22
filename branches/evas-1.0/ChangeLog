@@ -29,6 +29,13 @@
         * Fix bug in font string parsing that can result in a crash if a
           font element is long enough.
 
+2011-02-22  Carsten Haitzler (The Rasterman)
+
+	* Fixed bug smart calc array where it'd nuke the array when nested
+          process calls hapen and leave some objects uncalculated, but
+          removed from the array and marked as needing a calc thus never
+          getting back into the array.
+
 2011-02-27  Vincent Torri
 
 	* Fixed static linking of the bmp and tga loaders
