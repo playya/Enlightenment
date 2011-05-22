@@ -69,6 +69,10 @@
 
 	* Fix issues with clipping and map.
 
+2011-03-18  Jiyoun Park
+
+	* Fix wrong call to free when using mempool for Evas_Object.
+
 2011-04-06  Cedric Bail
 
 	* Backport all clip fix (should improve map and textblock usage).
