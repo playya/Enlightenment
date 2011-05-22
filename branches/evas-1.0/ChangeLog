@@ -102,3 +102,8 @@
 
 	* Textblock: fix segfault with evas_textblock_cursor_content_get
 
+2011-05-11  Carsten Haitzler (The Rasterman)
+
+	* Fix problem with Evas engine not calling pre/post swap functions
+        in the GL engine when using EGL/OpenGL-ES2
+
