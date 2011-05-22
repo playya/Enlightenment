@@ -40,6 +40,10 @@
 
 	* Fixed static linking of the bmp and tga loaders
 
+2011-03-07  Mike Blumenkrantz
+
+        * Fix segv when trying to set gl viewpoint with NULL ctx
+
 2011-04-06  Cedric Bail
 
 	* Backport all clip fix (should improve map and textblock usage).
