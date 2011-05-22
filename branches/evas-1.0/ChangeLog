@@ -24,6 +24,11 @@
 
 	* Backported a patch for Evas_Encoding robustness
 
+2011-02-20  Carsten Haitzler (The Rasterman)
+
+        * Fix bug in font string parsing that can result in a crash if a
+          font element is long enough.
+
 2011-02-27  Vincent Torri
 
 	* Fixed static linking of the bmp and tga loaders
