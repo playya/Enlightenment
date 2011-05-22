@@ -106,4 +106,6 @@
 
 	* Fix problem with Evas engine not calling pre/post swap functions
         in the GL engine when using EGL/OpenGL-ES2
+        * Fix SVG loader 2 phase loader having differing scale down code
+        for first and 2nd phase. Resulted in crash when loading some SVGs
 
