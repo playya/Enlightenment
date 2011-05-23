@@ -30,3 +30,8 @@
 
 	* Fix: ecore_con_url_ftp_upload upload the file until the end.
 
+2011-03-23  Carsten Haitzler (The Rasterman)
+
+        * Fix: ecore-evas interceptor didn't handle override-redirect
+        windows correctly, expecting a feed-back event from x, which it didn't
+        get.
