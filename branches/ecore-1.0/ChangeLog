@@ -40,3 +40,7 @@
         * Fix: ecore-evas interceptor didn't handle override-redirect
         windows correctly, expecting a feed-back event from x, which it didn't
         get.
+
+2011-04-11  Hannes Janetzek
+
+	* Fix removal of windows from ignore_list with ecore_x_window_ignore_set
