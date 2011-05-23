@@ -18,6 +18,11 @@
 	the 'space' key.
 	* Ecore_WinCE: do not erase a window background
 
+2011-02-24 Vincent Torri
+
+	* Ecore_File: fix compilation when ecore_con and curl are not
+	available
+
 2011-03-01 Guillaume Friloux
 
 	* Fix detection of complete file write in ecore_file inotify.

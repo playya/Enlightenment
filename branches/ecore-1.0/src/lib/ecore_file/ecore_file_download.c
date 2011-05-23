@@ -226,6 +226,8 @@ _ecore_file_download_url_compare_job(const void *data1, const void *data2)
    return -1;
 }
 
+#ifdef BUILD_ECORE_CON
+# ifdef HAVE_CURL
 static Eina_Bool
 _ecore_file_download_url_complete_cb(void *data __UNUSED__, int type __UNUSED__, void *event)
 {
@@ -246,6 +248,8 @@ _ecore_file_download_url_complete_cb(void *data __UNUSED__, int type __UNUSED__,
 
    return ECORE_CALLBACK_DONE;
 }
+# endif
+#endif
 
 static Eina_Bool
 _ecore_file_download_url_progress_cb(void *data __UNUSED__, int type __UNUSED__, void *event)
