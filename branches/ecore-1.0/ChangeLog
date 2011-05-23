@@ -50,3 +50,8 @@
         * Fix bug in Ecore_Evas setting modifiers for
         sub-buffer-canvas. They never got set. Now they do.
 
+2011-05-03  Carsten Haitzler (The Rasterman)
+
+        * Fixed null pointer dereference in selection notification
+        handling in Ecore_X.
+
