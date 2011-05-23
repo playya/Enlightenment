@@ -109,3 +109,6 @@
         * Fix SVG loader 2 phase loader having differing scale down code
         for first and 2nd phase. Resulted in crash when loading some SVGs
 
+2011-05-23  Vincent Torri
+
+	* Fix compilation with libjpeg 8 on Windows.
