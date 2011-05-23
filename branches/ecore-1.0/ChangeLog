@@ -55,3 +55,8 @@
         * Fixed null pointer dereference in selection notification
         handling in Ecore_X.
 
+2011-05-19  Carsten Haitzler (The Rasterman)
+
+        * Fix Ecore_X shadow tree search handling to respect shape and
+        shape input of windows.
+
