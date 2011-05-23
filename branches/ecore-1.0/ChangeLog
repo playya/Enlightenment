@@ -44,3 +44,9 @@
 2011-04-11  Hannes Janetzek
 
 	* Fix removal of windows from ignore_list with ecore_x_window_ignore_set
+
+2011-04-15  Carsten Haitzler (The Rasterman)
+
+        * Fix bug in Ecore_Evas setting modifiers for
+        sub-buffer-canvas. They never got set. Now they do.
+
