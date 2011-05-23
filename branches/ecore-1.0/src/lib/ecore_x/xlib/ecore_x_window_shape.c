@@ -270,16 +270,6 @@ ecore_x_window_shape_rectangles_get(Ecore_X_Window win, int *num_ret)
    return rects;
 } /* ecore_x_window_shape_rectangles_get */
 
-EAPI void
-ecore_x_window_shape_events_select(Ecore_X_Window win, Eina_Bool on)
-{
-   LOGFN(__FILE__, __LINE__, __FUNCTION__);
-   if (on)
-      XShapeSelectInput(_ecore_x_disp, win, ShapeNotifyMask);
-   else
-      XShapeSelectInput(_ecore_x_disp, win, 0);
-} /* ecore_x_window_shape_events_select */
-
 /**
  * Sets the input shape of the given window to that given by the pixmap @p mask.
  * @param   win  The given window.
@@ -298,3 +288,69 @@ ecore_x_window_shape_input_mask_set(Ecore_X_Window win, Ecore_X_Pixmap mask)
 #endif /* ifdef ShapeInput */
 } /* ecore_x_window_shape_input_mask_set */
 
+EAPI Ecore_X_Rectangle *
+ecore_x_window_shape_input_rectangles_get(Ecore_X_Window win, int *num_ret)
+{
+#ifdef ShapeInput
+   XRectangle *rect;
+   Ecore_X_Rectangle *rects = NULL;
+   int i, num = 0, ord;
+
+   LOGFN(__FILE__, __LINE__, __FUNCTION__);
+   rect = XShapeGetRectangles(_ecore_x_disp, win, ShapeInput, &num, &ord);
+   if (rect)
+     {
+        if (num < 1)
+          {
+             XFree(rect);
+             if (num_ret) *num_ret = 0;
+             return NULL;
+          }
+        rects = malloc(sizeof(Ecore_X_Rectangle) * num);
+        if (!rects)
+          {
+             XFree(rect);
+             if (num_ret) *num_ret = 0;
+             return NULL;
+          }
+        for (i = 0; i < num; i++)
+          {
+             rects[i].x = rect[i].x;
+             rects[i].y = rect[i].y;
+             rects[i].width = rect[i].width;
+             rects[i].height = rect[i].height;
+          }
+        XFree(rect);
+     }
+   if (num_ret) *num_ret = num;
+   return rects;
+#else
+   // have to return fake shape input rect of size of window
+   Window dw;
+   unsigned int di;
+   
+   if (num_ret) *num_ret = 0;
+   rects = malloc(sizeof(Ecore_X_Rectangle));
+   if (!rects) return NULL;
+   if (!XGetGeometry(_ecore_x_disp, win, &dw,
+                     &(rects[i].x), &(rects[i].y),
+                     &(rects[i].width), &(rects[i].height),
+                     &di, &di))
+     {
+        free(rects);
+        return NULL;
+     }
+   if (num_ret) *num_ret = 1;
+   return rects;
+#endif
+} /* ecore_x_window_shape_input_rectangles_get */
+
+EAPI void
+ecore_x_window_shape_events_select(Ecore_X_Window win, Eina_Bool on)
+{
+   LOGFN(__FILE__, __LINE__, __FUNCTION__);
+   if (on)
+      XShapeSelectInput(_ecore_x_disp, win, ShapeNotifyMask);
+   else
+      XShapeSelectInput(_ecore_x_disp, win, 0);
+} /* ecore_x_window_shape_events_select */

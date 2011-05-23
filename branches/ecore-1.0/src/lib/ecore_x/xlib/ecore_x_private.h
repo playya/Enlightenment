@@ -362,6 +362,9 @@ Ecore_Event_Mouse_Button *    _ecore_mouse_button(int          event,
 
 //#define LOGFNS 1
 
+/* Will be exported in 1.1 */
+EAPI Ecore_X_Rectangle *ecore_x_window_shape_input_rectangles_get(Ecore_X_Window win, int *num_ret);
+
 #ifdef LOGFNS
 #include <stdio.h>
 #define LOGFN(fl, ln, fn) printf("-ECORE-X: %25s: %5i - %s\n", fl, ln, fn);
