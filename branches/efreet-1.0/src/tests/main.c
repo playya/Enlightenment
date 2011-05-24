@@ -166,9 +166,11 @@ main(int argc, char ** argv)
     }
 
     printf("\n-----------------\n");
+#ifdef HAVE_CLEARENV
     clearenv();
     EINA_LIST_FREE(environment, env)
         free(env);
+#endif    
     printf("Passed %d of %d tests.\n", passed, num_tests);
 
     while (run)
