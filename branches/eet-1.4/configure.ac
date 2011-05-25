@@ -2,7 +2,7 @@ y##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##
 ##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##
 m4_define([v_maj], [1])
 m4_define([v_min], [4])
-m4_define([v_mic], [0])
+m4_define([v_mic], [1])
 m4_define([v_rev], m4_esyscmd([(svnversion "${SVN_REPO_PATH:-.}" | grep -v export || echo 0) | awk -F : '{printf("%s\n", $1);}' | tr -d ' :MSP\n']))
 m4_if(v_rev, [0], [m4_define([v_rev], m4_esyscmd([git log 2> /dev/null | (grep -m1 git-svn-id || echo 0) | sed -e 's/.*@\([0-9]*\).*/\1/' | tr -d '\n']))])
 ##--   When released, remove the dnl on the below line
@@ -264,8 +264,8 @@ AC_SUBST(EET_LIBS)
 
 # Eina library
 
-PKG_CHECK_MODULES(EINA, [eina >= 1.0.0])
-requirement_eet="eina >= 1.0.0 ${requirement_eet}"
+PKG_CHECK_MODULES(EINA, [eina >= 1.0.1])
+requirement_eet="eina >= 1.0.1 ${requirement_eet}"
 
 # Gnutls library
 have_gnutls="no"

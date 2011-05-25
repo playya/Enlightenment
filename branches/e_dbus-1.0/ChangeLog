@@ -16,3 +16,7 @@
         can't run to process edbus dispatches. Move this to an idle
         enterer that wil be run.
 
+2011-05-23  Cedric Bail
+
+	1.0.1 release
+

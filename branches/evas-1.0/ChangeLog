@@ -112,3 +112,8 @@
 2011-05-23  Vincent Torri
 
 	* Fix compilation with libjpeg 8 on Windows.
+
+2011-05-23  Cedric Bail
+
+	1.0.1 release
+

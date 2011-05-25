@@ -66,3 +66,8 @@
         (_ecore_main_loop_iterate_internal). This fixes fd handler pending
         issue when ecore_idler callback adds ecore_job/event.
         * Ecore ecore_main.c: Refactoring _ecore_main_loop_iterate_internal().
+
+2011-05-23  Cedric Bail
+
+	1.0.1 release
+

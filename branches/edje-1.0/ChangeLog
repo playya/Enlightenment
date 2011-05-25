@@ -26,3 +26,8 @@
 2011-05-11  Tom Hacohen
 
 	* text: fix ellipsis causing text to not draw in some cases.
+
+2011-05-23  Cedric Bail
+
+	1.0.1 release
+
