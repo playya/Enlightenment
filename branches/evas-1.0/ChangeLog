@@ -117,3 +117,9 @@
 
 	1.0.1 release
 
+2011-05-26  Carsten Haitzler (The Rasterman)
+
+        * Fix Evas table to handle weighting correctly for items and veto
+        rows or columns that have any child spanning that column not
+        able to expand.
+                
