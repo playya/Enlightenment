@@ -125,3 +125,6 @@
         * Fix Evas table to use actual fractional weights, not just
         boolean expand/not expand from weight value.
 
+2011-05-29  Vincent Torri
+
+	* Fix compilation when --disable-async-preload is passed to configure.
