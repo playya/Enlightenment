@@ -384,6 +384,7 @@ evas_common_font_glyph_search(RGBA_Font *fn, RGBA_Font_Int **fi_ret, int gl)
                }
 	  }
      }
+   *fi_ret = NULL;
    return 0;
 }
 
