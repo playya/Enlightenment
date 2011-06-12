@@ -31,3 +31,8 @@
 
 	1.0.1 release
 
+2011-06-11  Tom Hacohen (TAsn)
+
+	* Fix an issue with ellipsis not working properly with small
+	  text parts.
+
