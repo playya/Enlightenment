@@ -36,3 +36,7 @@
 	* Fix an issue with ellipsis not working properly with small
 	  text parts.
 
+2011-06-20  Bruno Dilly
+
+	* Fix an invalid memory read on edje embryo's function get_part_id.
+
