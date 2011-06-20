@@ -128,3 +128,7 @@
 2011-05-29  Vincent Torri
 
 	* Fix compilation when --disable-async-preload is passed to configure.
+
+2011-06-20 Carsten Haitzler (The Rasterman)
+
+	* Fix thread data leak on evas preload.
