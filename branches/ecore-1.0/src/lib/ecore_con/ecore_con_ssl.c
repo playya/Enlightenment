@@ -787,7 +787,6 @@ _ecore_con_ssl_client_init_gnutls(Ecore_Con_Client *cl)
 {
    const gnutls_datum_t *cert_list;
    unsigned int iter, cert_list_size;
-   gnutls_x509_crt_t cert = NULL;
    const char *priority = "NONE:%VERIFY_ALLOW_X509_V1_CA_CRT:+RSA:+DHE-RSA:+DHE-DSS:+ANON-DH:+COMP-DEFLATE:+COMP-NULL:+CTYPE-X509:+SHA1:+SHA256:+SHA384:+SHA512:+AES-256-CBC:+AES-128-CBC:+3DES-CBC:+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0";
    int ret = 0;
 
@@ -895,11 +894,6 @@ _ecore_con_ssl_client_init_gnutls(Ecore_Con_Client *cl)
    SSL_ERROR_CHECK_GOTO_ERROR(!(cert_list = gnutls_certificate_get_peers(cl->session, &cert_list_size)));
    SSL_ERROR_CHECK_GOTO_ERROR(!cert_list_size);
 
-   SSL_ERROR_CHECK_GOTO_ERROR(gnutls_x509_crt_init(&cert));
-   SSL_ERROR_CHECK_GOTO_ERROR(gnutls_x509_crt_import(cert, &cert_list[0], GNUTLS_X509_FMT_DER));
-
-   SSL_ERROR_CHECK_GOTO_ERROR(!gnutls_x509_crt_check_hostname(cert, cl->host_server->name));
-   gnutls_x509_crt_deinit(cert);
    DBG("SSL certificate verification succeeded!");
    return ECORE_CON_SSL_ERROR_NONE;
 
@@ -912,8 +906,6 @@ error:
         ERR("last out: %s", SSL_GNUTLS_PRINT_HANDSHAKE_STATUS(gnutls_handshake_get_last_out(cl->session)));
         ERR("last in: %s", SSL_GNUTLS_PRINT_HANDSHAKE_STATUS(gnutls_handshake_get_last_in(cl->session)));
      }
-   if (cert)
-     gnutls_x509_crt_deinit(cert);
    _ecore_con_ssl_client_shutdown_gnutls(cl);
    return ECORE_CON_SSL_ERROR_SERVER_INIT_FAILED;
 }
@@ -1166,11 +1158,23 @@ _ecore_con_ssl_server_init_openssl(Ecore_Con_Server *svr)
    if (!svr->verify)
      /* not verifying certificates, so we're done! */
      return ECORE_CON_SSL_ERROR_NONE;
-
-   SSL_set_verify(svr->ssl, SSL_VERIFY_PEER, NULL);
-   /* use CRL/CA lists to verify */
-   if (SSL_get_peer_certificate(svr->ssl))
-     SSL_ERROR_CHECK_GOTO_ERROR(SSL_get_verify_result(svr->ssl));
+   {
+      X509 *cert;
+      SSL_set_verify(svr->ssl, SSL_VERIFY_PEER, NULL);
+      /* use CRL/CA lists to verify */
+      cert = SSL_get_peer_certificate(svr->ssl);
+      if (cert)
+        {
+           char buf[256] = {0};
+           SSL_ERROR_CHECK_GOTO_ERROR(SSL_get_verify_result(svr->ssl));
+           X509_NAME_get_text_by_NID(X509_get_subject_name(cert), NID_subject_alt_name, buf, sizeof(buf));
+           if (buf[0])
+             SSL_ERROR_CHECK_GOTO_ERROR(strcasecmp(buf, svr->name));
+           X509_NAME_get_text_by_NID(X509_get_subject_name(cert), NID_commonName, buf, sizeof(buf));
+           SSL_ERROR_CHECK_GOTO_ERROR(!buf[0]);
+           SSL_ERROR_CHECK_GOTO_ERROR(strcasecmp(buf, svr->name));
+        }
+   }
    DBG("SSL certificate verification succeeded!");
 
    return ECORE_CON_SSL_ERROR_NONE;

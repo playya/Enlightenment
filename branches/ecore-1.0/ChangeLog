@@ -74,3 +74,9 @@
 2011-06-16  Cedric Bail
 
 	* Fix ecore_x_selection_convert not taking selection length into account.
+
+2011-06-25  Mike Blumenkrantz
+
+        * Fix security hole in openssl certificate verification
+        * Fix gnutls server-client certificate verification
+
