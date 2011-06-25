@@ -120,6 +120,31 @@ _openssl_print_errors(void)
      } while (1);
 }
 
+static Eina_Bool
+_openssl_name_verify(const char *name, const char *svrname)
+{
+   if (name[0] == '*')
+     {
+        /* we allow *.domain.TLD with a wildcard, but nothing else */
+        const char *p, *s;
+
+        EINA_SAFETY_ON_TRUE_RETURN_VAL((name[1] != '.') || (!name[2]), EINA_FALSE);
+        p = strchr(name + 1, '*');
+        EINA_SAFETY_ON_TRUE_RETURN_VAL(!!p, EINA_FALSE);
+        /* verify that we have a domain of at least *.X.TLD and not *.TLD */
+        p = strchr(name + 2, '.');
+        EINA_SAFETY_ON_TRUE_RETURN_VAL(!p, EINA_FALSE);
+        s = strchr(svrname, '.');
+        EINA_SAFETY_ON_TRUE_RETURN_VAL(!s, EINA_FALSE);
+        /* same as above for the stored name */
+        EINA_SAFETY_ON_TRUE_RETURN_VAL(!strchr(s + 1, '.'), EINA_FALSE);
+        EINA_SAFETY_ON_TRUE_RETURN_VAL(strcasecmp(s, name + 1), EINA_FALSE);
+     }
+   else
+     EINA_SAFETY_ON_TRUE_RETURN_VAL(strcasecmp(name, svrname), EINA_FALSE);
+   return EINA_TRUE;
+}
+
 #endif
 
 #define SSL_ERROR_CHECK_GOTO_ERROR(X)                                           \
@@ -1166,13 +1191,16 @@ _ecore_con_ssl_server_init_openssl(Ecore_Con_Server *svr)
       if (cert)
         {
            char buf[256] = {0};
+
            SSL_ERROR_CHECK_GOTO_ERROR(SSL_get_verify_result(svr->ssl));
            X509_NAME_get_text_by_NID(X509_get_subject_name(cert), NID_subject_alt_name, buf, sizeof(buf));
            if (buf[0])
-             SSL_ERROR_CHECK_GOTO_ERROR(strcasecmp(buf, svr->name));
-           X509_NAME_get_text_by_NID(X509_get_subject_name(cert), NID_commonName, buf, sizeof(buf));
-           SSL_ERROR_CHECK_GOTO_ERROR(!buf[0]);
-           SSL_ERROR_CHECK_GOTO_ERROR(strcasecmp(buf, svr->name));
+             SSL_ERROR_CHECK_GOTO_ERROR(!_openssl_name_verify(buf, svr->name));
+           else
+             {
+                X509_NAME_get_text_by_NID(X509_get_subject_name(cert), NID_commonName, buf, sizeof(buf));
+                SSL_ERROR_CHECK_GOTO_ERROR(!_openssl_name_verify(buf, svr->name));
+             }
         }
    }
    DBG("SSL certificate verification succeeded!");
