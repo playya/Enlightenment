@@ -8,3 +8,6 @@
 2011-05-16  Mike Blumenkrantz (discomfitor/zmike)
         fix lots of bugs with EEZE_UDEV_TYPE_DRIVE_* detection, also tighten up eeze_udev_find_unlisted_similar to be less permissive
 
+2011-06-29  Mike Blumenkrantz (discomfitor/zmike)
+        * fixed bug where EEZE_UDEV_EVENT_NONE would not match all events for watches
+        * fixed segv when detecting removable drives
