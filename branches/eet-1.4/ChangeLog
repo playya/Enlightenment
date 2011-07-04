@@ -495,3 +495,6 @@
 
 	* 1.4.1 release
 
+2011-07-04  Mike Blumenkrantz
+
+        * Fix segmentation faults in several eet_node functions
