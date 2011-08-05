@@ -231,9 +231,8 @@ _get_syspath_from_watch(void             *data,
             || (strcmp(test, "power_supply")))
           goto error;
 #endif
-        if (!(test = udev_device_get_property_value(device, "POWER_SUPPLY_TYPE"))
-            || (strcmp("Mains", test)))
-          goto error;
+        test = udev_device_get_property_value(device, "POWER_SUPPLY_ONLINE");
+        if (!test) goto error;
         break;
 
       case EEZE_UDEV_TYPE_POWER_BAT:
@@ -242,9 +241,8 @@ _get_syspath_from_watch(void             *data,
             || (strcmp(test, "power_supply")))
           goto error;
 #endif
-        if (!(test = udev_device_get_property_value(device, "POWER_SUPPLY_TYPE"))
-            || (strcmp("Battery", test)))
-          goto error;
+        test = udev_device_get_property_value(device, "POWER_SUPPLY_PRESENT");
+        if (!test) goto error;
         break;
 
       case EEZE_UDEV_TYPE_IS_IT_HOT_OR_IS_IT_COLD_SENSOR:
