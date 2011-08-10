@@ -23,3 +23,7 @@
 
         * Fix static linking with eina (iconv could potentially not be
 	passed to the linker)
+
+2011-08-09  Mike McCormack
+
+        * Fix eina_hamster_count on some machines
