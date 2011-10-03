@@ -40,3 +40,6 @@
 
 	* Fix an invalid memory read on edje embryo's function get_part_id.
 
+2011-10-02  Boris Faure (billiob)
+
+	* Fix edje_cc to accept -1 in description.max

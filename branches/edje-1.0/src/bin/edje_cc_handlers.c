@@ -3838,8 +3838,8 @@ st_collections_group_parts_part_description_max(void)
    ed = ep->default_desc;
    if (ep->other.desc_count) ed = ep->other.desc[ep->other.desc_count - 1];
 
-   ed->max.w = parse_float_range(0, 0, 0x7fffffff);
-   ed->max.h = parse_float_range(1, 0, 0x7fffffff);
+   ed->max.w = parse_float_range(0, -1, 0x7fffffff);
+   ed->max.h = parse_float_range(1, -1, 0x7fffffff);
 }
 
 /**
